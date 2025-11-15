@@ -2,57 +2,35 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Dashboard - Homi</title>
-
-    <style>
-        body {
-            font-family: Arial;
-            background: #f4f4f4;
-            padding: 20px;
-        }
-
-        .contenedor {
-            background: white;
-            max-width: 500px;
-            margin: auto;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px #ddd;
-            text-align: center;
-        }
-
-        h2 {
-            margin-bottom: 10px;
-        }
-
-        .rol {
-            font-size: 18px;
-            color: #555;
-        }
-
-        a {
-            display: inline-block;
-            margin-top: 20px;
-            padding: 10px 15px;
-            background: #dc3545;
-            color: white;
-            text-decoration: none;
-            border-radius: 6px;
-        }
-
-        a:hover {
-            background: #b52a36;
-        }
-    </style>
+    <title>Dashboard - Habita</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/homi.css') }}">
 </head>
 
 <body>
 
-    <div class="contenedor">
-        <h2>Bienvenido, {{ nombre }} 👋</h2>
-        <p class="rol">Tu rol es: <strong>{{ rol }}</strong></p>
+    <!-- NAVBAR -->
+    <div class="navbar">
+        <div class="logo">
+            <span>⟡</span> Habita
+        </div>
+        <div class="menu">
+            <a href="/logout">Cerrar Sesión</a>
+        </div>
+    </div>
 
-        <a href="/logout">Cerrar sesión</a>
+    <div class="contenedor">
+
+        <h2>¡Bienvenido, {{ nombre }}!</h2>
+
+        <p style="color:#555; font-size: 16px;">
+            Tu rol es: <strong>{{ rol | capitalize }}</strong>
+        </p>
+
+        <div class="card">
+            <h3>Tu espacio ideal en un clic</h3>
+            <p>Puedes continuar utilizando el sistema desde el menú superior.</p>
+        </div>
+
     </div>
 
 </body>
