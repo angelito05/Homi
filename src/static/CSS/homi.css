@@ -1,0 +1,194 @@
+/*TIPOGRAFÍA*/
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
+
+body {
+    font-family: 'Montserrat', sans-serif;
+    margin: 0;
+    padding: 0;
+    background: #F5F5F5;
+    color: #333;
+}
+
+/*VARIABLES DE COLOR*/
+:root {
+    --color-principal: #2BB2BB;
+    --color-secundario: #3CB371;
+    --color-blanco: #FFFFFF;
+    --color-gris-claro: #F5F5F5;
+    --color-titulo: #222;
+    --color-texto: #555;
+    --color-sombra: rgba(0, 0, 0, 0.08);
+}
+
+/*CONTENEDORES GENERALES*/
+.contenedor {
+    background: var(--color-blanco);
+    max-width: 430px;
+    margin: 40px auto;
+    padding: 30px;
+    border-radius: 14px;
+    box-shadow: 0px 4px 24px var(--color-sombra);
+}
+
+.card {
+    background: var(--color-blanco);
+    padding: 25px;
+    border-radius: 14px;
+    box-shadow: 0px 4px 20px var(--color-sombra);
+    margin-bottom: 20px;
+}
+
+/*TITULOS*/
+h1, h2, h3 {
+    color: var(--color-titulo);
+    margin-bottom: 12px;
+    font-weight: 600;
+}
+
+/*FORMULARIOS*/
+label {
+    font-weight: 600;
+    display: block;
+    margin-bottom: 5px;
+    color: var(--color-texto);
+}
+
+input, select {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    margin-bottom: 15px;
+    background: #fff;
+    font-size: 15px;
+    transition: border 0.2s;
+}
+
+input:focus, select:focus {
+    outline: none;
+    border: 1px solid var(--color-principal);
+}
+
+/*BOTONES*/
+button, .btn {
+    width: 100%;
+    background: var(--color-principal);
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    transition: background 0.2s, transform 0.1s;
+}
+
+button:hover, .btn:hover {
+    background: #23999f;
+}
+
+button:active, .btn:active {
+    transform: scale(0.97);
+}
+
+.btn-secundario {
+    background: var(--color-secundario);
+}
+
+.btn-secundario:hover {
+    background: #319b60;
+}
+
+/*ENLACES*/
+a {
+    color: var(--color-principal);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/*NAVBAR PRINCIPAL*/
+.navbar {
+    background: var(--color-blanco);
+    padding: 15px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0px 2px 10px var(--color-sombra);
+}
+
+.navbar .logo {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--color-principal);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.navbar .menu a {
+    margin-left: 20px;
+    font-weight: 500;
+}
+
+/*MENSAJES FLASH*/
+.flash {
+    padding: 12px;
+    text-align: center;
+    margin-bottom: 15px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.flash.error {
+    background: #fde1e1;
+    color: #b53333;
+}
+
+.flash.success {
+    background: #d8fae5;
+    color: #1c7a4a;
+}
+
+.flash.info {
+    background: #e3f7ff;
+    color: #187a92;
+}
+
+/*ELEMENTOS OCULTOS USADOS EN EL REGISTRO*/
+.hidden {
+    display: none;
+}
+
+/*BUSCADOR / INPUT CON ICONO (del diseño)*/
+.input-busqueda {
+    display: flex;
+    background: #fff;
+    padding: 10px;
+    border-radius: 14px;
+    box-shadow: 0 2px 10px var(--color-sombra);
+}
+
+.input-busqueda input {
+    flex: 1;
+    border: none;
+    box-shadow: none;
+}
+
+.input-busqueda button {
+    width: auto;
+    padding: 10px 20px;
+    border-radius: 10px;
+}
+
+
+/* IMÁGENES / TARJETAS*/
+.img-card {
+    width: 100%;
+    border-radius: 14px;
+    object-fit: cover;
+}
