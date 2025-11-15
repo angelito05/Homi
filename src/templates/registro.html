@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Registro - Homi</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            background: #f4f4f4;
+            padding: 20px;
+        }
+
+        .contenedor {
+            background: white;
+            max-width: 450px;
+            margin: auto;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px #ddd;
+        }
+
+        h2 {
+            text-align: center;
+        }
+
+        label {
+            display: block;
+            margin-top: 12px;
+            font-weight: bold;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 8px;
+            margin-top: 4px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            margin-top: 15px;
+            width: 100%;
+            padding: 10px;
+            background: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background: #0056d6;
+        }
+
+        .mensaje {
+            margin-top: 10px;
+            color: red;
+            text-align: center;
+        }
+
+        .hidden { display: none; }
+        .campo { margin-bottom: 10px; }
+
+        .enlace {
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .enlace a {
+            color: #007BFF;
+            text-decoration: none;
+        }
+
+        .enlace a:hover {
+            text-decoration: underline;
+        }
+    </style>
+
+    <script>
+        function cambiarRol() {
+            const rol = document.getElementById("rol").value;
+            const camposProveedor = document.querySelectorAll(".proveedor-only");
+
+            if (rol === "cliente") {
+                camposProveedor.forEach(campo => campo.classList.add("hidden"));
+            } else {
+                camposProveedor.forEach(campo => campo.classList.remove("hidden"));
+            }
+        }
+    </script>
+</head>
+
+<body onload="cambiarRol()">
+
+    <div class="contenedor">
+
+        <h2>Registro de Usuario</h2>
+
+        <!-- Mensajes flash (MISMO DISEÑO QUE LOGIN) -->
+        {% with mensajes = get_flashed_messages(with_categories=true) %}
+            {% if mensajes %}
+                {% for categoria, mensaje in mensajes %}
+                    <p class="mensaje">{{ mensaje }}</p>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form action="/registro" method="POST">
+
+            <!-- Rol -->
+            <label for="rol">Rol:</label>
+            <select name="rol" id="rol" onchange="cambiarRol()">
+                <option value="cliente">Cliente</option>
+                <option value="proveedor">Proveedor</option>
+            </select>
+
+            <!-- Nombre -->
+            <label>Nombre:</label>
+            <input type="text" name="nombre" required>
+
+            <!-- Primer apellido -->
+            <label>Primer apellido:</label>
+            <input type="text" name="primer_apellido" required>
+
+            <!-- Segundo apellido (solo proveedor) -->
+            <div class="proveedor-only hidden">
+                <label>Segundo apellido:</label>
+                <input type="text" name="segundo_apellido">
+            </div>
+
+            <!-- Correo -->
+            <label>Correo electrónico:</label>
+            <input type="email" name="correo_electronico" required>
+
+            <!-- Teléfono (solo proveedor) -->
+            <div class="proveedor-only hidden">
+                <label>Teléfono:</label>
+                <input type="text" name="telefono">
+            </div>
+
+            <!-- Contraseña -->
+            <label>Contraseña:</label>
+            <input type="password" name="contrasena" required>
+
+            <!-- Botón -->
+            <button type="submit">Registrarse</button>
+        </form>
+
+        <div class="enlace">
+            <p>¿Ya tienes cuenta? <a href="/index">Iniciar Sesión</a></p>
+        </div>
+
+    </div>
+
+</body>
+</html>

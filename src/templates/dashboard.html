@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard - Homi</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            background: #f4f4f4;
+            padding: 20px;
+        }
+
+        .contenedor {
+            background: white;
+            max-width: 500px;
+            margin: auto;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px #ddd;
+            text-align: center;
+        }
+
+        h2 {
+            margin-bottom: 10px;
+        }
+
+        .rol {
+            font-size: 18px;
+            color: #555;
+        }
+
+        a {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 15px;
+            background: #dc3545;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+        }
+
+        a:hover {
+            background: #b52a36;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="contenedor">
+        <h2>Bienvenido, {{ nombre }} 👋</h2>
+        <p class="rol">Tu rol es: <strong>{{ rol }}</strong></p>
+
+        <a href="/logout">Cerrar sesión</a>
+    </div>
+
+</body>
+</html>

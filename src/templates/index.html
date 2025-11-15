@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Iniciar Sesión - Homi</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            background: #f4f4f4;
+            padding: 20px;
+        }
+
+        .contenedor {
+            background: white;
+            max-width: 400px;
+            margin: auto;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px #ddd;
+        }
+
+        h2 {
+            text-align: center;
+        }
+
+        label {
+            display: block;
+            margin-top: 12px;
+            font-weight: bold;
+        }
+
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-top: 4px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            margin-top: 15px;
+            width: 100%;
+            padding: 10px;
+            background: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background: #0056d6;
+        }
+
+        .mensaje {
+            margin-top: 10px;
+            color: red;
+            text-align: center;
+        }
+
+        .enlace {
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .enlace a {
+            color: #007BFF;
+            text-decoration: none;
+        }
+
+        .enlace a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="contenedor">
+
+        <h2>Iniciar Sesión</h2>
+
+        <!-- Mensajes flash -->
+        {% with mensajes = get_flashed_messages(with_categories=true) %}
+            {% if mensajes %}
+                {% for categoria, mensaje in mensajes %}
+                    <p class="mensaje">{{ mensaje }}</p>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form action="/index" method="POST">
+
+            <label>Correo Electrónico:</label>
+            <input type="email" name="correo_electronico" required>
+
+            <label>Contraseña:</label>
+            <input type="password" name="contrasena" required>
+
+            <button type="submit">Ingresar</button>
+        </form>
+
+        <div class="enlace">
+            <p>¿No tienes cuenta? <a href="/registro">Registrarme</a></p>
+        </div>
+
+    </div>
+
+</body>
+</html>
