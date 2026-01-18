@@ -1,0 +1,305 @@
+/* src/static/CSS/publicaciones.css */
+
+body {
+    font-family: 'Montserrat', sans-serif; /* Fuente del diseño */
+    background-color: #F5F5F5; /* Fondo gris claro del diseño */
+    color: #333;
+}
+
+.pub-container {
+    width: 90%; /* Cambio: Usar porcentaje en lugar de ancho fijo */
+    max-width: 1100px; /* El límite máximo se mantiene */
+    margin: 20px auto; /* Menos margen vertical */
+    background: #FFFFFF;
+    padding: 20px; /* Un poco menos de padding para ganar espacio */
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+}
+
+.pub-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    border-bottom: 2px solid #F5F5F5;
+    padding-bottom: 15px;
+}
+.homi-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #2BB2BB; /* EL COLOR TURQUESA PRINCIPAL */
+    cursor: pointer;
+}
+.logo-icon {
+    width: 32px;
+    height: 32px;
+    /* El color lo hereda del padre (#2BB2BB) */
+}
+.logo-text-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.logo-text {
+    font-size: 26px;
+    font-weight: 700; /* Bold */
+    line-height: 1;
+    color: #2BB2BB;
+}
+.logo-slogan {
+    font-size: 12px;
+    color: #666;
+    font-weight: 400;
+    margin-top: 2px;
+}
+/* GRID PRINCIPAL DE 2 COLUMNAS */
+.pub-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Mitad y mitad exacto */
+    gap: 40px;
+    align-items: start;
+}
+
+.left-col, .right-col {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Inputs */
+.homi-input {
+    width: 100%;
+    padding: 15px;
+    background-color: #FFFFFF;
+    border: 1px solid #E0E0E0; /* Borde sutil */
+    border-radius: 12px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+    outline: none;
+    box-sizing: border-box;
+    transition: 0.3s;
+}
+
+.homi-input:focus {
+    border-color: #2BB2BB; /* Borde Turquesa al escribir */
+    box-shadow: 0 0 0 3px rgba(43, 178, 187, 0.1);
+}
+
+.homi-textarea {
+    resize: none;
+}
+
+.label-titulo {
+    font-weight: 700;
+    color: #2BB2BB; /* Títulos en Turquesa */
+    font-size: 1.1em;
+    margin-bottom: 8px;
+    display: block;
+}
+
+/* --- CARRUSEL INTERACTIVO --- */
+.carousel-container {
+    width: 100%;
+    height: 300px;
+    position: relative;
+    background-color: #e8e8e8;
+    border-radius: 15px;
+    overflow: hidden;
+    cursor: pointer;
+    border: 2px dashed #bbb; /* Borde punteado para indicar que se puede subir */
+    transition: border-color 0.3s;
+}
+
+.carousel-container:hover {
+    border-color: #2b5ba1;
+}
+
+.carousel-slide {
+    display: none;
+    height: 100%;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+    position: relative;
+}
+
+.carousel-slide.active {
+    display: flex;
+    animation: fadeEffect 0.5s;
+}
+
+@keyframes fadeEffect { from {opacity: .6} to {opacity: 1} }
+
+.slide-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.placeholder-content {
+    color: #777;
+    font-weight: bold;
+}
+
+/* Texto flotante que aparece sobre la imagen */
+.click-hint {
+    position: absolute;
+    bottom: 40px;
+    background: rgba(0,0,0,0.6);
+    color: white;
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-size: 12px;
+    opacity: 0;
+    transition: 0.3s;
+    pointer-events: none;
+}
+
+.carousel-slide:hover .click-hint {
+    opacity: 1;
+}
+
+/* Botones Nav */
+.carousel-btn {
+    cursor: pointer;
+    position: absolute;
+    top: 50%;
+    width: auto;
+    padding: 16px;
+    margin-top: -22px;
+    color: white;
+    font-weight: bold;
+    font-size: 18px;
+    transition: 0.3s;
+    border-radius: 0 3px 3px 0;
+    user-select: none;
+    background-color: rgba(0,0,0,0.2);
+    border: none;
+    z-index: 10;
+}
+
+.carousel-btn.next { right: 0; border-radius: 3px 0 0 3px; }
+.carousel-btn:hover { background-color: rgba(0,0,0,0.8); }
+
+.carousel-indicators {
+    position: absolute;
+    bottom: 15px;
+    width: 100%;
+    text-align: center;
+    z-index: 10;
+}
+
+.dot {
+    cursor: pointer;
+    height: 10px;
+    width: 10px;
+    margin: 0 4px;
+    background-color: #ccc;
+    border-radius: 50%;
+    display: inline-block;
+    border: 1px solid #fff;
+}
+.dot.active { background-color: #2b5ba1; transform: scale(1.2); }
+
+/* --- SECCIÓN PROPIETARIO --- */
+.owner-section {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 12px;
+    border-left: 5px solid #2b5ba1;
+}
+
+.owner-avatar {
+    width: 50px; height: 50px; border-radius: 50%;
+    object-fit: cover; background-color: #ccc;
+}
+
+.btn-publicar {
+    background-color: #2BB2BB;
+    color: white;
+    padding: 18px;
+    border: none;
+    border-radius: 12px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: auto; /* Empuja el botón al final */
+    box-shadow: 0 4px 6px rgba(43, 91, 161, 0.2);
+}
+.btn-publicar:hover { background-color: #1e427a; transform: translateY(-2px); }
+
+/* Mapa */
+#map {
+    height: 250px;
+    width: 100%;
+    border-radius: 12px;
+    border: 1px solid #ddd;
+    z-index: 1;
+}
+/* --- BOTÓN ELIMINAR IMAGEN --- */
+.btn-delete {
+    display: none; /* Oculto inicialmente */
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background-color: #ff4d4d; /* Rojo */
+    color: white;
+    border: none;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 20; /* Por encima de todo */
+    font-size: 16px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    transition: transform 0.2s, background 0.2s;
+    justify-content: center;
+    align-items: center;
+}
+
+.btn-delete:hover {
+    background-color: #cc0000;
+    transform: scale(1.1);
+}
+/* --- ESTILOS DEL LOGO HOMI --- */
+
+.homi-logo {
+    display: flex;
+    align-items: center;
+    gap: 8px; /* Espacio entre la estrella y el texto */
+    color: #2BB2BB; /* Azul Homi (El mismo de tus botones) */
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.homi-logo:hover {
+    transform: scale(1.05); /* Pequeño efecto zoom al pasar el mouse */
+}
+
+/* El texto "Homi" */
+.logo-text {
+    font-size: 28px;
+    font-weight: 800; /* Letra muy gruesa */
+    letter-spacing: -0.5px; /* Letras un poco más juntas */
+    line-height: 1;
+}
+
+/* La Estrella */
+.logo-icon {
+    width: 24px;
+    height: 24px;
+    /* Nota: El color lo hereda del padre (.homi-logo) gracias a fill="currentColor" en el HTML */
+}
+
+/* Ajuste para el icono de menú que ya tenías */
+.menu-icon {
+    font-size: 24px;
+    cursor: pointer;
+    color: #333;
+}
