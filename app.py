@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, session, f
 from flask_bcrypt import Bcrypt
 from pymongo import MongoClient
 from config import Config
+import consultas
 
 app = Flask(__name__, template_folder="src/templates", static_folder="src/static")
 app.config.from_object(Config)
@@ -12,11 +13,34 @@ bcrypt = Bcrypt(app)
 client = MongoClient(app.config["MONGODB_URI"])
 db = client["HomiDB"]
 usuarios = db["usuarios"]
+mongo = db
+
 
 # Página principal - LOGIN
 @app.route("/")
 def home():
-    return render_template("index.html")
+    propiedades = consultas.obtener_propiedades_destacadas(mongo.db)
+    
+    # Pasamos la sesión completa y las propiedades a la plantilla
+    return render_template('Inicio.html', session=session,propiedades=propiedades)
+
+@app.route('/buscar')
+def buscar():
+    """
+    Ruta para procesar la búsqueda del formulario.
+    Recoge los filtros y (en un futuro) consultará la BD.
+    """
+    # Obtenemos los parámetros de la URL (método GET)
+    categoria = request.args.get('categoria', '')
+    localizacion = request.args.get('localizacion', '')
+    keyword = request.args.get('keyword', '')
+   
+    return render_template('resultados.html', categoria=categoria, localizacion=localizacion, keyword=keyword)
+
+@app.route('/registro_proveedor')
+def registro_proveedor():
+    # Redirige al formulario de registro normal, o a uno específico
+    return redirect(url_for('registro'))
 
 # Registro de usuarios
 @app.route("/registro", methods=["GET", "POST"])
