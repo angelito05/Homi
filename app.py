@@ -8,7 +8,7 @@ app.config.from_object(Config)
 
 bcrypt = Bcrypt(app)
 
-# Conexión a MongoDB
+# Conexión a Mongo0DB
 client = MongoClient(app.config["MONGODB_URI"])
 db = client["HomiDB"]
 usuarios = db["usuarios"]
