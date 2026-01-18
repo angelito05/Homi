@@ -20,7 +20,6 @@ body {
     --color-sombra: rgba(0, 0, 0, 0.08);
 }
 
-
 /*CONTENEDORES GENERALES*/
 .contenedor {
     background: var(--color-blanco);
