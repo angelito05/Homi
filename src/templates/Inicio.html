@@ -128,23 +128,26 @@
 								</ul>
 							</div>
 							<ul class="header-btn d-md-flex">
+								{% if session.usuario_id %}
 								<li>
 									<a href="#" class="main-btn account-btn">
 										<span class="d-md-none"><i class="lni lni-user"></i></span>
 										<span class="d-none d-md-block">Mi cuenta</span>
 									</a>
 									<ul class="dropdown-nav">
-										<li><a href="dashboard.html">Dashboard</a></li>
-										<li><a href="profile-settings.html">Perfil</a></li>
-										<li><a href="post-ad.html">Publicaciones</a></li>
-										<li><a href="payments.html">Notificaciones</a></li>
-										<li><a href="favorites.html">Favoritos</a></li>
-										<li><a href="javascript:void(0)">Cerrar Sesion</a></li>
+										<li><a href="/dashboard">Dashboard</a></li>
+										<li><a href="/profile-settings">Perfil</a></li>
+										<li><a href="/post-ad">Publicaciones</a></li>
+										<li><a href="/payments">Notificaciones</a></li>
+										<li><a href="/favorites">Favoritos</a></li>
+										<li><a href="/logout">Cerrar Sesión</a></li>
 									</ul>
 								</li>
+								{% else %}
 								<li>
-									<a href="/index"  class="main-btn btn-hover d-none d-md-block">Iniciar Sesion</a>
+									<a href="/index" class="main-btn btn-hover d-none d-md-block">Iniciar Sesion</a>
 								</li>
+								{% endif %}
 							</ul>
 						</nav> <!-- navbar -->
 					</div>

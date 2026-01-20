@@ -9,7 +9,7 @@ app.config.from_object(Config)
 
 bcrypt = Bcrypt(app)
 
-# Conexión a Mongo0DB
+# Conexión a MongoDB
 client = MongoClient(app.config["MONGODB_URI"])
 db = client["HomiDB"]
 usuarios = db["usuarios"]
@@ -47,28 +47,17 @@ def registro_proveedor():
 def registro():
     if request.method == "POST":
         data = request.form.to_dict()
-        rol = data.get("rol", "cliente")
+        # Solo se permiten registros como cliente
+        rol = "cliente"
 
-        # Campos por rol
-        campos_clientes = ["nombre", "primer_apellido", "correo_electronico", "contrasena"]
-        campos_proveedores = ["nombre", "primer_apellido", "segundo_apellido", "correo_electronico", "telefono", "contrasena"]
+        # Campos obligatorios para clientes (incluyendo datos tipo proveedor)
+        campos_clientes = ["nombre", "primer_apellido", "segundo_apellido", "correo_electronico", "telefono", "contrasena"]
 
         # Validación de campos
-        if rol == "cliente":
-            for c in campos_clientes:
-                if not data.get(c):
-                    flash(f"El campo '{c}' es obligatorio para clientes.", "error")
-                    return redirect(url_for("registro"))
-
-        elif rol == "proveedor":
-            for c in campos_proveedores:
-                if not data.get(c):
-                    flash(f"El campo '{c}' es obligatorio para proveedores.", "error")
-                    return redirect(url_for("registro"))
-
-        else:
-            flash("Rol no válido.", "error")
-            return redirect(url_for("registro"))
+        for c in campos_clientes:
+            if not data.get(c):
+                flash(f"El campo '{c}' es obligatorio.", "error")
+                return redirect(url_for("registro"))
 
         # Evitar correos duplicados
         if usuarios.find_one({"correo_electronico": data["correo_electronico"]}):
@@ -81,9 +70,9 @@ def registro():
         nuevo_usuario = {
             "nombre": data["nombre"],
             "primer_apellido": data["primer_apellido"],
-            "segundo_apellido": data.get("segundo_apellido"),
             "correo_electronico": data["correo_electronico"],
             "contrasena": hashed_password,
+            "segundo_apellido": data.get("segundo_apellido"),
             "telefono": data.get("telefono"),
             "rol": rol,
             "estado": "activo"
@@ -131,7 +120,7 @@ def dashboard():
         flash("Debes iniciar sesión primero.", "error")
         return redirect(url_for("home"))
 
-    return render_template("dashboard.html", nombre=session["nombre"], rol=session["rol"])
+    return render_template("Inicio.html", nombre=session["nombre"], rol=session["rol"])
 
 # Logout
 @app.route("/logout")
