@@ -115,6 +115,7 @@
 											<li><a href="category-list.html">Más Propiedades</a></li>
 										</ul>
 									</li>
+									{% if session.get('rol') != 'proveedor' %}
 									<li class="nav-item">
 										<a class="page-scroll" data-toggle="collapse" data-target="#sub-nav-vender" aria-controls="sub-nav-vender"
 											aria-expanded="false" aria-label="Toggle navigation" href="javascript:void(0)">
@@ -137,6 +138,12 @@
 											</li>
 										</ul>
 									</li>
+									{% endif %}
+									{% if session.get('rol') == 'proveedor' %}
+									<li class="nav-item">
+										<a class="page-scroll" href="publicar.html">Publicar</a>
+									</li>
+									{% endif %}
 								</ul>
 							</div>
 							<ul class="header-btn d-md-flex">
@@ -147,9 +154,13 @@
 										<span class="d-none d-md-block">Mi cuenta</span>
 									</a>
 									<ul class="dropdown-nav">
+										{% if session.get('rol') == 'admin' %}
 										<li><a href="/dashboard">Dashboard</a></li>
+										{% endif %}
 										<li><a href="/profile-settings">Perfil</a></li>
+										{% if session.get('rol') == 'proveedor' %}
 										<li><a href="/post-ad">Publicaciones</a></li>
+										{% endif %}
 										<li><a href="/payments">Notificaciones</a></li>
 										<li><a href="/favorites">Favoritos</a></li>
 										<li><a href="/logout">Cerrar Sesión</a></li>
