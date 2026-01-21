@@ -33,8 +33,7 @@
         {% endwith %}
 
         <form action="/registro" method="POST">
-
-
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
 
                 <!-- Nombre -->
                 <label>Nombre:</label>

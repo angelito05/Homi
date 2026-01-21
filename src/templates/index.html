@@ -32,9 +32,10 @@
         {% endwith %}
 
         <form action="/index" method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
 
             <label for="correo_electronico">Correo Electrónico:</label>
-            <input type="email" name="correo_electronico" required>
+            <input type="email"  name="correo_electronico" required>
 
             <label for="contrasena">Contraseña:</label>
             <input type="password" name="contrasena" required>

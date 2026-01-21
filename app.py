@@ -2,12 +2,26 @@ from flask import Flask, render_template, request, redirect, url_for, session, f
 from flask_bcrypt import Bcrypt
 from pymongo import MongoClient
 from config import Config
+from flask_limiter import Limiter
+from flask_wtf.csrf import CSRFProtect
+from flask_limiter.util import get_remote_address
 import consultas
+from flask_talisman import Talisman
 
 app = Flask(__name__, template_folder="src/templates", static_folder="src/static")
 app.config.from_object(Config)
 
+limiter = Limiter(
+    get_remote_address, 
+    app=app, 
+    default_limits=["200 per day", "50 per hour"] # Opcional: límites por defecto
+)
+
+Talisman(app, content_security_policy=None, force_https=False)
+
 bcrypt = Bcrypt(app)
+
+csrf = CSRFProtect(app)
 
 # Conexión a MongoDB
 client = MongoClient(app.config["MONGODB_URI"])
@@ -87,6 +101,7 @@ def registro():
 
 # Login
 @app.route("/index", methods=["POST", "GET"])
+@limiter.limit("5 per minute")
 def index():
 
     if request.method == "GET":
