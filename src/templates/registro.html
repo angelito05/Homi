@@ -1,76 +1,129 @@
 <!DOCTYPE html>
-<html lang="es">
+<html class="no-js" lang="es">
 <head>
-    <meta charset="UTF-8">
-    <title>Registro - Homi</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/homi.css') }}">
-
+    <meta charset="utf-8">
+    <title>Crear Cuenta - Homi</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" href="static/images/logoHomi.png" type="image/png">
+    
+    <link rel="stylesheet" href="static/css/LineIcons.2.0.css">
+    <link rel="stylesheet" href="static/css/bootstrap-5.0.5-alpha.min.css">
+    <link rel="stylesheet" href="static/css/style.css">
+    
+    <style>
+        /* Estilo para el ojito dentro del input */
+        .password-container { position: relative; }
+        .toggle-password {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #7C869A;
+            z-index: 10;
+        }
+    </style>
 </head>
 
 <body>
-
-    <!-- NAVBAR -->
-    <div class="navbar">
-        <div class="logo">
-            <span>⟡</span> Habita
+    <header class="header_area">
+        <div class="header_navbar sticky">
+            <div class="container">
+                <nav class="navbar navbar-expand-lg">
+                    <a class="navbar-brand" href="/">
+                        <img src="static/images/logo/logoHomi.png" alt="Logo" style="width:60px;">
+                        <span style="font-size: 30px; font-weight: bold; color: #2BB2BB;">Homi</span>
+                    </a>
+                </nav>
+            </div>
         </div>
-        <div class="menu">
-            <a href="/">Ingresar</a>
+    </header>
+
+    <section class="login-area pt-100 pb-100">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="login-content box-style" style="padding: 40px;">
+                        <div class="text-center mb-30">
+                            <h2 class="theme-color">Crear Cuenta</h2>
+                        </div>
+
+                        {% with messages = get_flashed_messages(with_categories=true) %}
+                            {% if messages %}
+                                {% for category, message in messages %}
+                                    <div class="alert alert-{{ 'danger' if category == 'error' else 'success' }}">{{ message }}</div>
+                                {% endfor %}
+                            {% endif %}
+                        {% endwith %}
+
+                        <form action="/registro" method="POST">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="single-input mb-30">
+                                        <label>Nombre</label>
+                                        <input type="text" name="nombre" value="{{ data.nombre if data else '' }}" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="single-input mb-30">
+                                        <label>Apellidos</label>
+                                        <input type="text" name="primer_apellido" value="{{ data.primer_apellido if data else '' }}" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="single-input mb-30">
+                                        <label>Correo Electrónico</label>
+                                        <input type="email" name="correo_electronico" value="{{ data.correo_electronico if data else '' }}" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="single-input mb-30">
+                                        <label>Teléfono</label>
+                                        <input type="tel" name="telefono" value="{{ data.telefono if data else '' }}" required>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <div class="single-input mb-30 password-container">
+                                        <label>Contraseña</label>
+                                        <input type="password" name="contrasena" id="passRegistro" required placeholder="********">
+                                        <i class="lni lni-eye toggle-password" onclick="togglePass('passRegistro', this)"></i>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="single-input mb-30">
+                                        <label>Confirmar Contraseña</label>
+                                        <input type="password" name="confirmar_contrasena" required placeholder="Repite la contraseña">
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <p class="small text-muted mb-30 text-center">Debe tener mayúscula, número y símbolo especial.</p>
+                                </div>
+                                <div class="col-12 text-center">
+                                    <button type="submit" class="main-btn btn-hover w-100">Registrarse</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
+    </section>
 
-    <div class="contenedor">
-
-        <h2>Crear Cuenta</h2>
-
-        <!-- Mensajes flash -->
-        {% with mensajes = get_flashed_messages(with_categories=true) %}
-            {% if mensajes %}
-                {% for categoria, mensaje in mensajes %}
-                    <div class="flash {{ categoria }}">{{ mensaje }}</div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
-
-        <form action="/registro" method="POST">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-
-                <!-- Nombre -->
-                <label>Nombre:</label>
-                <input type="text" name="nombre" required>
-
-                <!-- Primer apellido -->
-                <label>Primer apellido:</label>
-                <input type="text" name="primer_apellido" required>
-
-                <!-- Segundo apellido (proveedor-only) -->
-            
-                <label>Segundo apellido:</label>
-                <input type="text" name="segundo_apellido" required>
-                
-
-                <!-- Correo -->
-                <label>Correo electrónico:</label>
-                <input type="email" name="correo_electronico" required>
-
-                <!-- Teléfono (proveedor-only) -->
-                
-                <label>Teléfono:</label>
-                <input type="text" name="telefono" required>
-                
-
-                <!-- Contraseña -->
-                <label>Contraseña:</label>
-                <input type="password" name="contrasena" required>
-
-                <button type="submit">Registrarse</button>
-            </form>
-
-        <div class="enlace" style="margin-top: 10px;">
-            <p>¿Ya tienes cuenta? <a href="/">Inicia sesión</a></p>
-        </div>
-
-    </div>
-
+    <script>
+        function togglePass(inputId, icon) {
+            const input = document.getElementById(inputId);
+            if (input.type === "password") {
+                input.type = "text";
+                icon.classList.add("lni-eye"); // Podrías cambiar el icono si tuvieras 'eye-off'
+                icon.style.color = "#2BB2BB"; // Cambia color al estar visible
+            } else {
+                input.type = "password";
+                icon.style.color = "#7C869A";
+            }
+        }
+    </script>
 </body>
 </html>

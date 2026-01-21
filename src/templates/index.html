@@ -1,53 +1,78 @@
 <!DOCTYPE html>
-<html lang="es">
+<html class="no-js" lang="es">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="utf-8">
     <title>Iniciar Sesión - Homi</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/homi.css') }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" href="static/images/logoHomi.png" type="image/png">
+    
+    <link rel="stylesheet" href="static/css/animate.css">
+    <link rel="stylesheet" href="static/css/LineIcons.2.0.css">
+    <link rel="stylesheet" href="static/css/bootstrap-5.0.5-alpha.min.css">
+    <link rel="stylesheet" href="static/css/style.css">
 </head>
 
 <body>
-
-    <!-- NAVBAR -->
-    <div class="navbar">
-        <div class="logo">
-            <span>⟡</span> Homi
+    <header class="header_area">
+        <div class="header_navbar sticky">
+            <div class="container">
+                <nav class="navbar navbar-expand-lg">
+                    <a class="navbar-brand" href="/">
+                        <img src="static/images/logo/logoHomi.png" alt="Logo" style="width:60px;">
+                        <span style="font-size: 30px; font-weight: bold; color: #2BB2BB;">Homi</span>
+                    </a>
+                </nav>
+            </div>
         </div>
-        <div class="menu">
-            <a href="/registro">Registrarse</a>
+    </header>
+
+    <section class="login-area pt-120 pb-120">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-6">
+                    <div class="login-content box-style" style="padding: 50px;">
+                        <div class="text-center mb-4">
+                            <h2 class="theme-color">Bienvenido de nuevo</h2>
+                            <p>Ingresa a tu cuenta para gestionar tus propiedades.</p>
+                        </div>
+
+                        {% with messages = get_flashed_messages(with_categories=true) %}
+                            {% if messages %}
+                                {% for category, message in messages %}
+                                    <div class="alert alert-{{ 'danger' if category == 'error' else 'success' }} alert-dismissible fade show" role="alert">
+                                        {{ message }}
+                                        <button type="button" class="btn-close" data-dismiss="alert" aria-label="Close"></button>
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                        {% endwith %}
+
+                        <form action="/index" method="POST">
+                            <div class="single-input mb-30">
+                                <label>Correo Electrónico</label>
+                                <input type="email" name="correo_electronico" placeholder="usuario@homi.com" required>
+                            </div>
+                            <div class="single-input mb-30 password-container">
+                                <label>Contraseña</label>
+                                <input type="password" name="contrasena" id="passLogin" placeholder="********" required>
+                                <i class="lni lni-eye toggle-password" onclick="togglePass('passLogin', this)"></i>
+                            </div>
+                            
+                            <div class="text-center">
+                                <button type="submit" class="main-btn btn-hover w-100">Ingresar</button>
+                            </div>
+                        </form>
+
+                        <div class="text-center mt-20">
+                            <p>¿No tienes cuenta? <a href="{{ url_for('registro') }}" class="theme-color">Regístrate aquí</a></p>
+                            <p class="mt-2"><a href="{{ url_for('registro_proveedor') }}" class="text-muted small">¿Quieres ser proveedor?</a></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
+    </section>
 
-    <div class="contenedor">
-
-        <h2>Iniciar Sesión</h2>
-
-        <!-- Mensajes flash -->
-        {% with mensajes = get_flashed_messages(with_categories=true) %}
-            {% if mensajes %}
-                {% for categoria, mensaje in mensajes %}
-                    <div class="flash {{ categoria }}">{{ mensaje }}</div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
-
-        <form action="/index" method="POST">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-
-            <label for="correo_electronico">Correo Electrónico:</label>
-            <input type="email"  name="correo_electronico" required>
-
-            <label for="contrasena">Contraseña:</label>
-            <input type="password" name="contrasena" required>
-
-            <button type="submit" >Ingresar</button>
-        </form>
-
-        <div class="enlace" style="margin-top: 10px;">
-            <p>¿No tienes cuenta? <a href="/registro">Crear una cuenta</a></p>
-        </div>
-
-    </div>
-
+    <script src="static/js/bootstrap.bundle-5.0.0.alpha-min.js"></script>
 </body>
 </html>
