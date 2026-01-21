@@ -80,7 +80,7 @@ def registro():
 
         usuarios.insert_one(nuevo_usuario)
         flash("Registro exitoso. Ahora puedes iniciar sesión.", "success")
-        return redirect(url_for("home"))
+        return redirect(url_for("index"))
 
     # GET: mostrar formulario
     return render_template("registro.html")
