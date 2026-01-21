@@ -48,6 +48,7 @@
                         {% endwith %}
 
                         <form action="/index" method="POST">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                             <div class="single-input mb-30">
                                 <label>Correo Electrónico</label>
                                 <input type="email" name="correo_electronico" placeholder="usuario@homi.com" required>

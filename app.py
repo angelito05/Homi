@@ -8,6 +8,7 @@ from flask_limiter.util import get_remote_address
 import consultas
 from datetime import datetime 
 import re
+from flask_talisman import Talisman
 from bson.objectid import ObjectId
 
 app = Flask(__name__, template_folder="src/templates", static_folder="src/static")
@@ -16,7 +17,7 @@ app.config.from_object(Config)
 limiter = Limiter(
     get_remote_address, 
     app=app, 
-    default_limits=["200 per day", "50 per hour"] # Opcional: límites por defecto
+    default_limits=["50 per day", "15 per hour"] # Opcional: límites por defecto
 )
 
 Talisman(app, content_security_policy=None, force_https=False)
