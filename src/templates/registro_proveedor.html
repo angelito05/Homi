@@ -1,0 +1,215 @@
+<!doctype html>
+<html class="no-js" lang="es">
+
+<head>
+    <meta charset="utf-8">
+    <title>Homi - Registro de Proveedores</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <link rel="shortcut icon" href="static/images/logoHomi.png" type="image/png">
+
+    <link rel="stylesheet" href="static/css/animate.css">
+    <link rel="stylesheet" href="static/css/tiny-slider.css">
+    <link rel="stylesheet" href="static/css/glightbox.min.css">
+    <link rel="stylesheet" href="static/css/LineIcons.2.0.css">
+    <link rel="stylesheet" href="static/css/selectr.css">
+    <link rel="stylesheet" href="static/css/nouislider.css">
+    <link rel="stylesheet" href="static/css/bootstrap-5.0.5-alpha.min.css">
+    <link rel="stylesheet" href="static/css/style.css">
+    
+    <style>
+        .login-area .single-input input {
+            border: 1px solid #e5e5e5;
+            padding: 15px;
+            width: 100%;
+            border-radius: 30px; /* Estilo redondeado como Homi */
+            outline: none;
+            transition: all 0.3s;
+        }
+        .login-area .single-input input:focus {
+            border-color: #2BB2BB;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="preloader">
+        <div class="loader">
+            <div class="ytp-spinner">
+                <div class="ytp-spinner-container">
+                    <div class="ytp-spinner-rotator">
+                        <div class="ytp-spinner-left"><div class="ytp-spinner-circle"></div></div>
+                        <div class="ytp-spinner-right"><div class="ytp-spinner-circle"></div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <header class="header_area">
+        <div id="header_navbar" class="header_navbar sticky">
+            <div class="container position-relative">
+                <div class="row align-items-center">
+                    <div class="col-xl-12">
+                        <nav class="navbar navbar-expand-lg">
+                            <a class="navbar-brand" href="/">
+                                <img id="logo" src="static/images/logo/logoHomi.png" alt="Logo" style="width:60px;"> 
+                                <span style="font-size: 30px; font-weight: bold; color: #2BB2BB;">Homi</span>
+                            </a>
+                            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+                                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                                <span class="toggler-icon"></span>
+                                <span class="toggler-icon"></span>
+                                <span class="toggler-icon"></span>
+                            </button>
+                            <div class="collapse navbar-collapse sub-menu-bar" id="navbarSupportedContent">
+                                <ul id="nav" class="navbar-nav ml-auto">
+                                    <li class="nav-item">
+                                        <a href="/">Volver al Inicio</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section class="hero-area bg_cover" style="background-image: url('static/images/hero/hero-bg.jpg'); padding: 180px 0 100px;">
+        <div class="container">
+            <div class="row">
+                <div class="mx-auto col-lg-9 col-xl-9 col-md-10">
+                    <div class="text-center hero-content">
+                        <h1 class="mb-30 wow fadeInUp" data-wow-delay=".2s" style="color: #fff;">Panel de Proveedores</h1>
+                        <p class="wow fadeInUp" data-wow-delay=".4s" style="color: #fff;">Regístrate para publicar tus propiedades.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="login-area pt-100 pb-100">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="login-content box-style" style="padding: 40px;">
+                        
+                        <div class="text-center mb-40">
+                            <h3>Registro de Proveedor</h3>
+                        </div>
+
+                        {% with messages = get_flashed_messages(with_categories=true) %}
+                          {% if messages %}
+                            {% for category, message in messages %}
+                              <div class="alert alert-{{ 'danger' if category == 'error' else 'success' }} mb-4" role="alert">
+                                {{ message }}
+                              </div>
+                            {% endfor %}
+                          {% endif %}
+                        {% endwith %}
+
+                        <form action="{{ url_for('registro_proveedor') }}" method="POST">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="single-input mb-30">
+                                        <label>Nombre(s)</label>
+                                        <input type="text" name="nombre" placeholder="Nombre" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="single-input mb-30">
+                                        <label>Apellidos</label>
+                                        <input type="text" name="primer_apellido" placeholder="Apellidos" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="single-input mb-30">
+                                        <label>Correo Electrónico</label>
+                                        <input type="email" name="correo_electronico" placeholder="ejemplo@homi.com" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="single-input mb-30">
+                                        <label>Teléfono</label>
+                                        <input type="tel" name="telefono" placeholder="Número celular" required>
+                                    </div>
+                                </div>
+
+                                <div class="col-12 mt-20 mb-20">
+                                    <h5 class="theme-color">Detalles de Negocio</h5>
+                                    <hr>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="single-input mb-30">
+                                        <label>Nombre Inmobiliaria (Opcional)</label>
+                                        <input type="text" name="inmobiliaria" placeholder="Tu Empresa S.A.">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="single-input mb-30">
+                                        <label>RFC (Opcional)</label>
+                                        <input type="text" name="rfc" placeholder="RFC para facturación">
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <div class="single-input mb-30">
+                                        <label>Facebook</label>
+                                        <input type="text" name="url_facebook" placeholder="Link de perfil">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="single-input mb-30">
+                                        <label>Instagram</label>
+                                        <input type="text" name="url_instagram" placeholder="Link de perfil">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="single-input mb-30">
+                                        <label>WhatsApp</label>
+                                        <input type="text" name="url_whatsapp" placeholder="Enlace directo">
+                                    </div>
+                                </div>
+
+                                <div class="col-12 mt-20 mb-20">
+                                    <h5 class="theme-color">Seguridad</h5>
+                                    <hr>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="single-input mb-30">
+                                        <label>Contraseña</label>
+                                        <input type="password" name="contrasena" placeholder="********" required>
+                                        <p class="small mt-2 text-muted">Si ya tienes cuenta de cliente, usa tu contraseña actual para cambiarte a proveedor.</p>
+                                    </div>
+                                </div>
+
+                                <div class="col-12 text-center mt-30">
+                                    <button type="submit" class="main-btn btn-hover">Registrarme como Proveedor</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer-area pt-50 pb-50" style="background: #333F57;">
+        <div class="container">
+            <div class="text-center">
+                <p style="color: #fff;">&copy; cosenø Dv. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="static/js/bootstrap.bundle-5.0.0.alpha-min.js"></script>
+    <script src="static/js/tiny-slider.js"></script>
+    <script src="static/js/wow.min.js"></script>
+    <script src="static/js/glightbox.min.js"></script>
+    <script src="static/js/selectr.min.js"></script>
+    <script src="static/js/nouislider.js"></script>
+    <script src="static/js/main.js"></script>
+</body>
+</html>

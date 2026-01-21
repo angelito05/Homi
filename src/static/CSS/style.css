@@ -3772,3 +3772,16 @@ footer css
 .client-logo-area .client-logo-wrapper .single-logo:hover {
   opacity: 1;
 }
+
+/* Activar dropdown al pasar el mouse en pantallas grandes */
+@media (min-width: 992px) {
+    .nav-item.dropdown:hover .dropdown-menu {
+        display: block;
+        margin-top: 0;
+        animation: fadeIn 0.3s;
+    }
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}

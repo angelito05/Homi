@@ -3,6 +3,7 @@ from flask_bcrypt import Bcrypt
 from pymongo import MongoClient
 from config import Config
 import consultas
+from datetime import datetime 
 
 app = Flask(__name__, template_folder="src/templates", static_folder="src/static")
 app.config.from_object(Config)
@@ -37,18 +38,13 @@ def buscar():
    
     return render_template('resultados.html', categoria=categoria, localizacion=localizacion, keyword=keyword)
 
-@app.route('/registro_proveedor')
-def registro_proveedor():
-    # Redirige al formulario de registro normal, o a uno específico
-    return redirect(url_for('registro'))
-
 # Registro de usuarios
 @app.route("/registro", methods=["GET", "POST"])
 def registro():
     if request.method == "POST":
         data = request.form.to_dict()
-        # Solo se permiten registros como cliente
-        rol = "cliente"
+        # Usar el rol que viene del formulario, si no existe, por defecto "cliente"
+        rol = data.get("rol", "cliente")
 
         # Campos obligatorios para clientes (incluyendo datos tipo proveedor)
         campos_clientes = ["nombre", "primer_apellido", "segundo_apellido", "correo_electronico", "telefono", "contrasena"]
@@ -84,6 +80,78 @@ def registro():
 
     # GET: mostrar formulario
     return render_template("registro.html")
+
+@app.route('/registro_proveedor', methods=['GET', 'POST'])
+def registro_proveedor():
+    if request.method == 'POST':
+        data = request.form.to_dict()
+        correo = data.get("correo_electronico")
+        contrasena_ingresada = data.get("contrasena")
+
+        # 1. Buscar si el usuario ya existe
+        usuario_existente = usuarios.find_one({"correo_electronico": correo})
+
+        if usuario_existente:
+            # === CASO: USUARIO EXISTENTE (CLIENTE QUE QUIERE SER PROVEEDOR) ===
+            
+            # Verificar contraseña para asegurar que es él
+            if not bcrypt.check_password_hash(usuario_existente["contrasena"], contrasena_ingresada):
+                flash("El correo ya está registrado pero la contraseña es incorrecta.", "error")
+                return redirect(url_for("registro_proveedor"))
+            
+            # Si ya era proveedor o admin, avisar
+            if usuario_existente.get("rol") in ["proveedor", "admin"]:
+                flash("Ya tienes una cuenta registrada con este rol.", "info")
+                return redirect(url_for("index"))
+
+            # ACTUALIZAR ROL Y DATOS FALTANTES
+            usuarios.update_one(
+                {"_id": usuario_existente["_id"]},
+                {
+                    "$set": {
+                        "rol": "proveedor",
+                        "telefono": data.get("telefono"), # Actualizamos por si lo cambió
+                        "nombre_inmobiliaria": data.get("inmobiliaria", ""),
+                        "rfc": data.get("rfc", ""),
+                        "url_facebook": data.get("url_facebook", ""),
+                        "url_instagram": data.get("url_instagram", ""),
+                        "url_whatsapp": data.get("url_whatsapp", ""),
+                        # No tocamos la contraseña ni fecha de registro original
+                    }
+                }
+            )
+            flash("¡Tu cuenta ha sido actualizada a Proveedor exitosamente! Inicia sesión.", "success")
+            return redirect(url_for("index"))
+
+        else:
+            # === CASO: USUARIO NUEVO (REGISTRO DESDE CERO) ===
+            hashed_password = bcrypt.generate_password_hash(contrasena_ingresada).decode("utf-8")
+            
+            nuevo_proveedor = {
+                "nombre": data["nombre"],
+                "primer_apellido": data["primer_apellido"],
+                "segundo_apellido": data.get("segundo_apellido", ""),
+                "correo_electronico": correo,
+                "contrasena": hashed_password,
+                "telefono": data.get("telefono"),
+                "rol": "proveedor", # Rol directo
+                "estado": "activo",
+                "fecha_registro": datetime.now(),
+                
+                # Datos extra de proveedor
+                "nombre_inmobiliaria": data.get("inmobiliaria", ""),
+                "rfc": data.get("rfc", ""),
+                "url_facebook": data.get("url_facebook", ""),
+                "url_instagram": data.get("url_instagram", ""),
+                "url_whatsapp": data.get("url_whatsapp", "")
+            }
+            
+            usuarios.insert_one(nuevo_proveedor)
+            flash("Cuenta de proveedor creada exitosamente.", "success")
+            return redirect(url_for("index"))
+
+    # GET request: mostrar el HTML
+    return render_template('registro_proveedor.html')
 
 # Login
 @app.route("/index", methods=["POST", "GET"])
