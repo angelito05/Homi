@@ -141,7 +141,8 @@
 									{% endif %}
 									{% if session.get('rol') == 'proveedor' %}
 									<li class="nav-item">
-										<a class="page-scroll" href="publicar.html">Publicar</a>
+										<a href="{{ url_for('publicaciones.crear_publicacion') }}"class="page-scroll" data-toggle="collapse" data-target="#sub-nav" aria-controls="sub-nav"
+											aria-expanded="false" aria-label="Toggle navigation" >Publicar Propiedad</a>
 									</li>
 									{% endif %}
 								</ul>

@@ -6,37 +6,80 @@
     <title>Crear Publicación | Homi</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
-    
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
     <link rel="stylesheet" href="{{ url_for('static', filename='CSS/homi.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='CSS/publicaciones.css') }}">
+    
+    <style>
+        .fila-formulario { display: flex; gap: 15px; margin-bottom: 10px; }
+        .columna-formulario { flex: 1; }
+        .error-texto { color: #dc3545; font-size: 0.85em; margin-top: 2px; display: block; }
+    </style>
 </head>
 <body>
 
     <div class="pub-container">
         <div class="pub-header">
             <div class="homi-logo">
-                <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path> 
-                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
-                </svg>
-                <div class="logo-text-container">
-                    <span class="logo-text">Homi</span>
-                    <span class="logo-slogan">Tu espacio ideal en un clic</span>
-                </div>
+                <span class="logo-text">Homi</span>
             </div>
-
             <div class="menu-icon">&#9776;</div>
         </div>
 
         <form action="/crear-publicacion" method="POST" enctype="multipart/form-data">
+            {{ form.csrf_token }}
+
             <div class="pub-grid">
                 
                 <div class="left-col">
                     <label class="label-titulo">Detalles de la Publicación</label>
-                    <input type="text" class="homi-input" placeholder="Título de la propiedad" name="titulo" required>
                     
-                    <textarea class="homi-input homi-textarea" style="height: 150px;" placeholder="Descripción detallada..." name="descripcion"></textarea>
+                    {{ form.titulo(class="homi-input", placeholder="Título de la propiedad (Ej: Casa en el centro)") }}
+                    {% for error in form.titulo.errors %}<span class="error-texto">{{ error }}</span>{% endfor %}
+                    
+                    {{ form.descripcion(class="homi-input homi-textarea", style="height: 100px;", placeholder="Descripción detallada...") }}
+
+                    <div class="fila-formulario">
+                        <div class="columna-formulario">
+                            <label>Operación</label>
+                            {{ form.tipo_operacion(class="homi-input") }}
+                        </div>
+                        <div class="columna-formulario">
+                            <label>Tipo Inmueble</label>
+                            {{ form.tipo_propiedad(class="homi-input") }}
+                        </div>
+                    </div>
+
+                    <label>Precio ($)</label>
+                    {{ form.precio(class="homi-input", placeholder="Ej: 1500000") }}
+
+                    <label class="label-titulo" style="margin-top: 15px;">Características</label>
+                    <div class="fila-formulario">
+                        <div class="columna-formulario">
+                            <label>Hab.</label>
+                            {{ form.numero_habitaciones(class="homi-input") }}
+                        </div>
+                        <div class="columna-formulario">
+                            <label>Baños</label>
+                            {{ form.numero_banos(class="homi-input") }}
+                        </div>
+                        <div class="columna-formulario">
+                            <label>m²</label>
+                            {{ form.superficie_m2(class="homi-input") }}
+                        </div>
+                    </div>
+
+                    <label class="label-titulo" style="margin-top: 15px;">Dirección</label>
+                    {{ form.calle(class="homi-input", placeholder="Calle") }}
+                    
+                    <div class="fila-formulario">
+                        {{ form.numero_ext_int(class="homi-input columna-formulario", placeholder="Núm. Ext/Int") }}
+                        {{ form.codigo_postal(class="homi-input columna-formulario", placeholder="C.P.") }}
+                    </div>
+                    <div class="fila-formulario">
+                        {{ form.colonia(class="homi-input columna-formulario", placeholder="Colonia") }}
+                        {{ form.ciudad(class="homi-input columna-formulario", placeholder="Ciudad") }}
+                    </div>
 
                     <div class="owner-section">
                         <img src="{{ url_for('static', filename=propietario.foto_perfil) }}" class="owner-avatar" onerror="this.src='https://cdn-icons-png.flaticon.com/512/847/847969.png'">
@@ -45,78 +88,50 @@
                         </div>
                     </div>
 
-                    <button type="submit" class="btn-publicar">PUBLICAR PROPIEDAD</button>
+                    {{ form.submit(class="btn-publicar") }}
                 </div>
 
                 <div class="right-col">
                     
                     <div class="carousel-container">
-    <input type="file" id="file-1" name="foto1" hidden onchange="previewCarouselImage(this, 1)">
-    <input type="file" id="file-2" name="foto2" hidden onchange="previewCarouselImage(this, 2)">
-    <input type="file" id="file-3" name="foto3" hidden onchange="previewCarouselImage(this, 3)">
-    <input type="file" id="file-4" name="foto4" hidden onchange="previewCarouselImage(this, 4)">
-    <input type="file" id="file-5" name="foto5" hidden onchange="previewCarouselImage(this, 5)">
+                        {{ form.foto1(id="file-1", hidden=True, onchange="previewCarouselImage(this, 1)") }}
+                        {{ form.foto2(id="file-2", hidden=True, onchange="previewCarouselImage(this, 2)") }}
+                        {{ form.foto3(id="file-3", hidden=True, onchange="previewCarouselImage(this, 3)") }}
+                        {{ form.foto4(id="file-4", hidden=True, onchange="previewCarouselImage(this, 4)") }}
+                        {{ form.foto5(id="file-5", hidden=True, onchange="previewCarouselImage(this, 5)") }}
 
-    <div class="carousel-slide active" onclick="document.getElementById('file-1').click()">
-        <button type="button" class="btn-delete" id="del-1" onclick="deleteImage(event, 1)">🗑️</button>
-        
-        <div class="placeholder-content" id="ph-1">
-            <span style="font-size: 40px;">📸</span><br>Subir Foto Principal
-        </div>
-        <img src="" class="slide-img" id="img-1" style="display:none;">
-        <div class="click-hint">Clic para cambiar</div>
-    </div>
+                        <div class="carousel-slide active" onclick="document.getElementById('file-1').click()">
+                            <button type="button" class="btn-delete" onclick="deleteImage(event, 1)">🗑️</button>
+                            <div class="placeholder-content" id="ph-1"><span style="font-size: 40px;">📸</span><br>Foto Principal</div>
+                            <img src="" class="slide-img" id="img-1" style="display:none;">
+                        </div>
+                        
+                        <div class="carousel-slide" onclick="document.getElementById('file-2').click()">
+                             <div class="placeholder-content" id="ph-2"><span>➕</span><br>Foto 2</div>
+                             <img src="" class="slide-img" id="img-2" style="display:none;">
+                        </div>
+                        <div class="carousel-indicators">
+                            <span class="dot active"></span>
+                            <span class="dot"></span>
+                            <span class="dot"></span>
+                            <span class="dot"></span>
+                            <span class="dot"></span>
+                        </div>
+                    </div>
 
-    <div class="carousel-slide" onclick="document.getElementById('file-2').click()">
-        <button type="button" class="btn-delete" id="del-2" onclick="deleteImage(event, 2)">🗑️</button>
-        <div class="placeholder-content" id="ph-2"><span>➕</span><br>Subir Foto 2</div>
-        <img src="" class="slide-img" id="img-2" style="display:none;">
-        <div class="click-hint">Clic para cambiar</div>
-    </div>
-
-    <div class="carousel-slide" onclick="document.getElementById('file-3').click()">
-        <button type="button" class="btn-delete" id="del-3" onclick="deleteImage(event, 3)">🗑️</button>
-        <div class="placeholder-content" id="ph-3"><span>➕</span><br>Subir Foto 3</div>
-        <img src="" class="slide-img" id="img-3" style="display:none;">
-        <div class="click-hint">Clic para cambiar</div>
-    </div>
-
-    <div class="carousel-slide" onclick="document.getElementById('file-4').click()">
-        <button type="button" class="btn-delete" id="del-4" onclick="deleteImage(event, 4)">🗑️</button>
-        <div class="placeholder-content" id="ph-4"><span>➕</span><br>Subir Foto 4</div>
-        <img src="" class="slide-img" id="img-4" style="display:none;">
-        <div class="click-hint">Clic para cambiar</div>
-    </div>
-
-    <div class="carousel-slide" onclick="document.getElementById('file-5').click()">
-        <button type="button" class="btn-delete" id="del-5" onclick="deleteImage(event, 5)">🗑️</button>
-        <div class="placeholder-content" id="ph-5"><span>➕</span><br>Subir Foto 5</div>
-        <img src="" class="slide-img" id="img-5" style="display:none;">
-        <div class="click-hint">Clic para cambiar</div>
-    </div>
-
-    <button type="button" class="carousel-btn prev" onclick="event.stopPropagation(); moveSlide(-1)">&#10094;</button>
-    <button type="button" class="carousel-btn next" onclick="event.stopPropagation(); moveSlide(1)">&#10095;</button>
-    
-    <div class="carousel-indicators">
-        <span class="dot active" onclick="currentSlide(1)"></span>
-        <span class="dot" onclick="currentSlide(2)"></span>
-        <span class="dot" onclick="currentSlide(3)"></span>
-        <span class="dot" onclick="currentSlide(4)"></span>
-        <span class="dot" onclick="currentSlide(5)"></span>
-    </div>
-</div>
-
-                    <label class="label-titulo">Ubicación</label>
-                    <div id="map"></div>
-                    <input type="hidden" name="latitud" id="lat">
-                    <input type="hidden" name="longitud" id="lng">
+                    <label class="label-titulo">Ubicación (Selecciona en el mapa)</label>
+                    <div id="map" style="height: 300px; width: 100%; border-radius: 10px;"></div>
+                    
+                    {{ form.latitud(id="lat") }}
+                    {{ form.longitud(id="lng") }}
                 </div>
             </div>
         </form>
     </div>
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-    <script src="{{ url_for('static', filename='JS/publicaciones.js') }}"></script>
-</body>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <script src="{{ url_for('static', filename='JS/publicaciones.js') }}?v=2"></script>
+
+    </body>
 </html>

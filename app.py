@@ -10,9 +10,11 @@ from datetime import datetime
 import re
 from flask_talisman import Talisman
 from bson.objectid import ObjectId
+from app_publicaciones import publicaciones_bp
 
 app = Flask(__name__, template_folder="src/templates", static_folder="src/static")
 app.config.from_object(Config)
+app.register_blueprint(publicaciones_bp)
 
 limiter = Limiter(
     get_remote_address, 

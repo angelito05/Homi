@@ -108,6 +108,7 @@
                         {% endwith %}
 
                         <form action="{{ url_for('registro_proveedor') }}" method="POST">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="single-input mb-30">
