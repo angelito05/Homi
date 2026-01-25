@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Mi Perfil | Homi</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='CSS/homi.css') }}">
+    <style>
+        .perfil-container {
+            max-width: 800px;
+            margin: 40px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+        }
+        .perfil-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 20px;
+            margin-bottom: 20px;
+        }
+        .avatar-grande {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: #eee;
+        }
+        .info-estatica {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+        }
+        .campo-info label {
+            font-size: 0.8em;
+            color: #666;
+            display: block;
+        }
+        .campo-info span {
+            font-weight: 600;
+            color: #333;
+        }
+        .form-section-title {
+            margin-top: 25px;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+            color: #2c3e50;
+            border-left: 4px solid #0d6efd;
+            padding-left: 10px;
+        }
+        .homi-input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 5px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .error-msg { color: #dc3545; font-size: 0.85em; margin-bottom: 10px; display: block; }
+        .alert { padding: 10px; border-radius: 5px; margin-bottom: 15px; }
+        .alert-success { background: #d1e7dd; color: #0f5132; }
+        .alert-error { background: #f8d7da; color: #842029; }
+    </style>
+</head>
+<body>
+
+    <div class="perfil-container">
+        
+        <div style="margin-bottom: 15px;">
+            <a href="{{ url_for('dashboard') }}" style="text-decoration: none; color: #666;">&larr; Volver al Inicio</a>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="perfil-header">
+            <img src="{{ url_for('static', filename='images/dashboard/profile-img.png') }}" class="avatar-grande">
+            <div>
+                <h2 style="margin: 0;">{{ usuario.nombre }} {{ usuario.primer_apellido }}</h2>
+                <span style="color: #777; text-transform: capitalize;">{{ usuario.rol }}</span>
+                {% if usuario.verificado %}
+                    <span style="color: green; font-size: 0.9em;">(Verificado ✅)</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="info-estatica">
+            <div class="campo-info">
+                <label>Nombre Completo</label>
+                <span>{{ usuario.nombre }} {{ usuario.primer_apellido }} {{ usuario.segundo_apellido }}</span>
+            </div>
+            <div class="campo-info">
+                <label>Rol de Cuenta</label>
+                <span style="text-transform: capitalize;">{{ usuario.rol }}</span>
+            </div>
+            {% if usuario.rfc_curp %}
+            <div class="campo-info">
+                <label>RFC / CURP</label>
+                <span>{{ usuario.rfc_curp }}</span>
+            </div>
+            {% endif %}
+        </div>
+
+        <form method="POST">
+            {{ form.hidden_tag() }}
+
+            <div class="form-section-title">Datos de Contacto</div>
+            
+            <label>Correo Electrónico</label>
+            {{ form.correo_electronico(class="homi-input") }}
+            {% for error in form.correo_electronico.errors %}<span class="error-msg">{{ error }}</span>{% endfor %}
+
+            <label>Teléfono</label>
+            {{ form.telefono(class="homi-input") }}
+            {% for error in form.telefono.errors %}<span class="error-msg">{{ error }}</span>{% endfor %}
+
+            <div class="form-section-title">Seguridad</div>
+            
+            <label>Nueva Contraseña (Déjalo vacío si no quieres cambiarla)</label>
+            {{ form.nueva_contrasena(class="homi-input", placeholder="********") }}
+            {% for error in form.nueva_contrasena.errors %}<span class="error-msg">{{ error }}</span>{% endfor %}
+
+            <label>Confirmar Nueva Contraseña</label>
+            {{ form.confirmar_contrasena(class="homi-input", placeholder="********") }}
+            {% for error in form.confirmar_contrasena.errors %}<span class="error-msg">{{ error }}</span>{% endfor %}
+
+            <hr style="margin: 30px 0;">
+
+            <label style="font-weight: bold; color: #d63384;">Para guardar cambios, ingresa tu contraseña actual:</label>
+            {{ form.contrasena_actual(class="homi-input", style="border-color: #d63384;", placeholder="Contraseña actual requerida") }}
+            {% for error in form.contrasena_actual.errors %}<span class="error-msg">{{ error }}</span>{% endfor %}
+
+            {{ form.submit(class="btn-publicar", style="width: 100%; margin-top: 10px;") }}
+        </form>
+
+    </div>
+</body>
+</html>

@@ -57,6 +57,7 @@
                         {% endwith %}
 
                         <form action="/registro" method="POST">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="single-input mb-30">
@@ -66,8 +67,14 @@
                                 </div>
                                 <div class="col-md-6">
                                     <div class="single-input mb-30">
-                                        <label>Apellidos</label>
+                                        <label>Primer Apellido</label>
                                         <input type="text" name="primer_apellido" value="{{ data.primer_apellido if data else '' }}" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="single-input mb-30">
+                                        <label>Segundo Apellido</label>
+                                        <input type="text" name="segundo_apellido" value="{{ data.segundo_apellido if data else '' }}" required>
                                     </div>
                                 </div>
                                 <div class="col-md-6">

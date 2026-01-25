@@ -1,7 +1,8 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
 from wtforms import StringField, TextAreaField, SelectField, DecimalField, IntegerField, HiddenField, SubmitField
-from wtforms.validators import DataRequired, NumberRange, Length
+from wtforms import StringField, PasswordField, SubmitField, FileField
+from wtforms.validators import DataRequired, NumberRange, Length, Email, EqualTo, Optional
 
 print("--- [DIAGNÓSTICO] EL ARCHIVO FORMS.PY SE HA CARGADO CORRECTAMENTE ---")
 
@@ -39,3 +40,17 @@ class PublicacionForm(FlaskForm):
     foto5 = FileField('Foto 5', validators=[FileAllowed(['jpg', 'png', 'jpeg'], 'Solo imágenes')])
 
     submit = SubmitField('PUBLICAR PROPIEDAD')
+
+class PerfilForm(FlaskForm):
+    # Datos editables
+    correo_electronico = StringField('Correo Electrónico', validators=[DataRequired(), Email()])
+    telefono = StringField('Teléfono', validators=[DataRequired(), Length(min=10, max=15)])
+    
+    # Seguridad (Requerimos la contraseña actual para guardar cualquier cambio)
+    contrasena_actual = PasswordField('Contraseña Actual (Requerida)', validators=[DataRequired()])
+    
+    # Cambio de contraseña (Opcional)
+    nueva_contrasena = PasswordField('Nueva Contraseña (Opcional)', validators=[Optional(), Length(min=8)])
+    confirmar_contrasena = PasswordField('Confirmar Nueva Contraseña', validators=[EqualTo('nueva_contrasena', message='Las contraseñas no coinciden')])
+    
+    submit = SubmitField('Guardar Cambios')

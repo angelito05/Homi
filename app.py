@@ -7,6 +7,7 @@ from flask_wtf.csrf import CSRFProtect
 from flask_limiter.util import get_remote_address
 import consultas
 from datetime import datetime 
+from forms import PublicacionForm, PerfilForm
 import re
 from flask_talisman import Talisman
 from bson.objectid import ObjectId
@@ -204,6 +205,64 @@ def registro_proveedor():
             usuarios.insert_one(nuevo_proveedor)
             flash("Registro de proveedor exitoso.", "success")
             return redirect(url_for("index"))
+        
+        
+@app.route("/perfil", methods=["GET", "POST"])
+def perfil():
+    # 1. Verificar Sesión
+    if "usuario_id" not in session:
+        return redirect(url_for("home"))
+
+    # 2. Obtener datos
+    usuario_id = ObjectId(session["usuario_id"])
+    usuario = usuarios.find_one({"_id": usuario_id})
+
+    if not usuario:
+        session.clear()
+        return redirect(url_for("home"))
+
+    form = PerfilForm()
+
+    # 3. Pre-llenar el formulario
+    if request.method == 'GET':
+        form.correo_electronico.data = usuario.get('correo_electronico')
+        form.telefono.data = usuario.get('telefono')
+
+    # 4. Procesar Formulario 
+    if form.validate_on_submit():
+        # A) Verificar que la contraseña actual sea correcta (Seguridad)
+        if not bcrypt.check_password_hash(usuario["contrasena"], form.contrasena_actual.data):
+            flash("La contraseña actual es incorrecta. No se guardaron cambios.", "error")
+            return render_template("perfil.html", form=form, usuario=usuario)
+
+        # B) Validar duplicidad de correo (si lo cambió)
+        if form.correo_electronico.data != usuario["correo_electronico"]:
+            if usuarios.find_one({"correo_electronico": form.correo_electronico.data}):
+                flash("Ese correo ya está registrado por otro usuario.", "error")
+                return render_template("perfil.html", form=form, usuario=usuario)
+
+        # C) Preparar datos a actualizar
+        datos_actualizar = {
+            "correo_electronico": form.correo_electronico.data,
+            "telefono": form.telefono.data
+        }
+
+        # D) Cambio de Contraseña (si el usuario escribió algo en 'nueva_contrasena')
+        if form.nueva_contrasena.data:
+            # Usamos tu función existente para validar seguridad
+            if not validar_contrasena_segura(form.nueva_contrasena.data):
+                flash("La nueva contraseña debe tener mayúscula, número y símbolo.", "error")
+                return render_template("perfil.html", form=form, usuario=usuario)
+
+            hashed_pw = bcrypt.generate_password_hash(form.nueva_contrasena.data).decode('utf-8')
+            datos_actualizar["contrasena"] = hashed_pw
+
+        # E) Guardar en MongoDB
+        usuarios.update_one({"_id": usuario_id}, {"$set": datos_actualizar})
+        flash("¡Perfil actualizado correctamente!", "success")
+        return redirect(url_for("perfil"))
+
+    return render_template("perfil.html", form=form, usuario=usuario)
 
 # Login
 @app.route("/index", methods=["POST", "GET"])
