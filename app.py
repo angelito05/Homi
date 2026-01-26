@@ -33,6 +33,7 @@ csrf = CSRFProtect(app)
 client = MongoClient(app.config["MONGODB_URI"])
 db = client["HomiDB"]
 usuarios = db["usuarios"]
+logs_col = db["log_audotoria"]
 mongo = db
 
 # --- FUNCIÓN DE AYUDA PARA VALIDAR CONTRASEÑA ---
@@ -123,7 +124,17 @@ def registro():
     # GET: mostrar formulario
     return render_template("registro.html")
 
-# En app.py
+def registrar_movimiento(usuario_id, accion, detalles):
+    try:
+        nuevo_log = {
+            "id_usuario": ObjectId(usuario_id) if usuario_id else None,
+            "accion": accion,
+            "detalles": detalles,
+            "fecha_evento": datetime.utcnow()
+        }
+        logs_col.insert_one(nuevo_log)
+    except Exception as e:
+        print(f"Error guardando log: {e}")
 
 @app.route('/registro_proveedor', methods=['GET', 'POST'])
 def registro_proveedor():
@@ -157,6 +168,11 @@ def registro_proveedor():
         usuarios.update_one(
             {"_id": usuario_id},
             {"$set": datos_actualizar}
+        )
+        registrar_movimiento(
+            usuario_id, 
+            "CAMBIO_ROL", 
+            f"El usuario actualizó su cuenta a Proveedor. Inmobiliaria: {data.get('inmobiliaria', 'N/A')}"
         )
 
         # Actualizamos la sesión
@@ -226,6 +242,31 @@ def perfil():
         return redirect(url_for("perfil"))
 
     return render_template("perfil.html", form=form, usuario=usuario)
+
+@app.route('/admin_dashboard')
+def admin_dashboard():
+    if 'usuario_id' not in session or session.get('rol') != 'admin':
+        flash("Acceso denegado.", "error")
+        return redirect(url_for('home'))
+
+    # Pipeline para unir Logs con Usuarios
+    pipeline = [
+        {
+            "$lookup": {
+                "from": "Usuarios",
+                "localField": "id_usuario",
+                "foreignField": "_id",
+                "as": "usuario_info"
+            }
+        },
+        # Descomponemos el array (preserveNullAndEmptyArrays para ver logs del sistema sin usuario)
+        { "$unwind": { "path": "$usuario_info", "preserveNullAndEmptyArrays": True } },
+        { "$sort": { "fecha_evento": -1 } }
+    ]
+
+    movimientos = list(logs_col.aggregate(pipeline))
+
+    return render_template('admin_dashboard.html', movimientos=movimientos)
 
 # Login
 @app.route("/index", methods=["POST", "GET"])
