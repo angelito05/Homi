@@ -113,28 +113,6 @@
 										<li><a href="category-list.html">Más Propiedades</a></li>
 									</ul>
 								</li>
-
-								{% if session.get('rol') == 'proveedor' %}
-								<li class="nav-item">
-									<a class="page-scroll" data-toggle="collapse" data-target="#sub-nav-vender" aria-controls="sub-nav-vender" aria-expanded="false" href="javascript:void(0)">
-										Vender
-										<div class="sub-nav-toggler"><span></span></div>
-									</a>
-									<ul class="sub-menu collapse" id="sub-nav-vender">
-										<li style="padding: 10px 20px; border-bottom: 1px solid #eee;">
-											<h5 style="font-size: 16px; color: #2BB2BB;">¿Listo para publicar?</h5>
-											<p style="font-size: 12px; line-height: 1.2;">Comparte tus propiedades con miles.</p>
-										</li>
-										<li style="padding: 10px 20px;">
-											<a href="{{ url_for('publicaciones.crear_publicacion') }}" class="btn btn-primary btn-sm" 
-											style="background-color: #2BB2BB; color: white; border-radius: 20px; padding: 5px 15px; text-align:center;">
-											Publicar propiedad
-											</a>
-										</li>
-									</ul>
-								</li>
-								
-								{% else %}
 								<li class="nav-item">
 									<a class="page-scroll" data-toggle="collapse" data-target="#sub-nav-vender" aria-controls="sub-nav-vender" aria-expanded="false" href="javascript:void(0)">
 										Vender
@@ -152,10 +130,21 @@
 											</a>
 										</li>
 									</ul>
-									</li>
+									{% if session.get('rol') == 'proveedor' %}
+									<ul class="sub-menu collapse" id="sub-nav-vender">
+										<li style="padding: 10px 20px; border-bottom: 1px solid #eee;">
+											<h5 style="font-size: 16px; color: #2BB2BB;">¿Listo para publicar?</h5>
+											<p style="font-size: 12px; line-height: 1.2;">Comparte tus propiedades con miles.</p>
+										</li>
+										<li style="padding: 10px 20px;">
+											<a href="{{ url_for('publicaciones.crear_publicacion') }}" class="btn btn-primary btn-sm" 
+											style="background-color: #2BB2BB; color: white; border-radius: 20px; padding: 5px 15px; text-align:center;">
+											Publicar propiedad
+											</a>
+										</li>
+									</ul>
 									{% endif %}
-
-								</ul>
+								</li>
 							</div>
 							<ul class="header-btn d-md-flex">
 								{% if session.usuario_id %}

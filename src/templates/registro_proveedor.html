@@ -103,7 +103,11 @@
                         
                         <div class="text-center mb-40">
                             <h3>Datos Fiscales y de Contacto</h3>
+                           {% if session.usuario_id %} 
                             <p>Actualiza tu cuenta actual</p>
+                            {% else %}
+                            <p>Completa el formulario para registrarte como proveedor</p>
+                            {% endif %}
                         </div>
 
                         {% with messages = get_flashed_messages(with_categories=true) %}
@@ -121,25 +125,25 @@
                                 <div class="col-md-6">
                                     <div class="single-input mb-30">
                                         <label>Nombre(s) *</label>
-                                        <input type="text" name="nombre" value="{{ user.nombre }}" readonly class="input-readonly">
+                                        <input type="text" name="nombre" value="{{ user.nombre }}" required>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="single-input mb-30">
                                         <label>Primer Apellido</label>
-                                        <input type="text" name="primer_apellido" value="{{ user.primer_apellido }}" readonly class="input-readonly">
+                                        <input type="text" name="primer_apellido" value="{{ user.primer_apellido }}"  required>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="single-input mb-30">
                                         <label>Segundo Apellido</label>
-                                        <input type="text" name="segundo_apellido" value="{{ user.segundo_apellido }}" readonly class="input-readonly">
+                                        <input type="text" name="segundo_apellido" value="{{ user.segundo_apellido }}" required>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="single-input mb-30">
                                         <label>Correo Electrónico</label>
-                                        <input type="email" name="correo_electronico" value="{{ user.correo_electronico }}" readonly class="input-readonly">
+                                        <input type="email" name="correo_electronico" value="{{ user.correo_electronico }}"  required>
                                     </div>
                                 </div>
                                 
@@ -181,12 +185,45 @@
                                 <div class="col-md-4">
                                     <input type="text" name="url_whatsapp" value="{{ user.url_whatsapp }}" placeholder="WhatsApp Link" class="single-input mb-30" style="width:100%; border-radius:30px; padding:15px; border:1px solid #e5e5e5;">
                                 </div>
-
-                                <div class="col-12 text-center mt-4">
-                                    <button type="submit" class="main-btn btn-hover">Convertirme en Proveedor</button>
+                                <div class="col-12"><hr> <h6 class="mb-3 theme-color">Seguridad de la Cuenta</h6></div>
+                                <div class="col-md-6">
+                                    <div class="single-input mb-30 password-container">
+                                        <label>Contraseña *</label>
+                                        <input type="password" name="contrasena" id="passProv" required placeholder="********">
+                                        <i class="lni lni-eye toggle-password" onclick="togglePass('passProv', this)"></i>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="single-input mb-30">
+                                        <label>Confirmar Contraseña *</label>
+                                        <input type="password" name="confirmar_contrasena" required placeholder="Repite para verificar">
+                                    </div>
+                                </div>
+                                    <p class="small text-muted mb-30">
+                                        {% if session.get('usuario_id') %}
+                                            Confirma tu contraseña actual para autorizar el cambio a proveedor.
+                                        {% else %}
+                                            Debe contener 8 caracteres, 1 mayúscula, 1 número y 1 símbolo.
+                                        {% endif %}
+                                    </p>
+                                </div>
+                                <div class="col-12 text-center">
+                                    <button type="submit" class="main-btn btn-hover">Confirmar Registro</button>
                                 </div>
                             </div>
                         </form>
+                        <script>
+                            function togglePass(inputId, icon) {
+                                const input = document.getElementById(inputId);
+                                if (input.type === "password") {
+                                    input.type = "text";
+                                    icon.style.color = "#2BB2BB";
+                                } else {
+                                    input.type = "password";
+                                    icon.style.color = "#7C869A";
+                                }
+                            }
+                        </script>
                     </div>
                 </div>
             </div>

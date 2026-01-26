@@ -196,51 +196,107 @@ def registrar_movimiento(usuario_id, accion, detalles):
 
 @app.route('/registro_proveedor', methods=['GET', 'POST'])
 def registro_proveedor():
-    # 1. SEGURIDAD: Solo usuarios logueados pueden entrar aquí
-    if "usuario_id" not in session:
-        flash("Por favor, inicia sesión como cliente antes de registrarte como proveedor.", "error")
-        return redirect(url_for("home")) # O a login
+    # Si es GET, mostramos el formulario
+    if request.method == 'GET':
+        # Pasamos los datos de sesión (si existen) para pre-llenar
+        datos_usuario = {}
+        if "usuario_id" in session:
+            # Buscamos los datos frescos de la BD
+            import consultas # Asegúrate de tener esto o usar mongo directamente
+            usuario_db = usuarios.find_one({"_id": ObjectId(session["usuario_id"])}) if "usuario_id" in session else None
+            if usuario_db:
+                datos_usuario = usuario_db
+        
+        return render_template('registro_proveedor.html', user={})
 
-    usuario_id = ObjectId(session["usuario_id"])
-
-    # 2. PROCESAR FORMULARIO (POST)
+    # Si es POST (Enviaron el formulario)
     if request.method == 'POST':
         data = request.form.to_dict()
+        correo = data.get("correo_electronico")
+        contrasena_ingresada = data.get("contrasena")
+        contrasena = data.get("contrasena")
+
+        # Validar confirmación de contraseña (solo si está creando cuenta nueva o cambiando pass)
+        if data.get("contrasena") and data["contrasena"] != data.get("confirmar_contrasena"):
+             flash("Las contraseñas no coinciden.", "error")
+             return render_template('registro_proveedor.html', user=data)
         
-        # Preparamos solo los campos nuevos/actualizables
-        datos_actualizar = {
+        # VALIDAR CONTRASEÑA SEGURA
+        if not validar_contrasena_segura(data["contrasena"]):
+            flash("La contraseña no es segura (Faltan mayúsculas, números o símbolos).", "error")
+            return render_template('registro_proveedor.html', user=data)
+
+        # 1. Buscar si el usuario ya existe
+        usuario_existente = usuarios.find_one({"correo_electronico": correo})
+
+        datos_extra = {
             "telefono": data.get("telefono"),
-            "codigo_postal": data.get("codigo_postal"),
-            "rfc_curp": data.get("rfc_curp"),
-            "nombre_inmobiliaria": data.get("inmobiliaria"),
-            "url_facebook": data.get("url_facebook"),
-            "url_instagram": data.get("url_instagram"),
-            "url_whatsapp": data.get("url_whatsapp"),
-            
-            # CAMBIO DE ROL
-            "rol": "proveedor",
+            "codigo_postal": data.get("codigo_postal"), # NUEVO
+            "rfc_curp": data.get("rfc_curp"),           # NUEVO
+            "nombre_inmobiliaria": data.get("inmobiliaria", ""),
+            "url_facebook": data.get("url_facebook", ""),
+            "url_instagram": data.get("url_instagram", ""),
+            "url_whatsapp": data.get("url_whatsapp", ""),
             "verificado": False
         }
+        if usuario_existente:
+            # Usuario ya existe, actualizar datos y cambiar rol
+            usuario_id = usuario_existente["_id"]
 
-        # ACTUALIZAMOS EL REGISTRO EXISTENTE
-        usuarios.update_one(
-            {"_id": usuario_id},
-            {"$set": datos_actualizar}
-        )
-        registrar_movimiento(
-            usuario_id, 
-            "CAMBIO_ROL", 
-            f"El usuario actualizó su cuenta a Proveedor. Inmobiliaria: {data.get('inmobiliaria', 'N/A')}"
-        )
+            # Actualizar datos
+            usuarios.update_one(
+                {"_id": usuario_id},
+                {
+                    "$set": {
+                        **datos_extra,
+                        "rol": "proveedor"
+                    }
+                }
+            )
+            registrar_movimiento(
+                usuario_id, 
+                "CAMBIO_ROL", 
+                f"El usuario actualizó su cuenta a Proveedor. Inmobiliaria: {data.get('inmobiliaria', 'N/A')}"
+            )
 
-        # Actualizamos la sesión
-        session["rol"] = "proveedor"
-        flash("¡Felicidades! Tu cuenta ahora es de Proveedor.", "success")
-        return redirect(url_for("dashboard"))
+            # Actualizar sesión
+            session["usuario_id"] = str(usuario_id)
+            session["rol"] = "proveedor"
 
-    # 3. CARGAR DATOS (GET)
-    usuario_db = usuarios.find_one({"_id": usuario_id})
-    # Pasamos 'user' al template para que llene los inputs automáticamente
+            flash("¡Felicidades! Tu cuenta ahora es de Proveedor.", "success")
+            return redirect(url_for("dashboard"))
+        else:
+            # Nuevo usuario, crear cuenta de proveedor
+            hashed_password = bcrypt.generate_password_hash(contrasena).decode("utf-8")
+
+            nuevo_usuario = {
+                "nombre": data.get("nombre", ""),
+                "primer_apellido": data.get("primer_apellido", ""),
+                "segundo_apellido": data.get("segundo_apellido", ""),
+                "correo_electronico": correo,
+                "contrasena": hashed_password,
+                "rol": "proveedor",
+                "estado": "activo",
+                **datos_extra
+            }
+
+            resultado = usuarios.insert_one(nuevo_usuario)
+            usuario_id = resultado.inserted_id
+
+            registrar_movimiento(
+                usuario_id, 
+                "CREACION_CUENTA_PROVEEDOR", 
+                f"Se creó una nueva cuenta de Proveedor. Inmobiliaria: {data.get('inmobiliaria', 'N/A')}"
+            )
+
+            # Crear sesión
+            session["usuario_id"] = str(usuario_id)
+            session["rol"] = "proveedor"
+
+            flash("¡Registro como Proveedor exitoso!", "success")
+            return redirect(url_for("inicio"))
+    # Si llegamos aquí, hubo un error
+    usuario_db = data if 'data' in locals() else {}
     return render_template('registro_proveedor.html', user=usuario_db)
         
         
