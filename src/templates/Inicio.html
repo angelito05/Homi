@@ -84,67 +84,77 @@
 								<span class="toggler-icon"></span>
 							</button>
 							<div class="collapse navbar-collapse sub-menu-bar" id="navbarSupportedContent">
-								<ul id="nav" class="navbar-nav">
-									<li class="nav-item">
-										<a class="page-scroll active" href="Inicio.html">Inicio</a>
-									</li>
-									<li class="nav-item">
-										<a class="page-scroll" data-toggle="collapse" data-target="#sub-nav1" aria-controls="sub-nav1"
-											aria-expanded="false" aria-label="Toggle navigation" href="javascript:void(0)">Comprar
-											<div class="sub-nav-toggler">
-												<span></span>
-											</div>
-										</a>
-										<ul class="sub-menu collapse" id="sub-nav1">
-											<li><a href="about.html">Casas</a></li>
-											<li><a href="service.html">Departamentos</a></li>
-											<li><a href="category-list.html">Más Propiedades</a></li>
-										</ul>
-									</li>
-									<li class="nav-item">
-										<a class="page-scroll" data-toggle="collapse" data-target="#sub-nav" aria-controls="sub-nav"
-											aria-expanded="false" aria-label="Toggle navigation" href="javascript:void(0)">Rentar
-											<div class="sub-nav-toggler">
-												<span></span>
-											</div>
-										</a>
-										
-										<ul class="sub-menu collapse" id="sub-nav">
-											<li><a href="about.html">Casas</a></li>
-											<li><a href="service.html">Departamentos</a></li>
-											<li><a href="category-list.html">Más Propiedades</a></li>
-										</ul>
-									</li>
-									{% if session.get('rol') != 'proveedor' %}
-									<li class="nav-item">
-										<a class="page-scroll" data-toggle="collapse" data-target="#sub-nav-vender" aria-controls="sub-nav-vender"
-											aria-expanded="false" aria-label="Toggle navigation" href="javascript:void(0)">
-											Vender
-											<div class="sub-nav-toggler">
-												<span></span>
-											</div>
-										</a>
-										
-										<ul class="sub-menu collapse" id="sub-nav-vender">
-											<li style="padding: 10px 20px; border-bottom: 1px solid #eee;">
-												<h5 style="font-size: 16px; color: #2BB2BB;">¿Quieres publicar?</h5>
-												<p style="font-size: 12px; line-height: 1.2;">Únete a Homi y llega a miles.</p>
-											</li>
-											<li style="padding: 10px 20px;">
-												<a href="{{ url_for('registro_proveedor') }}" class="btn btn-primary btn-sm" 
-												style="background-color: #2BB2BB; color: white; border-radius: 20px; padding: 5px 15px; text-align:center;">
-												Vuélvete proveedor
-												</a>
-											</li>
-										</ul>
+															<ul id="nav" class="navbar-nav">
+								
+								<li class="nav-item">
+									<a class="page-scroll active" href="{{ url_for('home') }}">Inicio</a>
+								</li>
+
+								<li class="nav-item">
+									<a class="page-scroll" data-toggle="collapse" data-target="#sub-nav1" aria-controls="sub-nav1" aria-expanded="false" href="javascript:void(0)">
+										Comprar
+										<div class="sub-nav-toggler"><span></span></div>
+									</a>
+									<ul class="sub-menu collapse" id="sub-nav1">
+										<li><a href="about.html">Casas</a></li>
+										<li><a href="service.html">Departamentos</a></li>
+										<li><a href="category-list.html">Más Propiedades</a></li>
+									</ul>
+								</li>
+
+								<li class="nav-item">
+									<a class="page-scroll" data-toggle="collapse" data-target="#sub-nav" aria-controls="sub-nav" aria-expanded="false" href="javascript:void(0)">
+										Rentar
+										<div class="sub-nav-toggler"><span></span></div>
+									</a>
+									<ul class="sub-menu collapse" id="sub-nav">
+										<li><a href="about.html">Casas</a></li>
+										<li><a href="service.html">Departamentos</a></li>
+										<li><a href="category-list.html">Más Propiedades</a></li>
+									</ul>
+								</li>
+
+								{% if session.get('rol') == 'proveedor' %}
+								<li class="nav-item">
+									<a class="page-scroll" data-toggle="collapse" data-target="#sub-nav-vender" aria-controls="sub-nav-vender" aria-expanded="false" href="javascript:void(0)">
+										Vender
+										<div class="sub-nav-toggler"><span></span></div>
+									</a>
+									<ul class="sub-menu collapse" id="sub-nav-vender">
+										<li style="padding: 10px 20px; border-bottom: 1px solid #eee;">
+											<h5 style="font-size: 16px; color: #2BB2BB;">¿Listo para publicar?</h5>
+											<p style="font-size: 12px; line-height: 1.2;">Comparte tus propiedades con miles.</p>
+										</li>
+										<li style="padding: 10px 20px;">
+											<a href="{{ url_for('publicaciones.crear_publicacion') }}" class="btn btn-primary btn-sm" 
+											style="background-color: #2BB2BB; color: white; border-radius: 20px; padding: 5px 15px; text-align:center;">
+											Publicar propiedad
+											</a>
+										</li>
+									</ul>
+								</li>
+								
+								{% else %}
+								<li class="nav-item">
+									<a class="page-scroll" data-toggle="collapse" data-target="#sub-nav-vender" aria-controls="sub-nav-vender" aria-expanded="false" href="javascript:void(0)">
+										Vender
+										<div class="sub-nav-toggler"><span></span></div>
+									</a>
+									<ul class="sub-menu collapse" id="sub-nav-vender">
+										<li style="padding: 10px 20px; border-bottom: 1px solid #eee;">
+											<h5 style="font-size: 16px; color: #2BB2BB;">¿Quieres publicar?</h5>
+											<p style="font-size: 12px; line-height: 1.2;">Únete a Homi y llega a miles.</p>
+										</li>
+										<li style="padding: 10px 20px;">
+											<a href="{{ url_for('registro_proveedor') }}" class="btn btn-primary btn-sm" 
+											style="background-color: #2BB2BB; color: white; border-radius: 20px; padding: 5px 15px; text-align:center;">
+											Vuélvete proveedor
+											</a>
+										</li>
+									</ul>
 									</li>
 									{% endif %}
-									{% if session.get('rol') == 'proveedor' %}
-									<li class="nav-item">
-										<a href="{{ url_for('publicaciones.crear_publicacion') }}"class="page-scroll" data-toggle="collapse" data-target="#sub-nav" aria-controls="sub-nav"
-											aria-expanded="false" aria-label="Toggle navigation" >Publicar Propiedad</a>
-									</li>
-									{% endif %}
+
 								</ul>
 							</div>
 							<ul class="header-btn d-md-flex">
