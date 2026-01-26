@@ -33,6 +33,7 @@ csrf = CSRFProtect(app)
 client = MongoClient(app.config["MONGODB_URI"])
 db = client["HomiDB"]
 usuarios = db["usuarios"]
+propiedades = db["propiedades"]
 mongo = db
 
 # --- FUNCIÓN DE AYUDA PARA VALIDAR CONTRASEÑA ---
@@ -50,26 +51,83 @@ def validar_contrasena_segura(password):
         return False
     return True
 
-# Página principal - LOGIN
 @app.route("/")
 def home():
-    propiedades = consultas.obtener_propiedades_destacadas(mongo.db)
-    
-    # Pasamos la sesión completa y las propiedades a la plantilla
-    return render_template('Inicio.html', session=session,propiedades=propiedades)
+    # Propiedades destacadas (tu lógica existente)
+    propiedades_destacadas = consultas.obtener_propiedades_destacadas(mongo)
 
-@app.route('/buscar')
+    # Colonias dinámicas desde MongoDB (solo Acapulco)
+    colonias = propiedades.distinct(
+        "colonia",
+        {"ciudad": "Acapulco"}
+    )
+    colonias = sorted([c for c in colonias if c])
+
+    return render_template(
+        "Inicio.html",
+        session=session,
+        propiedades=propiedades_destacadas,
+        colonias=colonias
+    )
+
+
+@app.route("/buscar")
 def buscar():
-    """
-    Ruta para procesar la búsqueda del formulario.
-    Recoge los filtros y (en un futuro) consultará la BD.
-    """
-    # Obtenemos los parámetros de la URL (método GET)
-    categoria = request.args.get('categoria', '')
-    localizacion = request.args.get('localizacion', '')
-    keyword = request.args.get('keyword', '')
-   
-    return render_template('resultados.html', categoria=categoria, localizacion=localizacion, keyword=keyword)
+
+    categoria = request.args.get("categoria", "")
+    localizacion = request.args.get("localizacion", "")
+    keyword = request.args.get("keyword", "")
+    operacion = request.args.get("operacion", "")
+    extra = request.args.get("extra", "")
+
+    filtro = {
+        "ciudad": "Acapulco"
+    }
+
+    # Venta / Renta
+    if operacion:
+        filtro["tipo_operacion"] = operacion
+
+    # Categoría directa
+    if categoria:
+        filtro["tipo_propiedad"] = categoria
+
+    # MÁS PROPIEDADES
+    if extra == "mas":
+        filtro["tipo_propiedad"] = {
+            "$in": ["condominio", "local", "terreno"]
+        }
+
+    # Colonia
+    if localizacion:
+        filtro["colonia"] = {"$regex": localizacion, "$options": "i"}
+
+    # Keyword
+    if keyword:
+        filtro["$or"] = [
+            {"titulo": {"$regex": keyword, "$options": "i"}},
+            {"descripcion": {"$regex": keyword, "$options": "i"}}
+        ]
+
+    resultados = list(propiedades.find(filtro))
+
+    colonias = propiedades.distinct(
+        "colonia",
+        {"ciudad": "Acapulco"}
+    )
+
+    return render_template(
+        "resultados.html",
+        resultados=resultados,
+        colonias=sorted(colonias),
+        categoria=categoria,
+        localizacion=localizacion,
+        keyword=keyword,
+        operacion=operacion,
+        extra=extra
+    )
+
+
 
 # Registro de usuarios
 @app.route("/registro", methods=["GET", "POST"])
@@ -123,51 +181,88 @@ def registro():
     # GET: mostrar formulario
     return render_template("registro.html")
 
-# En app.py
-
 @app.route('/registro_proveedor', methods=['GET', 'POST'])
 def registro_proveedor():
-    # 1. SEGURIDAD: Solo usuarios logueados pueden entrar aquí
-    if "usuario_id" not in session:
-        flash("Por favor, inicia sesión como cliente antes de registrarte como proveedor.", "error")
-        return redirect(url_for("home")) # O a login
+    # Si es GET, mostramos el formulario
+    if request.method == 'GET':
+        # Pasamos los datos de sesión (si existen) para pre-llenar
+        datos_usuario = {}
+        if "usuario_id" in session:
+            # Buscamos los datos frescos de la BD
+            import consultas # Asegúrate de tener esto o usar mongo directamente
+            usuario_db = usuarios.find_one({"_id": ObjectId(session["usuario_id"])}) if "usuario_id" in session else None
+            if usuario_db:
+                datos_usuario = usuario_db
+        
+        return render_template('registro_proveedor.html', user={})
 
-    usuario_id = ObjectId(session["usuario_id"])
-
-    # 2. PROCESAR FORMULARIO (POST)
+    # Si es POST (Enviaron el formulario)
     if request.method == 'POST':
         data = request.form.to_dict()
+        correo = data.get("correo_electronico")
+        contrasena = data.get("contrasena")
+
+        # Validar confirmación de contraseña (solo si está creando cuenta nueva o cambiando pass)
+        if data.get("contrasena") and data["contrasena"] != data.get("confirmar_contrasena"):
+             flash("Las contraseñas no coinciden.", "error")
+             return render_template('registro_proveedor.html', user=data)
         
-        # Preparamos solo los campos nuevos/actualizables
-        datos_actualizar = {
+        # VALIDAR CONTRASEÑA SEGURA
+        if not validar_contrasena_segura(data["contrasena"]):
+            flash("La contraseña no es segura (Faltan mayúsculas, números o símbolos).", "error")
+            return render_template('registro_proveedor.html', user=data)
+
+        usuario_existente = usuarios.find_one({"correo_electronico": correo})
+
+        datos_extra = {
             "telefono": data.get("telefono"),
-            "codigo_postal": data.get("codigo_postal"),
-            "rfc_curp": data.get("rfc_curp"),
-            "nombre_inmobiliaria": data.get("inmobiliaria"),
-            "url_facebook": data.get("url_facebook"),
-            "url_instagram": data.get("url_instagram"),
-            "url_whatsapp": data.get("url_whatsapp"),
-            
-            # CAMBIO DE ROL
-            "rol": "proveedor",
+            "codigo_postal": data.get("codigo_postal"), # NUEVO
+            "rfc_curp": data.get("rfc_curp"),           # NUEVO
+            "nombre_inmobiliaria": data.get("inmobiliaria", ""),
+            "url_facebook": data.get("url_facebook", ""),
+            "url_instagram": data.get("url_instagram", ""),
+            "url_whatsapp": data.get("url_whatsapp", ""),
             "verificado": False
         }
 
-        # ACTUALIZAMOS EL REGISTRO EXISTENTE
-        usuarios.update_one(
-            {"_id": usuario_id},
-            {"$set": datos_actualizar}
-        )
+        if usuario_existente:
+            # Validar que la contraseña coincida con la de la BD para confirmar identidad
+            if not bcrypt.check_password_hash(usuario_existente["contrasena"], contrasena):
+                flash("Contraseña incorrecta. Para convertir tu cuenta, ingresa tu contraseña actual.", "error")
+                return render_template('registro_proveedor.html', user=data)
 
-        # Actualizamos la sesión
-        session["rol"] = "proveedor"
-        flash("¡Felicidades! Tu cuenta ahora es de Proveedor.", "success")
-        return redirect(url_for("dashboard"))
+            # Actualizar rol y datos
+            usuarios.update_one(
+                {"_id": usuario_existente["_id"]},
+                {
+                    "$set": {
+                        "rol": "proveedor",
+                        **datos_extra # Desempaqueta los datos extra aquí
+                    }
+                }
+            )
+            # Actualizar sesión para que el cambio de rol se refleje inmediatamente
+            session["rol"] = "proveedor"
+            flash("¡Felicidades! Ahora eres proveedor.", "success")
+            return redirect(url_for("home")) # Redirigir a Home (Inicio)
 
-    # 3. CARGAR DATOS (GET)
-    usuario_db = usuarios.find_one({"_id": usuario_id})
-    # Pasamos 'user' al template para que llene los inputs automáticamente
-    return render_template('registro_proveedor.html', user=usuario_db)
+        else:
+            # Usuario Nuevo
+            hashed_password = bcrypt.generate_password_hash(contrasena).decode("utf-8")
+            nuevo_proveedor = {
+                "nombre": data["nombre"],
+                "primer_apellido": data["primer_apellido"],
+                "segundo_apellido": data.get("segundo_apellido", ""),
+                "correo_electronico": correo,
+                "contrasena": hashed_password,
+                "rol": "proveedor",
+                "estado": "activo",
+                "fecha_registro": datetime.now(),
+                **datos_extra
+            }
+            usuarios.insert_one(nuevo_proveedor)
+            flash("Registro de proveedor exitoso.", "success")
+            return redirect(url_for("index"))
         
         
 @app.route("/perfil", methods=["GET", "POST"])
