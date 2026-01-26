@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="es">
+<head>
+	<meta charset="utf-8">
+	<title>Resultados | Homi</title>
+
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<link rel="shortcut icon" href="static/images/logoHomi.png">
+	<link rel="stylesheet" href="static/css/bootstrap-5.0.5-alpha.min.css">
+	<link rel="stylesheet" href="static/css/LineIcons.2.0.css">
+	<link rel="stylesheet" href="static/css/style.css">
+</head>
+
+<body>
+
+<!--====== HEADER ======-->
+<header class="header_area">
+	<div class="header_navbar">
+		<div class="container">
+			<nav class="navbar navbar-expand-lg">
+				<a class="navbar-brand" href="{{ url_for('home') }}">
+					<img src="static/images/logo/logoHomi.png" style="max-width:50px;">
+					<span style="color:#2BB2BB;font-weight:bold;">Homi</span>
+				</a>
+
+				<div class="collapse navbar-collapse">
+					<ul class="navbar-nav ms-auto">
+
+						<li class="nav-item">
+							<a class="nav-link" href="{{ url_for('buscar', operacion='venta') }}">
+								Comprar
+							</a>
+						</li>
+
+						<li class="nav-item">
+							<a class="nav-link" href="{{ url_for('buscar', operacion='renta') }}">
+								Rentar
+							</a>
+						</li>
+
+						<li class="nav-item">
+							<a class="nav-link" href="{{ url_for('home') }}">
+								Inicio
+							</a>
+						</li>
+
+					</ul>
+				</div>
+			</nav>
+		</div>
+	</div>
+</header>
+
+<!--====== SEARCH BAR ======-->
+<div class="search-area mt-120">
+	<div class="container">
+		<div class="search-wrapper">
+			<form action="{{ url_for('buscar') }}" method="get">
+				<div class="row justify-content-center">
+
+					<input type="hidden" name="operacion" value="{{ request.args.get('operacion','') }}">
+
+					<div class="col-lg-3">
+						<input class="form-control" type="text" name="keyword"
+							   placeholder="¿Qué buscas?"
+							   value="{{ keyword }}">
+					</div>
+
+					<div class="col-lg-3">
+						<select class="form-control" name="categoria">
+							<option value="">Categoría</option>
+							<option value="Casa">Casa</option>
+							<option value="Departamento">Departamento</option>
+							<option value="Terreno">Terreno</option>
+							<option value="Local">Local</option>
+						</select>
+					</div>
+
+					<div class="col-lg-3">
+						<select class="form-control" name="localizacion">
+							<option value="">Colonia</option>
+							{% for colonia in colonias %}
+								<option value="{{ colonia }}">{{ colonia }}</option>
+							{% endfor %}
+						</select>
+					</div>
+
+					<div class="col-lg-2">
+						<button class="main-btn btn-hover w-100">
+							Buscar
+						</button>
+					</div>
+
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+<!--====== RESULTS ======-->
+<section class="latest-product-area pt-80 pb-110">
+	<div class="container">
+
+		<div class="row mb-40">
+			<div class="col-12 text-center">
+				<h2>Resultados encontrados</h2>
+				<p class="text-muted">
+					{{ resultados|length }} propiedades disponibles
+				</p>
+			</div>
+		</div>
+
+		<div class="row">
+
+			{% if resultados %}
+				{% for p in resultados %}
+				<div class="col-lg-4 col-md-6">
+					<div class="single-product">
+
+						<div class="product-img">
+							<img src="{{ p.imagen_principal or 'static/images/product/l-product-1.jpg' }}">
+						</div>
+
+						<div class="product-content">
+							<h3 class="name">{{ p.titulo }}</h3>
+
+							<ul class="address">
+								<li><i class="lni lni-map-marker"></i> {{ p.colonia }}</li>
+								<li><i class="lni lni-package"></i> {{ p.tipo_propiedad }}</li>
+							</ul>
+
+							<div class="product-bottom">
+								<h3 class="price">
+									${{ "{:,.0f}".format(p.precio) }}
+								</h3>
+							</div>
+						</div>
+
+					</div>
+				</div>
+				{% endfor %}
+			{% else %}
+				<div class="col-12 text-center">
+					<h4>No se encontraron resultados 😕</h4>
+				</div>
+			{% endif %}
+
+		</div>
+	</div>
+</section>
+
+</body>
+</html>
