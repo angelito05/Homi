@@ -34,6 +34,7 @@ client = MongoClient(app.config["MONGODB_URI"])
 db = client["HomiDB"]
 usuarios = db["usuarios"]
 propiedades = db["propiedades"]
+logs_col = db["log_audotoria"]
 mongo = db
 
 # --- FUNCIÓN DE AYUDA PARA VALIDAR CONTRASEÑA ---
@@ -182,6 +183,18 @@ def registro():
     # GET: mostrar formulario
     return render_template("registro.html")
 
+def registrar_movimiento(usuario_id, accion, detalles):
+    try:
+        nuevo_log = {
+            "id_usuario": ObjectId(usuario_id) if usuario_id else None,
+            "accion": accion,
+            "detalles": detalles,
+            "fecha_evento": datetime.utcnow()
+        }
+        logs_col.insert_one(nuevo_log)
+    except Exception as e:
+        print(f"Error guardando log: {e}")
+
 @app.route('/registro_proveedor', methods=['GET', 'POST'])
 def registro_proveedor():
     # Si es GET, mostramos el formulario
@@ -201,6 +214,7 @@ def registro_proveedor():
     if request.method == 'POST':
         data = request.form.to_dict()
         correo = data.get("correo_electronico")
+        contrasena_ingresada = data.get("contrasena")
         contrasena = data.get("contrasena")
 
         # Validar confirmación de contraseña (solo si está creando cuenta nueva o cambiando pass)
@@ -213,6 +227,7 @@ def registro_proveedor():
             flash("La contraseña no es segura (Faltan mayúsculas, números o símbolos).", "error")
             return render_template('registro_proveedor.html', user=data)
 
+        # 1. Buscar si el usuario ya existe
         usuario_existente = usuarios.find_one({"correo_electronico": correo})
 
         datos_extra = {
@@ -225,45 +240,65 @@ def registro_proveedor():
             "url_whatsapp": data.get("url_whatsapp", ""),
             "verificado": False
         }
-
         if usuario_existente:
-            # Validar que la contraseña coincida con la de la BD para confirmar identidad
-            if not bcrypt.check_password_hash(usuario_existente["contrasena"], contrasena):
-                flash("Contraseña incorrecta. Para convertir tu cuenta, ingresa tu contraseña actual.", "error")
-                return render_template('registro_proveedor.html', user=data)
+            # Usuario ya existe, actualizar datos y cambiar rol
+            usuario_id = usuario_existente["_id"]
 
-            # Actualizar rol y datos
+            # Actualizar datos
             usuarios.update_one(
-                {"_id": usuario_existente["_id"]},
+                {"_id": usuario_id},
                 {
                     "$set": {
-                        "rol": "proveedor",
-                        **datos_extra # Desempaqueta los datos extra aquí
+                        **datos_extra,
+                        "rol": "proveedor"
                     }
                 }
             )
-            # Actualizar sesión para que el cambio de rol se refleje inmediatamente
-            session["rol"] = "proveedor"
-            flash("¡Felicidades! Ahora eres proveedor.", "success")
-            return redirect(url_for("home")) # Redirigir a Home (Inicio)
+            registrar_movimiento(
+                usuario_id, 
+                "CAMBIO_ROL", 
+                f"El usuario actualizó su cuenta a Proveedor. Inmobiliaria: {data.get('inmobiliaria', 'N/A')}"
+            )
 
+            # Actualizar sesión
+            session["usuario_id"] = str(usuario_id)
+            session["rol"] = "proveedor"
+
+            flash("¡Felicidades! Tu cuenta ahora es de Proveedor.", "success")
+            return redirect(url_for("dashboard"))
         else:
-            # Usuario Nuevo
+            # Nuevo usuario, crear cuenta de proveedor
             hashed_password = bcrypt.generate_password_hash(contrasena).decode("utf-8")
-            nuevo_proveedor = {
-                "nombre": data["nombre"],
-                "primer_apellido": data["primer_apellido"],
+
+            nuevo_usuario = {
+                "nombre": data.get("nombre", ""),
+                "primer_apellido": data.get("primer_apellido", ""),
                 "segundo_apellido": data.get("segundo_apellido", ""),
                 "correo_electronico": correo,
                 "contrasena": hashed_password,
                 "rol": "proveedor",
                 "estado": "activo",
-                "fecha_registro": datetime.now(),
                 **datos_extra
             }
-            usuarios.insert_one(nuevo_proveedor)
-            flash("Registro de proveedor exitoso.", "success")
-            return redirect(url_for("index"))
+
+            resultado = usuarios.insert_one(nuevo_usuario)
+            usuario_id = resultado.inserted_id
+
+            registrar_movimiento(
+                usuario_id, 
+                "CREACION_CUENTA_PROVEEDOR", 
+                f"Se creó una nueva cuenta de Proveedor. Inmobiliaria: {data.get('inmobiliaria', 'N/A')}"
+            )
+
+            # Crear sesión
+            session["usuario_id"] = str(usuario_id)
+            session["rol"] = "proveedor"
+
+            flash("¡Registro como Proveedor exitoso!", "success")
+            return redirect(url_for("inicio"))
+    # Si llegamos aquí, hubo un error
+    usuario_db = data if 'data' in locals() else {}
+    return render_template('registro_proveedor.html', user=usuario_db)
         
         
 @app.route("/perfil", methods=["GET", "POST"])
@@ -322,6 +357,31 @@ def perfil():
         return redirect(url_for("perfil"))
 
     return render_template("perfil.html", form=form, usuario=usuario)
+
+@app.route('/admin_dashboard')
+def admin_dashboard():
+    if 'usuario_id' not in session or session.get('rol') != 'admin':
+        flash("Acceso denegado.", "error")
+        return redirect(url_for('home'))
+
+    # Pipeline para unir Logs con Usuarios
+    pipeline = [
+        {
+            "$lookup": {
+                "from": "Usuarios",
+                "localField": "id_usuario",
+                "foreignField": "_id",
+                "as": "usuario_info"
+            }
+        },
+        # Descomponemos el array (preserveNullAndEmptyArrays para ver logs del sistema sin usuario)
+        { "$unwind": { "path": "$usuario_info", "preserveNullAndEmptyArrays": True } },
+        { "$sort": { "fecha_evento": -1 } }
+    ]
+
+    movimientos = list(logs_col.aggregate(pipeline))
+
+    return render_template('admin_dashboard.html', movimientos=movimientos)
 
 # Login
 @app.route("/index", methods=["POST", "GET"])

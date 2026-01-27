@@ -6,16 +6,16 @@
     <title>Homi - Registro de Proveedores</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     
-    <link rel="shortcut icon" href="static/images/logoHomi.png" type="image/png">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='images/logoHomi.png') }}" type="image/png">
 
-    <link rel="stylesheet" href="static/css/animate.css">
-    <link rel="stylesheet" href="static/css/tiny-slider.css">
-    <link rel="stylesheet" href="static/css/glightbox.min.css">
-    <link rel="stylesheet" href="static/css/LineIcons.2.0.css">
-    <link rel="stylesheet" href="static/css/selectr.css">
-    <link rel="stylesheet" href="static/css/nouislider.css">
-    <link rel="stylesheet" href="static/css/bootstrap-5.0.5-alpha.min.css">
-    <link rel="stylesheet" href="static/css/style.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='CSS/animate.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='CSS/tiny-slider.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='CSS/glightbox.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='CSS/LineIcons.2.0.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='CSS/selectr.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='CSS/nouislider.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='CSS/bootstrap-5.0.5-alpha.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='CSS/style.css') }}">
     
     <style>
         .login-area .single-input input {
@@ -28,6 +28,12 @@
         }
         .login-area .single-input input:focus {
             border-color: #2BB2BB;
+        }
+        /* Clase extra para inputs bloqueados */
+        .input-readonly {
+            background-color: #f9f9f9;
+            color: #777;
+            cursor: not-allowed;
         }
     </style>
 </head>
@@ -82,7 +88,7 @@
                 <div class="mx-auto col-lg-9 col-xl-9 col-md-10">
                     <div class="text-center hero-content">
                         <h1 class="mb-30 wow fadeInUp" data-wow-delay=".2s" style="color: #fff;">Alta de Proveedor</h1>
-                        <p class="wow fadeInUp" data-wow-delay=".4s" style="color: #fff;">Regístrate para publicar tus propiedades.</p>
+                        <p class="wow fadeInUp" data-wow-delay=".4s" style="color: #fff;">Completa tu perfil para publicar propiedades.</p>
                     </div>
                 </div>
             </div>
@@ -96,7 +102,12 @@
                     <div class="login-content box-style" style="padding: 40px;">
                         
                         <div class="text-center mb-40">
-                            <h3>Completa los datos fiscales y de seguridad</h3>
+                            <h3>Datos Fiscales y de Contacto</h3>
+                           {% if session.usuario_id %} 
+                            <p>Actualiza tu cuenta actual</p>
+                            {% else %}
+                            <p>Completa el formulario para registrarte como proveedor</p>
+                            {% endif %}
                         </div>
 
                         {% with messages = get_flashed_messages(with_categories=true) %}
@@ -109,29 +120,37 @@
 
                         <form action="{{ url_for('registro_proveedor') }}" method="POST">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="single-input mb-30">
                                         <label>Nombre(s) *</label>
-                                        <input type="text" name="nombre" value="{{ user.get('nombre', '') }}" required>
+                                        <input type="text" name="nombre" value="{{ user.nombre }}" required>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="single-input mb-30">
-                                        <label>Apellidos *</label>
-                                        <input type="text" name="primer_apellido" value="{{ user.get('primer_apellido', '') }}" required>
+                                        <label>Primer Apellido</label>
+                                        <input type="text" name="primer_apellido" value="{{ user.primer_apellido }}"  required>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="single-input mb-30">
-                                        <label>Correo Electrónico *</label>
-                                        <input type="email" name="correo_electronico" value="{{ user.get('correo_electronico', '') }}" required {% if session.get('usuario_id') %}readonly style="background-color: #eee;"{% endif %}>
+                                        <label>Segundo Apellido</label>
+                                        <input type="text" name="segundo_apellido" value="{{ user.segundo_apellido }}" required>
                                     </div>
                                 </div>
+                                <div class="col-md-6">
+                                    <div class="single-input mb-30">
+                                        <label>Correo Electrónico</label>
+                                        <input type="email" name="correo_electronico" value="{{ user.correo_electronico }}"  required>
+                                    </div>
+                                </div>
+                                
                                 <div class="col-md-6">
                                     <div class="single-input mb-30">
                                         <label>Teléfono *</label>
-                                        <input type="tel" name="telefono" value="{{ user.get('telefono', '') }}" required>
+                                        <input type="tel" name="telefono" value="{{ user.telefono }}" required>
                                     </div>
                                 </div>
 
@@ -140,33 +159,32 @@
                                 <div class="col-md-6">
                                     <div class="single-input mb-30">
                                         <label>Código Postal *</label>
-                                        <input type="number" name="codigo_postal" placeholder="Ej. 39000" required>
+                                        <input type="number" name="codigo_postal" placeholder="Ej. 39000" value="{{ user.codigo_postal }}" required>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="single-input mb-30">
                                         <label>RFC o CURP *</label>
-                                        <input type="text" name="rfc_curp" value="{{ user.get('rfc_curp', '') }}" required style="text-transform: uppercase;">
+                                        <input type="text" name="rfc_curp" value="{{ user.rfc_curp }}" required style="text-transform: uppercase;">
                                     </div>
                                 </div>
                                 <div class="col-md-12">
                                     <div class="single-input mb-30">
                                         <label>Nombre Inmobiliaria (Opcional)</label>
-                                        <input type="text" name="inmobiliaria" placeholder="Nombre comercial">
+                                        <input type="text" name="inmobiliaria" value="{{ user.nombre_inmobiliaria }}" placeholder="Nombre comercial">
                                     </div>
                                 </div>
 
                                 <div class="col-12"><hr> <h6 class="mb-3 theme-color">Redes Sociales (Opcional)</h6></div>
                                 <div class="col-md-4">
-                                    <input type="text" name="url_facebook" placeholder="Facebook URL" class="form-control mb-3">
+                                    <input type="text" name="url_facebook" value="{{ user.url_facebook }}" placeholder="Facebook URL" class="single-input mb-30" style="width:100%; border-radius:30px; padding:15px; border:1px solid #e5e5e5;">
                                 </div>
                                 <div class="col-md-4">
-                                    <input type="text" name="url_instagram" placeholder="Instagram URL" class="form-control mb-3">
+                                    <input type="text" name="url_instagram" value="{{ user.url_instagram }}" placeholder="Instagram URL" class="single-input mb-30" style="width:100%; border-radius:30px; padding:15px; border:1px solid #e5e5e5;">
                                 </div>
                                 <div class="col-md-4">
-                                    <input type="text" name="url_whatsapp" placeholder="WhatsApp Link" class="form-control mb-3">
+                                    <input type="text" name="url_whatsapp" value="{{ user.url_whatsapp }}" placeholder="WhatsApp Link" class="single-input mb-30" style="width:100%; border-radius:30px; padding:15px; border:1px solid #e5e5e5;">
                                 </div>
-
                                 <div class="col-12"><hr> <h6 class="mb-3 theme-color">Seguridad de la Cuenta</h6></div>
                                 <div class="col-md-6">
                                     <div class="single-input mb-30 password-container">
@@ -175,7 +193,6 @@
                                         <i class="lni lni-eye toggle-password" onclick="togglePass('passProv', this)"></i>
                                     </div>
                                 </div>
-
                                 <div class="col-md-6">
                                     <div class="single-input mb-30">
                                         <label>Confirmar Contraseña *</label>
@@ -190,7 +207,6 @@
                                         {% endif %}
                                     </p>
                                 </div>
-
                                 <div class="col-12 text-center">
                                     <button type="submit" class="main-btn btn-hover">Confirmar Registro</button>
                                 </div>
@@ -213,20 +229,21 @@
             </div>
         </div>
     </section>
+
     <footer class="footer-area pt-50 pb-50" style="background: #333F57;">
         <div class="container">
             <div class="text-center">
-                <p style="color: #fff;">&copy; cosenø Dv. Todos los derechos reservados.</p>
+                <p style="color: #fff;">&copy; Homi. Todos los derechos reservados.</p>
             </div>
         </div>
     </footer>
 
-    <script src="static/js/bootstrap.bundle-5.0.0.alpha-min.js"></script>
-    <script src="static/js/tiny-slider.js"></script>
-    <script src="static/js/wow.min.js"></script>
-    <script src="static/js/glightbox.min.js"></script>
-    <script src="static/js/selectr.min.js"></script>
-    <script src="static/js/nouislider.js"></script>
-    <script src="static/js/main.js"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap.bundle-5.0.0.alpha-min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/tiny-slider.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/wow.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/glightbox.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/selectr.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/nouislider.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
 </html>

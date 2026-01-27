@@ -14,6 +14,7 @@ publicaciones_bp = Blueprint('publicaciones', __name__, template_folder='src/tem
 client = MongoClient(Config.MONGODB_URI)
 db = client["HomiDB"]
 propiedades_col = db["propiedades"]
+logs_col = db["log_audotoria"]
 
 @publicaciones_bp.route('/crear-publicacion', methods=['GET', 'POST'])
 def crear_publicacion():
@@ -102,6 +103,12 @@ def crear_publicacion():
                 "fecha_publicacion": datetime.utcnow(),
                 "imagenes": imagenes_guardadas
             }
+            logs_col.insert_one({
+                "id_usuario": ObjectId(session['usuario_id']),
+                "accion": "NUEVA_PROPIEDAD",
+                "detalles": f"Publicó propiedad: {form.titulo.data} en {form.ciudad.data}. Precio: {precio_final}",
+                "fecha_evento": datetime.utcnow()
+            })
 
             propiedades_col.insert_one(nueva_propiedad)
             flash("¡Propiedad enviada a revisión!", "success")
