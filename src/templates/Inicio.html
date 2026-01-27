@@ -89,30 +89,60 @@
 										<a class="page-scroll active" href="Inicio.html">Inicio</a>
 									</li>
 									<li class="nav-item">
-										<a class="page-scroll" data-toggle="collapse" data-target="#sub-nav1" aria-controls="sub-nav1"
-											aria-expanded="false" aria-label="Toggle navigation" href="javascript:void(0)">Comprar
+										<a class="page-scroll" data-toggle="collapse" data-target="#sub-nav1"
+										aria-controls="sub-nav1" aria-expanded="false"
+										aria-label="Toggle navigation" href="javascript:void(0)">
+											Comprar
 											<div class="sub-nav-toggler">
 												<span></span>
 											</div>
 										</a>
+
 										<ul class="sub-menu collapse" id="sub-nav1">
-											<li><a href="about.html">Casas</a></li>
-											<li><a href="service.html">Departamentos</a></li>
-											<li><a href="category-list.html">Más Propiedades</a></li>
+											<li>
+												<a href="{{ url_for('buscar', operacion='venta', categoria='casa') }}">
+													Casas
+												</a>
+											</li>
+											<li>
+												<a href="{{ url_for('buscar', operacion='venta', categoria='departamento') }}">
+													Departamentos
+												</a>
+											</li>
+											<li>
+												<a href="{{ url_for('buscar', operacion='venta', extra='mas') }}">
+													Más Propiedades
+												</a>
+											</li>
 										</ul>
 									</li>
+
 									<li class="nav-item">
-										<a class="page-scroll" data-toggle="collapse" data-target="#sub-nav" aria-controls="sub-nav"
-											aria-expanded="false" aria-label="Toggle navigation" href="javascript:void(0)">Rentar
+										<a class="page-scroll" data-toggle="collapse" data-target="#sub-nav"
+										aria-controls="sub-nav" aria-expanded="false"
+										aria-label="Toggle navigation" href="javascript:void(0)">
+											Rentar
 											<div class="sub-nav-toggler">
 												<span></span>
 											</div>
 										</a>
-										
+
 										<ul class="sub-menu collapse" id="sub-nav">
-											<li><a href="about.html">Casas</a></li>
-											<li><a href="service.html">Departamentos</a></li>
-											<li><a href="category-list.html">Más Propiedades</a></li>
+											<li>
+												<a href="{{ url_for('buscar', operacion='renta', categoria='casa') }}">
+													Casas
+												</a>
+											</li>
+											<li>
+												<a href="{{ url_for('buscar', operacion='renta', categoria='departamento') }}">
+													Departamentos
+												</a>
+											</li>
+											<li>
+												<a href="{{ url_for('buscar', operacion='renta', extra='mas') }}">
+													Más Propiedades
+												</a>
+											</li>
 										</ul>
 									</li>
 									{% if session.get('rol') != 'proveedor' %}
@@ -201,51 +231,47 @@
 	<div class="search-area">
 		<div class="container">
 			<div class="search-wrapper">
-				<form action="#">
+				<form action="{{ url_for('buscar') }}" method="get">
 					<div class="row justify-content-center">
+
+						<!-- Keyword -->
 						<div class="col-lg-3 col-sm-5 col-10">
-							<div class="search-input">
-								<label for="keyword"><i class="lni lni-search-alt theme-color"></i></label>
-								<input type="text" name="keyword" id="keyword" placeholder="Palabra clave del producto">
-							</div>
+							<input class="form-control"
+								type="text"
+								name="keyword"
+								placeholder="¿Qué buscas?"
+								value="{{ keyword }}">
 						</div>
+
+						<!-- Categoría -->
 						<div class="col-lg-3 col-sm-5 col-10">
-							<div class="search-input">
-								<label for="category"><i class="lni lni-grid-alt theme-color"></i></label>
-								<select name="category" id="category">
-									<option value="none" selected disabled>Categorias</option>
-									<option value="none">Vehicle</option>
-									<option value="none">Electronics</option>
-									<option value="none">Mobiles</option>
-									<option value="none">Furniture</option>
-									<option value="none">Fashion</option>
-									<option value="none">Jobs</option>
-									<option value="none">Real Estate</option>
-									<option value="none">Animals</option>
-									<option value="none">Education</option>
-									<option value="none">Matrimony</option>
-								</select>
-							</div>
+							<select class="form-control" name="categoria">
+								<option value="">Categoría</option>
+								<option value="casa">Casa</option>
+								<option value="departamento">Departamento</option>
+								<option value="condominio">Condominio</option>
+								<option value="terreno">Terreno</option>
+								<option value="local">Local</option>
+							</select>
 						</div>
+
+						<!-- Colonia -->
 						<div class="col-lg-3 col-sm-5 col-10">
-							<div class="search-input">
-								<label for="location"><i class="lni lni-map-marker theme-color"></i></label>
-								<select name="location" id="location">
-									<option value="none" selected disabled>Localidad</option>
-									<option value="none">New York</option>
-									<option value="none">California</option>
-									<option value="none">Washington</option>
-									<option value="none">Birmingham</option>
-									<option value="none">Chicago</option>
-									<option value="none">Phoenix</option>
-								</select>
-							</div>
+							<select class="form-control" name="localizacion">
+								<option value="">Colonia</option>
+								{% for colonia in colonias %}
+									<option value="{{ colonia }}">{{ colonia }}</option>
+								{% endfor %}
+							</select>
 						</div>
+
+						<!-- Botón -->
 						<div class="col-lg-2 col-sm-5 col-10">
-							<div class="search-btn">
-								<button class="main-btn btn-hover">Buscar <i class="lni lni-search-alt"></i></button>
-							</div>
+							<button class="main-btn btn-hover w-100">
+								Buscar
+							</button>
 						</div>
+
 					</div>
 				</form>
 			</div>

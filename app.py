@@ -33,6 +33,7 @@ csrf = CSRFProtect(app)
 client = MongoClient(app.config["MONGODB_URI"])
 db = client["HomiDB"]
 usuarios = db["usuarios"]
+propiedades = db["propiedades"]
 mongo = db
 
 # --- FUNCIÓN DE AYUDA PARA VALIDAR CONTRASEÑA ---
@@ -50,26 +51,84 @@ def validar_contrasena_segura(password):
         return False
     return True
 
-# Página principal - LOGIN
 @app.route("/")
 def home():
-    propiedades = consultas.obtener_propiedades_destacadas(mongo.db)
-    
-    # Pasamos la sesión completa y las propiedades a la plantilla
-    return render_template('Inicio.html', session=session,propiedades=propiedades)
+    # Propiedades destacadas (tu lógica existente)
+    propiedades_destacadas = consultas.obtener_propiedades_destacadas(mongo)
 
-@app.route('/buscar')
+    # Colonias dinámicas desde MongoDB (solo Acapulco)
+    colonias = propiedades.distinct(
+        "colonia",
+        {"ciudad": "Acapulco"}
+    )
+    colonias = sorted([c for c in colonias if c])
+
+    return render_template(
+        "Inicio.html",
+        session=session,
+        propiedades=propiedades_destacadas,
+        colonias=colonias
+    )
+
+
+@app.route("/buscar")
 def buscar():
-    """
-    Ruta para procesar la búsqueda del formulario.
-    Recoge los filtros y (en un futuro) consultará la BD.
-    """
-    # Obtenemos los parámetros de la URL (método GET)
-    categoria = request.args.get('categoria', '')
-    localizacion = request.args.get('localizacion', '')
-    keyword = request.args.get('keyword', '')
-   
-    return render_template('resultados.html', categoria=categoria, localizacion=localizacion, keyword=keyword)
+
+    categoria = request.args.get("categoria", "").lower()
+    localizacion = request.args.get("localizacion", "")
+    keyword = request.args.get("keyword", "")
+    operacion = request.args.get("operacion", "").lower()
+    extra = request.args.get("extra", "")
+
+    # Filtro base: solo Acapulco
+    filtro = {
+        "ciudad": "Acapulco"
+    }
+
+    # Venta / Renta
+    if operacion:
+        filtro["tipo_operacion"] = operacion
+
+    # Categoría
+    if categoria:
+        filtro["tipo_propiedad"] = categoria
+
+    # Más propiedades (solo si NO hay categoría)
+    if extra == "mas" and not categoria:
+        filtro["tipo_propiedad"] = {
+            "$in": ["condominio", "local", "terreno"]
+        }
+
+    # Colonia
+    if localizacion:
+        filtro["colonia"] = {"$regex": f"^{localizacion}$", "$options": "i"}
+
+    # Keyword (titulo o descripcion)
+    if keyword:
+        filtro["$or"] = [
+            {"titulo": {"$regex": keyword, "$options": "i"}},
+            {"descripcion": {"$regex": keyword, "$options": "i"}}
+        ]
+
+    resultados = list(propiedades.find(filtro))
+
+    # Colonias dinámicas
+    colonias = propiedades.distinct(
+        "colonia",
+        {"ciudad": "Acapulco"}
+    )
+
+    return render_template(
+        "resultados.html",
+        resultados=resultados,
+        colonias=sorted(colonias),
+        categoria=categoria,
+        localizacion=localizacion,
+        keyword=keyword,
+        operacion=operacion,
+        extra=extra
+    )
+
 
 # Registro de usuarios
 @app.route("/registro", methods=["GET", "POST"])
