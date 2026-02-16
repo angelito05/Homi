@@ -198,7 +198,7 @@
 										{% endif %}
 										<li><a href="/perfil">Perfil</a></li>
 										{% if session.get('rol') == 'proveedor' %}
-										<li><a href="/post-ad">Publicaciones</a></li>
+										<li><a href="{{ url_for('publicaciones.crear_publicacion') }}">Publicaciones</a></li>
 										{% endif %}
 										<li><a href="/payments">Notificaciones</a></li>
 										<li><a href="/favorites">Favoritos</a></li>
@@ -215,7 +215,20 @@
 					</div>
 				</div> <!-- row -->
 			</div> <!-- container -->
-		</div> <!-- header navbar -->
+		</div>
+		 <!-- header navbar -->
+ <div style="position: fixed; top: 100px; right: 20px; z-index: 9999; min-width: 300px; max-width: 400px;">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }} alert-dismissible fade show auto-dismiss shadow" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+</div>
 	</header>
 
 	<!--====== HEADER PART ENDS ======-->
@@ -1082,6 +1095,22 @@
 			}
 		});
 	</script>
+	
+	<script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Selecciona todas las alertas que tengan la clase 'auto-dismiss'
+            var alerts = document.querySelectorAll('.auto-dismiss');
+            
+            alerts.forEach(function(alert) {
+                // Esperar 5 segundos (5000 milisegundos)
+                setTimeout(function() {
+                    // Usar la API de Bootstrap para cerrar la alerta suavemente
+                    var bsAlert = new bootstrap.Alert(alert);
+                    bsAlert.close();
+                }, 5000);
+            });
+        });
+    </script>
 
 </body>
 
