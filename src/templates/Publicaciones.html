@@ -20,14 +20,14 @@
 
     <div class="pub-container">
         <div class="pub-header">
+            <div style="margin-bottom: 15px;">
+                    <a href="{{ url_for('home') }}" style="text-decoration: none; color: #666;">&larr; Volver al Inicio</a>
+            </div>
             <div class="homi-logo">
                 <span class="logo-text">Homi</span>
             </div>
-            <div class="menu-icon">&#9776;</div>
         </div>
-        <div style="margin-bottom: 15px;">
-                    <a href="{{ url_for('home') }}" style="text-decoration: none; color: #666;">&larr; Volver al Inicio</a>
-        </div>
+        
 
         <form action="/crear-publicacion" method="POST" enctype="multipart/form-data">
             {{ form.csrf_token }}
