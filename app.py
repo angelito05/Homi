@@ -360,11 +360,12 @@ def perfil():
 
 @app.route('/admin_dashboard')
 def admin_dashboard():
+    # Verificar permisos de Admin
     if 'usuario_id' not in session or session.get('rol') != 'admin':
         flash("Acceso denegado.", "error")
         return redirect(url_for('home'))
 
-    # Pipeline para unir Logs con Usuarios
+    # Pipeline para obtener los movimientos (Igual que tenías)
     pipeline = [
         {
             "$lookup": {
@@ -374,14 +375,14 @@ def admin_dashboard():
                 "as": "usuario_info"
             }
         },
-        # Descomponemos el array (preserveNullAndEmptyArrays para ver logs del sistema sin usuario)
         { "$unwind": { "path": "$usuario_info", "preserveNullAndEmptyArrays": True } },
         { "$sort": { "fecha_evento": -1 } }
     ]
 
     movimientos = list(logs_col.aggregate(pipeline))
 
-    return render_template('admin_dashboard.html', movimientos=movimientos)
+    # CAMBIO IMPORTANTE: Renderizamos index.html activando el modo admin
+    return render_template('index.html', movimientos=movimientos, mostrar_admin=True)
 
 # Login
 @app.route("/index", methods=["POST", "GET"])
@@ -389,7 +390,12 @@ def admin_dashboard():
 def index():
 
     if request.method == "GET":
-        return render_template("index.html")
+        # Si el usuario ya es admin y tiene sesión abierta, redirigir al dashboard directamente
+        if session.get("rol") == "admin":
+             return redirect(url_for("admin_dashboard"))
+        
+        # Si no, mostrar el Login (index.html en modo normal)
+        return render_template("index.html", mostrar_admin=False)
 
     correo = request.form.get("correo_electronico")
     contrasena = request.form.get("contrasena")
@@ -410,6 +416,12 @@ def index():
     session["rol"] = usuario["rol"]
 
     flash("Inicio de sesión exitoso", "success")
+
+    # REDIRECCIÓN INTELIGENTE POR ROL
+    if usuario["rol"] == "admin":
+        return redirect(url_for("admin_dashboard"))
+    
+    # Usuarios normales van a su dashboard estándar
     return redirect(url_for("dashboard"))
 
 # Dashboard
