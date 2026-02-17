@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ prop['titulo'] }} | Homi</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='images/logoHomi.png') }}">
+    
+    <link rel="stylesheet" href="{{ url_for('static', filename='CSS/bootstrap-5.0.5-alpha.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='CSS/LineIcons.2.0.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='CSS/style.css') }}">
+    
+    <style>
+        .prop-gallery img.main-img { 
+            width: 100%; 
+            height: 400px; 
+            object-fit: cover; 
+            border-radius: 8px; 
+        }
+        .thumb-img {
+            height: 80px; 
+            width: 100%; 
+            object-fit: cover; 
+            cursor: pointer; 
+            border-radius: 4px;
+            transition: opacity 0.3s;
+        }
+        .thumb-img:hover {
+            opacity: 0.7;
+            border: 2px solid #2BB2BB;
+        }
+        .publisher-card { 
+            border: 1px solid #eee; 
+            border-radius: 10px; 
+            padding: 25px; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05); 
+            position: sticky; 
+            top: 100px; 
+        }
+        .avatar-lg { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .feature-box { background: #f8f9fa; padding: 15px; border-radius: 8px; text-align: center; margin-bottom: 15px; }
+        .feature-box i { font-size: 1.5rem; color: #2BB2BB; margin-bottom: 5px; display: block; }
+        .feature-box span { font-weight: 600; color: #555; }
+    </style>
+</head>
+<body>
+
+    <header class="header_area" style="background:#fff; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+        <div class="container py-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <a href="{{ url_for('home') }}" class="navbar-brand font-weight-bold text-dark">
+                    <img src="{{ url_for('static', filename='images/logo/logoHomi.png') }}" width="40"> 
+                    <span style="color: #2BB2BB;">Homi</span>
+                </a>
+                <div>
+                    <a href="{{ url_for('home') }}" class="btn btn-sm btn-outline-secondary">Volver al Inicio</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container py-5">
+        <div class="row">
+            <div class="col-lg-8">
+                
+                <div class="prop-gallery mb-4">
+                    {% if prop['imagenes'] and prop['imagenes']|length > 0 %}
+                        {% set first_img = prop['imagenes'][0] %}
+                        {% set main_url = first_img['url_imagen'] if first_img is mapping else first_img %}
+
+                        <img src="{{ main_url }}" alt="Imagen Principal" class="main-img mb-2" id="imagenPrincipal">
+                        
+                        {% if prop['imagenes']|length > 1 %}
+                        <div class="row g-2 mt-2">
+                            {% for img in prop['imagenes'] %}
+                                {% set thumb_url = img['url_imagen'] if img is mapping else img %}
+                                <div class="col-3">
+                                    <img src="{{ thumb_url }}" 
+                                         class="thumb-img" 
+                                         onclick="cambiarImagen(this.src)">
+                                </div>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    {% else %}
+                        <img src="{{ url_for('static', filename='images/product/l-product-1.jpg') }}" class="main-img" alt="Sin imagen">
+                    {% endif %}
+                </div>
+
+                <div class="mb-4">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <span class="badge bg-info text-white mb-2">{{ prop['tipo_operacion']|upper }}</span>
+                            <span class="badge bg-secondary text-white mb-2">{{ prop['tipo_propiedad']|capitalize }}</span>
+                            <h1 class="fw-bold">{{ prop['titulo'] }}</h1>
+                            <p class="text-muted"><i class="lni lni-map-marker"></i> {{ prop['colonia'] }}, {{ prop['ciudad'] }}</p>
+                        </div>
+                        <div class="text-right">
+                             <h3 class="text-primary" style="color: #2BB2BB;">${{ "{:,.0f}".format(prop['precio']) }} <small class="text-muted fs-6">MXN</small></h3>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-4">
+                        <div class="feature-box"><i class="lni lni-home"></i><span>{{ prop['numero_habitaciones'] }} Hab.</span></div>
+                    </div>
+                    <div class="col-4">
+                        <div class="feature-box"><i class="lni lni-drop"></i><span>{{ prop['numero_banos'] }} Baños</span></div>
+                    </div>
+                    <div class="col-4">
+                        <div class="feature-box"><i class="lni lni-ruler"></i><span>{{ prop['superficie_m2'] }} m²</span></div>
+                    </div>
+                </div>
+
+                <div class="mb-5">
+                    <h4>Descripción</h4>
+                    <hr>
+                    <p style="white-space: pre-line; color: #666; line-height: 1.8;">{{ prop['descripcion'] }}</p>
+                </div>
+
+            </div>
+
+            <div class="col-lg-4">
+                <div class="publisher-card bg-white">
+                    <div class="text-center mb-4">
+                        <img src="{{ propietario['foto'] }}" class="avatar-lg mb-3" alt="Foto Propietario">
+                        <h5 class="mb-1">{{ propietario['nombre'] }}</h5>
+                        <p class="text-muted small">Miembro desde {{ propietario['fecha_registro'] }}</p>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <a href="https://wa.me/521{{ propietario['telefono'] }}?text=Hola,%20me%20interesa%20tu%20propiedad:%20{{ prop['titulo'] }}" 
+                           target="_blank" class="btn btn-success w-100 mb-2" style="background-color: #25D366; border: none;">
+                            <i class="lni lni-whatsapp"></i> Enviar WhatsApp
+                        </a>
+                        
+                        <a href="tel:{{ propietario['telefono'] }}" class="btn btn-outline-primary w-100">
+                            <i class="lni lni-phone"></i> Llamar al Vendedor
+                        </a>
+                    </div>
+
+                    <div class="mt-4 pt-3 text-center border-top">
+                        <small class="text-muted d-block mb-2">Seguridad</small>
+                        <p class="small text-muted" style="line-height: 1.3;">
+                            <i class="lni lni-shield-check text-success"></i> 
+                            Nunca transfieras dinero sin visitar la propiedad primero.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/bootstrap.bundle-5.0.0.alpha-min.js') }}"></script>
+    
+    <script>
+        function cambiarImagen(src) {
+            document.getElementById('imagenPrincipal').src = src;
+        }
+    </script>
+</body>
+</html>

@@ -299,7 +299,43 @@ def registro_proveedor():
     # Si llegamos aquí, hubo un error
     usuario_db = data if 'data' in locals() else {}
     return render_template('registro_proveedor.html', user=usuario_db)
+
+@app.route("/propiedad/<id_propiedad>")
+def detalle_propiedad(id_propiedad):
+    try:
+        # 1. Buscar la propiedad
+        prop = propiedades.find_one({"_id": ObjectId(id_propiedad)})
+        if not prop:
+            flash("La propiedad no existe o fue eliminada.", "error")
+            return redirect(url_for('home'))
+
+        # 2. Buscar al propietario (Dueño del ID guardado en la propiedad)
+        propietario = usuarios.find_one({"_id": prop.get("id_propietario")})
         
+        # 3. Preparar datos seguros para mostrar (Evitamos enviar la contraseña, etc.)
+        datos_propietario = {}
+        if propietario:
+            datos_propietario = {
+                "nombre": f"{propietario.get('nombre', 'Anfitrión')} {propietario.get('primer_apellido', '')}",
+                "telefono": propietario.get("telefono", "No disponible"),
+                "correo": propietario.get("correo_electronico", ""),
+                "fecha_registro": propietario.get("_id").generation_time.strftime('%Y'),
+                # Nota: Como aún no tenemos subida de foto de perfil, usamos la default
+                "foto": url_for('static', filename='images/dashboard/profile-img.png') 
+            }
+        else:
+            datos_propietario = {
+                "nombre": "Usuario Desconocido",
+                "telefono": "---",
+                "foto": url_for('static', filename='images/dashboard/profile-img.png')
+            }
+
+        return render_template("detalle_propiedad.html", prop=prop, propietario=datos_propietario)
+
+    except Exception as e:
+        print(f"Error cargando propiedad: {e}")
+        flash("Ocurrió un error al cargar la propiedad.", "error")
+        return redirect(url_for('home'))        
         
 @app.route("/perfil", methods=["GET", "POST"])
 def perfil():

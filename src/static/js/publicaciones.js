@@ -125,3 +125,10 @@ function showSlide(n) {
     if(slides[slideIndex-1]) slides[slideIndex-1].classList.add("active");
     if(dots[slideIndex-1]) dots[slideIndex-1].classList.add("active");
 }
+
+function triggerUpload(index) {
+    var fileInput = document.getElementById('file-' + index);
+    if(fileInput) {
+        fileInput.click();
+    }
+}

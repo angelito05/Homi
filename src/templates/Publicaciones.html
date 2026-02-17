@@ -1,46 +1,62 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Crear Publicación | Homi</title>
-    
+
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="{{ url_for('static', filename='CSS/homi.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='CSS/publicaciones.css') }}">
-    
+
     <style>
-        .fila-formulario { display: flex; gap: 15px; margin-bottom: 10px; }
-        .columna-formulario { flex: 1; }
-        .error-texto { color: #dc3545; font-size: 0.85em; margin-top: 2px; display: block; }
+        .fila-formulario {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+
+        .columna-formulario {
+            flex: 1;
+        }
+
+        .error-texto {
+            color: #dc3545;
+            font-size: 0.85em;
+            margin-top: 2px;
+            display: block;
+        }
     </style>
 </head>
+
 <body>
 
     <div class="pub-container">
         <div class="pub-header">
             <div style="margin-bottom: 15px;">
-                    <a href="{{ url_for('home') }}" style="text-decoration: none; color: #666;">&larr; Volver al Inicio</a>
+                <a href="{{ url_for('home') }}" style="text-decoration: none; color: #666;">&larr; Volver al Inicio</a>
             </div>
             <div class="homi-logo">
                 <span class="logo-text">Homi</span>
             </div>
         </div>
-        
+
 
         <form action="/crear-publicacion" method="POST" enctype="multipart/form-data">
             {{ form.csrf_token }}
 
             <div class="pub-grid">
-                
+
                 <div class="left-col">
                     <label class="label-titulo">Detalles de la Publicación</label>
-                    
+
                     {{ form.titulo(class="homi-input", placeholder="Título de la propiedad (Ej: Casa en el centro)") }}
                     {% for error in form.titulo.errors %}<span class="error-texto">{{ error }}</span>{% endfor %}
-                    
-                    {{ form.descripcion(class="homi-input homi-textarea", style="height: 100px;", placeholder="Descripción detallada...") }}
+
+                    {{ form.descripcion(class="homi-input homi-textarea", style="height: 100px;",
+                    placeholder="Descripción detallada...") }}
 
                     <div class="fila-formulario">
                         <div class="columna-formulario">
@@ -74,7 +90,7 @@
 
                     <label class="label-titulo" style="margin-top: 15px;">Dirección</label>
                     {{ form.calle(class="homi-input", placeholder="Calle") }}
-                    
+
                     <div class="fila-formulario">
                         {{ form.numero_ext_int(class="homi-input columna-formulario", placeholder="Núm. Ext/Int") }}
                         {{ form.codigo_postal(class="homi-input columna-formulario", placeholder="C.P.") }}
@@ -85,7 +101,8 @@
                     </div>
 
                     <div class="owner-section">
-                        <img src="{{ url_for('static', filename=propietario.foto_perfil) }}" class="owner-avatar" onerror="this.src='https://cdn-icons-png.flaticon.com/512/847/847969.png'">
+                        <img src="{{ url_for('static', filename=propietario.foto_perfil) }}" class="owner-avatar"
+                            onerror="this.src='https://cdn-icons-png.flaticon.com/512/847/847969.png'">
                         <div>
                             <strong>Propietario:</strong><br><span>{{ propietario.nombre }}</span>
                         </div>
@@ -95,36 +112,91 @@
                 </div>
 
                 <div class="right-col">
-                    
-                    <div class="carousel-container">
-                        {{ form.foto1(id="file-1", hidden=True, onchange="previewCarouselImage(this, 1)") }}
-                        {{ form.foto2(id="file-2", hidden=True, onchange="previewCarouselImage(this, 2)") }}
-                        {{ form.foto3(id="file-3", hidden=True, onchange="previewCarouselImage(this, 3)") }}
-                        {{ form.foto4(id="file-4", hidden=True, onchange="previewCarouselImage(this, 4)") }}
-                        {{ form.foto5(id="file-5", hidden=True, onchange="previewCarouselImage(this, 5)") }}
 
-                        <div class="carousel-slide active" onclick="document.getElementById('file-1').click()">
-                            <button type="button" class="btn-delete" onclick="deleteImage(event, 1)">🗑️</button>
-                            <div class="placeholder-content" id="ph-1"><span style="font-size: 40px;">📸</span><br>Foto Principal</div>
+                    <div class="carousel-container">
+
+                        <input type="file" name="foto1" id="file-1" accept="image/*" hidden
+                            onchange="previewCarouselImage(this, 1)">
+                        <input type="file" name="foto2" id="file-2" accept="image/*" hidden
+                            onchange="previewCarouselImage(this, 2)">
+                        <input type="file" name="foto3" id="file-3" accept="image/*" hidden
+                            onchange="previewCarouselImage(this, 3)">
+                        <input type="file" name="foto4" id="file-4" accept="image/*" hidden
+                            onchange="previewCarouselImage(this, 4)">
+                        <input type="file" name="foto5" id="file-5" accept="image/*" hidden
+                            onchange="previewCarouselImage(this, 5)">
+
+                        <div class="carousel-slide active" onclick="triggerUpload(1)">
+                            <div class="placeholder-content" id="ph-1">
+                                <i class="lni lni-camera" style="font-size: 40px; color: #2BB2BB;"></i>
+                                <p>Foto Principal</p>
+                                <span class="click-hint">Click para subir</span>
+                            </div>
                             <img src="" class="slide-img" id="img-1" style="display:none;">
+                            <button type="button" class="btn-delete" id="del-1" onclick="deleteImage(event, 1)">
+                                <i class="lni lni-trash"></i>
+                            </button>
                         </div>
-                        
-                        <div class="carousel-slide" onclick="document.getElementById('file-2').click()">
-                             <div class="placeholder-content" id="ph-2"><span>➕</span><br>Foto 2</div>
-                             <img src="" class="slide-img" id="img-2" style="display:none;">
+
+                        <div class="carousel-slide" onclick="triggerUpload(2)">
+                            <div class="placeholder-content" id="ph-2">
+                                <i class="lni lni-plus" style="font-size: 40px; color: #ccc;"></i>
+                                <p>Foto 2</p>
+                            </div>
+                            <img src="" class="slide-img" id="img-2" style="display:none;">
+                            <button type="button" class="btn-delete" id="del-2" onclick="deleteImage(event, 2)">
+                                <i class="lni lni-trash"></i>
+                            </button>
                         </div>
+
+                        <div class="carousel-slide" onclick="triggerUpload(3)">
+                            <div class="placeholder-content" id="ph-3">
+                                <i class="lni lni-plus" style="font-size: 40px; color: #ccc;"></i>
+                                <p>Foto 3</p>
+                            </div>
+                            <img src="" class="slide-img" id="img-3" style="display:none;">
+                            <button type="button" class="btn-delete" id="del-3" onclick="deleteImage(event, 3)">
+                                <i class="lni lni-trash"></i>
+                            </button>
+                        </div>
+
+                        <div class="carousel-slide" onclick="triggerUpload(4)">
+                            <div class="placeholder-content" id="ph-4">
+                                <i class="lni lni-plus" style="font-size: 40px; color: #ccc;"></i>
+                                <p>Foto 4</p>
+                            </div>
+                            <img src="" class="slide-img" id="img-4" style="display:none;">
+                            <button type="button" class="btn-delete" id="del-4" onclick="deleteImage(event, 4)">
+                                <i class="lni lni-trash"></i>
+                            </button>
+                        </div>
+
+                        <div class="carousel-slide" onclick="triggerUpload(5)">
+                            <div class="placeholder-content" id="ph-5">
+                                <i class="lni lni-plus" style="font-size: 40px; color: #ccc;"></i>
+                                <p>Foto 5</p>
+                            </div>
+                            <img src="" class="slide-img" id="img-5" style="display:none;">
+                            <button type="button" class="btn-delete" id="del-5" onclick="deleteImage(event, 5)">
+                                <i class="lni lni-trash"></i>
+                            </button>
+                        </div>
+
                         <div class="carousel-indicators">
-                            <span class="dot active"></span>
-                            <span class="dot"></span>
-                            <span class="dot"></span>
-                            <span class="dot"></span>
-                            <span class="dot"></span>
+                            <span class="dot active" onclick="currentSlide(1)"></span>
+                            <span class="dot" onclick="currentSlide(2)"></span>
+                            <span class="dot" onclick="currentSlide(3)"></span>
+                            <span class="dot" onclick="currentSlide(4)"></span>
+                            <span class="dot" onclick="currentSlide(5)"></span>
                         </div>
+
+                        <a class="carousel-btn prev" onclick="moveSlide(-1)" style="left:0;">&#10094;</a>
+                        <a class="carousel-btn next" onclick="moveSlide(1)" style="right:0;">&#10095;</a>
                     </div>
 
                     <label class="label-titulo">Ubicación (Selecciona en el mapa)</label>
                     <div id="map" style="height: 300px; width: 100%; border-radius: 10px;"></div>
-                    
+
                     {{ form.latitud(id="lat") }}
                     {{ form.longitud(id="lng") }}
                 </div>
@@ -133,8 +205,9 @@
     </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    
+
     <script src="{{ url_for('static', filename='JS/publicaciones.js') }}?v=2"></script>
 
-    </body>
+</body>
+
 </html>
