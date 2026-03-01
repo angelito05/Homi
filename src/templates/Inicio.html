@@ -89,60 +89,34 @@
 										<a class="page-scroll active" href="Inicio.html">Inicio</a>
 									</li>
 									<li class="nav-item">
-										<a class="page-scroll" data-toggle="collapse" data-target="#sub-nav1"
-										aria-controls="sub-nav1" aria-expanded="false"
-										aria-label="Toggle navigation" href="javascript:void(0)">
+										<a class="page-scroll" data-toggle="collapse" data-target="#sub-nav1" aria-controls="sub-nav1"
+											aria-expanded="false" aria-label="Toggle navigation" href="javascript:void(0)">
 											Comprar
 											<div class="sub-nav-toggler">
 												<span></span>
 											</div>
 										</a>
-
 										<ul class="sub-menu collapse" id="sub-nav1">
-											<li>
-												<a href="{{ url_for('buscar', operacion='venta', categoria='casa') }}">
-													Casas
-												</a>
-											</li>
-											<li>
-												<a href="{{ url_for('buscar', operacion='venta', categoria='departamento') }}">
-													Departamentos
-												</a>
-											</li>
-											<li>
-												<a href="{{ url_for('buscar', operacion='venta', extra='mas') }}">
-													Más Propiedades
-												</a>
-											</li>
+											<li><a href="{{ url_for('buscar', operacion='venta', categoria='casa') }}">Casas</a></li>
+											<li><a href="{{ url_for('buscar', operacion='venta', categoria='departamento') }}">Departamentos</a></li>
+											<li><a href="{{ url_for('buscar', operacion='venta', categoria='local') }}">Locales</a></li>
+											<li><a href="{{ url_for('buscar', operacion='venta') }}">Más Propiedades</a></li>
 										</ul>
 									</li>
 
 									<li class="nav-item">
-										<a class="page-scroll" data-toggle="collapse" data-target="#sub-nav"
-										aria-controls="sub-nav" aria-expanded="false"
-										aria-label="Toggle navigation" href="javascript:void(0)">
+										<a class="page-scroll" data-toggle="collapse" data-target="#sub-nav" aria-controls="sub-nav"
+											aria-expanded="false" aria-label="Toggle navigation" href="javascript:void(0)">
 											Rentar
 											<div class="sub-nav-toggler">
 												<span></span>
 											</div>
 										</a>
-
 										<ul class="sub-menu collapse" id="sub-nav">
-											<li>
-												<a href="{{ url_for('buscar', operacion='renta', categoria='casa') }}">
-													Casas
-												</a>
-											</li>
-											<li>
-												<a href="{{ url_for('buscar', operacion='renta', categoria='departamento') }}">
-													Departamentos
-												</a>
-											</li>
-											<li>
-												<a href="{{ url_for('buscar', operacion='renta', extra='mas') }}">
-													Más Propiedades
-												</a>
-											</li>
+											<li><a href="{{ url_for('buscar', operacion='renta', categoria='casa') }}">Casas</a></li>
+											<li><a href="{{ url_for('buscar', operacion='renta', categoria='departamento') }}">Departamentos</a></li>
+											<li><a href="{{ url_for('buscar', operacion='renta', categoria='local') }}">Locales</a></li>
+											<li><a href="{{ url_for('buscar', operacion='renta') }}">Más Propiedades</a></li>
 										</ul>
 									</li>
 									
@@ -301,9 +275,17 @@
 	<!--====== CATEGORY LIST PART START ======-->
 	<section class="category-list-area pt-130">
 		<div class="container">
+			<div class="row">
+				<div class="mx-auto col-xl-6 col-lg-7 col-md-10">
+					<div class="text-center section-title mb-60">
+						<h1>Nuestro portal inmobiliario</h1>
+						<p>Compra, venta y renta de inmuebles en todo México.</p>
+					</div>
+				</div>
+			</div>
 			<div class="category-list-wrapper">
 				<div class="category-list-item">
-					<a href="category.html">
+					<a href="{{ url_for('buscar', categoria='casa') }}">
 						<div class="icon">
 							<i class="lni lni-home"></i>
 						</div>
@@ -311,7 +293,7 @@
 					</a>
 				</div>
 				<div class="category-list-item">
-					<a href="category.html">
+					<a href="{{ url_for('buscar', categoria='local') }}">
 						<div class="icon">
 							<i class="lni lni-briefcase"></i>
 						</div>
@@ -319,7 +301,7 @@
 					</a>
 				</div>
 				<div class="category-list-item">
-					<a href="category.html">
+					<a href="{{ url_for('buscar', categoria='terreno') }}">
 						<div class="icon">
 							<i class="lni lni-layers"></i>
 						</div>
@@ -327,7 +309,7 @@
 					</a>
 				</div>
 				<div class="category-list-item">
-					<a href="category.html">
+					<a href="{{ url_for('buscar', categoria='condominio') }}">
 						<div class="icon">
 							<i class="lni lni-star"></i>
 						</div>
@@ -335,7 +317,7 @@
 					</a>
 				</div>
 				<div class="category-list-item">
-					<a href="category.html">
+					<a href="{{ url_for('buscar', categoria='departamento') }}">
 						<div class="icon">
 							<i class="lni lni-apartment"></i>
 						</div>
@@ -346,69 +328,6 @@
 		</div>
 	</section>
 	<!--====== CATEGORY LIST PART END ======-->
-
-	<!--====== LATEST PRODUCT PART START ======-->
-	<section class="latest-product-area pt-130 pb-110">
-		<div class="container">
-			<div class="row">
-				<div class="mx-auto col-xl-6 col-lg-7 col-md-10">
-					<div class="text-center section-title mb-60">
-						<h1>Nuestro portal inmobiliario</h1>
-						<p>Compra, venta y renta de inmuebles en todo México.</p>
-					</div>
-				</div>
-			</div>
-			<div class="row">
-                {% if propiedades %}
-                    {% for prop in propiedades %}
-                    <div class="col-xl-4 col-lg-6 col-md-6">
-                        <div class="single-product">
-                            <div class="product-img">
-                                <a href="{{ url_for('detalle_propiedad', id_propiedad=prop._id) }}">
-                                    <img src="{{ prop.imagen_principal_url or (prop.imagenes[0].url_imagen if prop.imagenes else url_for('static', filename='images/product/l-product-1.jpg')) }}" 
-                                         alt="{{ prop.titulo }}" 
-                                         style="height: 250px; object-fit: cover; width: 100%;">
-                                </a>
-
-                                <div class="product-action">
-                                    {% set pid_str = prop._id|string %}
-                                    <a href="javascript:void(0)" onclick="toggleHeart('{{ pid_str }}', this)" title="Guardar en favoritos">
-                                        {% if pid_str in mis_favoritos %}
-                                            <i class="lni lni-heart-filled" style="color: #ff4757;"></i>
-                                        {% else %}
-                                            <i class="lni lni-heart"></i>
-                                        {% endif %}
-                                    </a>
-                                </div>
-                            </div>
-
-                            <div class="product-content">
-                                <h3 class="name">
-                                    <a href="{{ url_for('detalle_propiedad', id_propiedad=prop._id) }}">{{ prop.titulo }}</a>
-                                </h3>
-                                <span class="update">{{ prop.colonia }}</span>
-                                <ul class="address">
-                                    <li><i class="lni lni-home"></i> {{ prop.tipo_propiedad|capitalize }}</li>
-                                    <li><i class="lni lni-ruler"></i> {{ prop.superficie_m2 }} m²</li>
-                                    <li><i class="lni lni-tag"></i> {{ prop.tipo_operacion|upper }}</li>
-                                </ul>
-                                <div class="product-bottom">
-                                    <h3 class="price">${{ "{:,.0f}".format(prop.precio) }}</h3>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    {% endfor %}
-                {% else %}
-                    <div class="col-12 text-center py-5">
-                        <i class="lni lni-sad" style="font-size: 3rem; color: #ccc;"></i>
-                        <p class="text-muted mt-3">No hay propiedades destacadas en este momento.</p>
-                    </div>
-                {% endif %}
-            </div>
-		</div>
-	</section>
-	<!--====== LATEST PRODUCT PART ENDS ======-->
 
 	<!--====== VIDEO PART START ======-->
 	<section class="video-area">
@@ -514,8 +433,8 @@
 			<div class="row">
 				<div class="mx-auto col-lg-6 col-md-10">
 					<div class="text-center section-title mb-60">
-						<h1>Productos destacados</h1>
-						<p>Explora nuestra selección de productos destacados, cuidadosamente curada para ofrecerte lo mejor en calidad y valor.</p>
+						<h1>Propiedades Recientes</h1>
+						<p>Explora nuestras últimas publicaciones, cuidadosamente seleccionadas para ofrecerte lo mejor.</p>
 					</div>
 				</div>
 			</div>
@@ -523,119 +442,37 @@
 			<div class="product-carousel-wrapper">
 				<div class="row feature-product-carousel">
 				
-					<div class="col-lg-4 col-md-6">
-						<div class="single-product">
-							<div class="product-img">
-								<img src="static/images/product/l-product-1.jpg" alt="">
-							</div>
-				
-							<div class="product-content">
-								<div class="rating-wrapper">
-									<h5 class="price theme-color">$120.99</h5>
-									<div class="rating">
-										<span>2 Review</span>
-										<i class="lni lni-star-filled"></i>
-										<i class="lni lni-star-filled"></i>
-										<i class="lni lni-star-filled"></i>
-										<i class="lni lni-star-filled"></i>
-										<i class="lni lni-star"></i>
-									</div>
-								</div>
-								<h3 class="name"><a href="product-details.html">Apple iPhone x</a></h3>
-								<p class="sort-des">Lorem ipsum dolor sit amet, consetetur sadipscing elitr sed diam.</p>
-								<div class="product-bottom">
-									<a href="javascript:void(0)" class="address-link"><i class="lni lni-map-marker"></i> United State of America</a>
-									<span class="theme-color"><i class="lni lni-heart"></i></span>
-								</div>
-							</div>
-						</div>
-					</div>
-				
-					<div class="col-lg-4 col-md-6">
-						<div class="single-product">
-							<div class="product-img">
-								<a href="javascript:void(0)" class="badge">New</a>
-								<img src="static/images/product/l-product-2.jpg" alt="">
-							</div>
-				
-							<div class="product-content">
-								<div class="rating-wrapper">
-									<h5 class="price theme-color">$320.99</h5>
-									<div class="rating">
-										<span>2 Review</span>
-										<i class="lni lni-star-filled"></i>
-										<i class="lni lni-star-filled"></i>
-										<i class="lni lni-star-filled"></i>
-										<i class="lni lni-star-filled"></i>
-										<i class="lni lni-star"></i>
-									</div>
-								</div>
-								<h3 class="name"><a href="product-details.html">Best Compact DSLR</a></h3>
-								<p class="sort-des">Lorem ipsum dolor sit amet, consetetur sadipscing elitr sed diam.</p>
-								<div class="product-bottom">
-									<a href="javascript:void(0)" class="address-link"><i class="lni lni-map-marker"></i> United State of America</a>
-									<span class="theme-color"><i class="lni lni-heart"></i></span>
-								</div>
-							</div>
-						</div>
-					</div>
-				
-					<div class="col-lg-4 col-md-6">
-						<div class="single-product">
-							<div class="product-img">
-								<a href="javascript:void(0)" class="badge bottom">25% Discount</a>
-								<img src="static/images/product/l-product-3.jpg" alt="">
-							</div>
-				
-							<div class="product-content">
-								<div class="rating-wrapper">
-									<h5 class="price theme-color">$90 <del>$120</del></h5>
-									<div class="rating">
-										<span>2 Review</span>
-										<i class="lni lni-star-filled"></i>
-										<i class="lni lni-star-filled"></i>
-										<i class="lni lni-star-filled"></i>
-										<i class="lni lni-star-filled"></i>
-										<i class="lni lni-star"></i>
-									</div>
-								</div>
-								<h3 class="name"><a href="product-details.html">Cctv camera</a></h3>
-								<p class="sort-des">Lorem ipsum dolor sit amet, consetetur sadipscing elitr sed diam.</p>
-								<div class="product-bottom">
-									<a href="javascript:void(0)" class="address-link"><i class="lni lni-map-marker"></i> United State of America</a>
-									<span class="theme-color"><i class="lni lni-heart"></i></span>
-								</div>
-							</div>
-						</div>
-					</div>
-				
-					<div class="col-lg-4 col-md-6">
-						<div class="single-product">
-							<div class="product-img">
-								<img src="static/images/product/l-product-4.jpg" alt="">
-							</div>
-				
-							<div class="product-content">
-								<div class="rating-wrapper">
-									<h5 class="price theme-color">$1120.99</h5>
-									<div class="rating">
-										<span>2 Review</span>
-										<i class="lni lni-star-filled"></i>
-										<i class="lni lni-star-filled"></i>
-										<i class="lni lni-star-filled"></i>
-										<i class="lni lni-star-filled"></i>
-										<i class="lni lni-star"></i>
-									</div>
-								</div>
-								<h3 class="name"><a href="product-details.html">Apple's new iMac</a></h3>
-								<p class="sort-des">Lorem ipsum dolor sit amet, consetetur sadipscing elitr sed diam.</p>
-								<div class="product-bottom">
-									<a href="javascript:void(0)" class="address-link"><i class="lni lni-map-marker"></i> United State of America</a>
-									<span class="theme-color"><i class="lni lni-heart"></i></span>
-								</div>
-							</div>
-						</div>
-					</div>
+                    {% if propiedades %}
+                        {% for prop in propiedades %}
+                        <div class="col-lg-4 col-md-6">
+                            <div class="single-product">
+                                <div class="product-img">
+                                    <a href="{{ url_for('detalle_propiedad', id_propiedad=prop._id) }}">
+                                        <img src="{{ prop.imagen_principal_url or url_for('static', filename='images/product/l-product-1.jpg') }}" alt="{{ prop.titulo }}" style="height: 250px; object-fit: cover; width: 100%;">
+                                    </a>
+                                </div>
+                    
+                                <div class="product-content">
+                                    <div class="rating-wrapper">
+                                        <h5 class="price theme-color">${{ "{:,.0f}".format(prop.precio) }}</h5>
+                                        <div class="rating">
+                                            <span class="badge bg-info text-white">{{ prop.tipo_operacion|upper }}</span>
+                                        </div>
+                                    </div>
+                                    <h3 class="name"><a href="{{ url_for('detalle_propiedad', id_propiedad=prop._id) }}">{{ prop.titulo }}</a></h3>
+                                    <p class="sort-des"><i class="lni lni-map-marker"></i> {{ prop.colonia }}, {{ prop.ciudad }}</p>
+                                    <div class="product-bottom">
+                                        <span class="theme-color"><i class="lni lni-home"></i> {{ prop.tipo_propiedad|capitalize }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="col-12 text-center">
+                            <p class="text-muted">Aún no hay propiedades para mostrar en el carrusel.</p>
+                        </div>
+                    {% endif %}
 				
 				</div>
 			</div>

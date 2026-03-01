@@ -19,8 +19,7 @@ app.register_blueprint(publicaciones_bp)
 
 limiter = Limiter(
     get_remote_address, 
-    app=app, 
-    default_limits=["50 per day", "15 per hour"] # Opcional: límites por defecto
+    app=app
 )
 
 Talisman(app, content_security_policy=None, force_https=False)
@@ -54,14 +53,11 @@ def validar_contrasena_segura(password):
 
 @app.route("/")
 def home():
-    # Propiedades destacadas (tu lógica existente)
-    propiedades_destacadas = consultas.obtener_propiedades_destacadas(mongo)
+    # Obtener hasta 9 propiedades para llenar el grid y el carrusel
+    propiedades_destacadas = consultas.obtener_propiedades_destacadas(mongo, limite=9)
 
     # Colonias dinámicas desde MongoDB (solo Acapulco)
-    colonias = propiedades.distinct(
-        "colonia",
-        {"ciudad": "Acapulco"}
-    )
+    colonias = propiedades.distinct("colonia", {"ciudad": "Acapulco"})
     colonias = sorted([c for c in colonias if c])
 
     return render_template(
@@ -112,6 +108,21 @@ def buscar():
         ]
 
     resultados = list(propiedades.find(filtro))
+
+    # --- AGREGA ESTE BLOQUE PARA LAS IMÁGENES ---
+    for p in resultados:
+        imagen_principal = ""
+        if "imagenes" in p and len(p["imagenes"]) > 0:
+            primera_img = p["imagenes"][0]
+            # Verificamos si la imagen se guardó como diccionario o como texto (URL directa)
+            if isinstance(primera_img, dict):
+                imagen_principal = primera_img.get("url_imagen", "")
+            else:
+                imagen_principal = primera_img
+        
+        # Si no hay imagen, le ponemos una por defecto
+        p["imagen_principal_url"] = imagen_principal if imagen_principal else url_for('static', filename='images/product/l-product-1.jpg')
+    # ---------------------------------------------
 
     # Colonias dinámicas
     colonias = propiedades.distinct(
@@ -422,7 +433,7 @@ def admin_dashboard():
 
 # Login
 @app.route("/index", methods=["POST", "GET"])
-@limiter.limit("5 per minute")
+@limiter.limit("5 per minute", methods=["POST"])
 def index():
 
     if request.method == "GET":

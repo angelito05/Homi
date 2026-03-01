@@ -1,37 +1,34 @@
-# Homi/consultas.py
 from bson.objectid import ObjectId
 
-# --- Cons.ultas de Propiedades ---
-
-def obtener_propiedades_destacadas(db, limite=6):
+def obtener_propiedades_destacadas(db, limite=9):
     """
-    Obtiene una lista de propiedades para mostrar en la página de inicio.
-    
-    En MongoDB, esto sería buscar propiedades que estén 'aprobadas' 
-    y opcionalmente 'es_destacada'.
+    Obtiene las propiedades más recientes publicadas en la plataforma.
     """
     try:
-        # Buscamos propiedades aprobadas y las ordenamos por fecha de publicación
-        propiedades_cursor = db.Propiedades.find(
-            {"estado_publicacion": "aprobada"}
-        ).sort("fecha_publicacion", -1).limit(limite) # -1 para descendente
+        # 1. Cambiamos db.Propiedades por db.propiedades (minúscula)
+        # 2. Quitamos el filtro {"estado_publicacion": "aprobada"} dejándolo como {} para traer TODAS
+        # 3. Ordenamos por "_id" descendente (-1) para traer siempre las más nuevas primero
+        propiedades_cursor = db.propiedades.find({}).sort("_id", -1).limit(limite)
 
         propiedades_lista = []
         for prop in propiedades_cursor:
-            # Tu esquema SQL 'ImagenesPropiedad' en Mongo probablemente sea un array.
-            # Buscamos la imagen principal o tomamos la primera.
             imagen_principal = ""
+            
+            # Verificamos si tiene imágenes
             if "imagenes" in prop and len(prop["imagenes"]) > 0:
-                # Intentamos buscar la que está marcada como principal
+                # Buscamos si alguna está marcada como principal
                 for img in prop["imagenes"]:
-                    if img.get("es_principal", False):
-                        imagen_principal = img.get("url_imagen")
+                    if isinstance(img, dict) and img.get("es_principal", False):
+                        imagen_principal = img.get("url_imagen", "")
                         break
+                
                 # Si no hay principal, tomamos la primera
                 if not imagen_principal:
-                    imagen_principal = prop["imagenes"][0].get("url_imagen")
+                    primera_img = prop["imagenes"][0]
+                    # Soporta si guardaste la imagen como Diccionario o como Texto directo
+                    imagen_principal = primera_img.get("url_imagen", "") if isinstance(primera_img, dict) else primera_img
             
-            # Agregamos la URL de la imagen al diccionario principal
+            # Guardamos la url para que el HTML la pueda leer fácilmente
             prop["imagen_principal_url"] = imagen_principal
             propiedades_lista.append(prop)
             
@@ -40,8 +37,6 @@ def obtener_propiedades_destacadas(db, limite=6):
     except Exception as e:
         print(f"Error al obtener propiedades destacadas: {e}")
         return []
-
-# --- Consultas de Usuarios (Ejemplos para futuro) ---
 
 def obtener_usuario_por_id(db, user_id):
     """
