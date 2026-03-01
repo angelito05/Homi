@@ -145,7 +145,7 @@
 											</li>
 										</ul>
 									</li>
-									{% if session.get('rol') != 'proveedor' %}
+									
 									<li class="nav-item">
 										<a class="page-scroll" data-toggle="collapse" data-target="#sub-nav-vender" aria-controls="sub-nav-vender"
 											aria-expanded="false" aria-label="Toggle navigation" href="javascript:void(0)">
@@ -154,7 +154,6 @@
 												<span></span>
 											</div>
 										</a>
-										
 										<ul class="sub-menu collapse" id="sub-nav-vender">
 											<li style="padding: 10px 20px; border-bottom: 1px solid #eee;">
 												<h5 style="font-size: 16px; color: #2BB2BB;">¿Quieres publicar?</h5>
@@ -167,68 +166,67 @@
 												</a>
 											</li>
 										</ul>
+									
+									 {% if session.get('rol') == 'proveedor' %}
+										<ul class="sub-menu collapse" id="sub-nav-vender">
+											<li style="padding: 10px 20px; border-bottom: 1px solid #eee;">
+												<h5 style="font-size: 16px; color: #2BB2BB;">¿Listo para publicar?</h5>
+												<p style="font-size: 12px; line-height: 1.2;">Comparte tus propiedades con miles.</p>
+											</li>
+											<li style="padding: 10px 20px;">
+												<a href="{{ url_for('publicaciones.crear_publicacion') }}" class="btn btn-primary btn-sm" 
+												style="background-color: #2BB2BB; color: white; border-radius: 20px; padding: 5px 15px; text-align:center;">
+												Publicar propiedad
+												</a>
+											</li>
+										</ul>
+									 {% endif %}
+									</li>
+								</div>
+								<ul class="header-btn d-md-flex">
+									{% if session.usuario_id %}
+									<li>
+										<a href="#" class="main-btn account-btn">
+											<span class="d-md-none"><i class="lni lni-user"></i></span>
+											<span class="d-none d-md-block">Mi cuenta</span>
+										</a>
+										<ul class="dropdown-nav">
+											{% if session.get('rol') == 'admin' %}
+											<li><a href="/dashboard">Dashboard</a></li>
+											{% endif %}
+											<li><a href="/perfil">Perfil</a></li>
+											{% if session.get('rol') == 'proveedor' %}
+											<li><a href="{{ url_for('publicaciones.crear_publicacion') }}">Publicaciones</a></li>
+											{% endif %}
+											<li><a href="/payments">Notificaciones</a></li>
+											<li><a href="/favorites">Favoritos</a></li>
+											<li><a href="/logout">Cerrar Sesión</a></li>
+										</ul>
+									</li>
+									{% else %}
+									<li>
+										<a href="/index" class="main-btn btn-hover d-none d-md-block">Iniciar Sesion</a>
 									</li>
 									{% endif %}
-									{% if session.get('rol') == 'proveedor' %}
-									<ul class="sub-menu collapse" id="sub-nav-vender">
-										<li style="padding: 10px 20px; border-bottom: 1px solid #eee;">
-											<h5 style="font-size: 16px; color: #2BB2BB;">¿Listo para publicar?</h5>
-											<p style="font-size: 12px; line-height: 1.2;">Comparte tus propiedades con miles.</p>
-										</li>
-										<li style="padding: 10px 20px;">
-											<a href="{{ url_for('publicaciones.crear_publicacion') }}" class="btn btn-primary btn-sm" 
-											style="background-color: #2BB2BB; color: white; border-radius: 20px; padding: 5px 15px; text-align:center;">
-											Publicar propiedad
-											</a>
-										</li>
-									</ul>
-									{% endif %}
-								</li>
-							</div>
-							<ul class="header-btn d-md-flex">
-								{% if session.usuario_id %}
-								<li>
-									<a href="#" class="main-btn account-btn">
-										<span class="d-md-none"><i class="lni lni-user"></i></span>
-										<span class="d-none d-md-block">Mi cuenta</span>
-									</a>
-									<ul class="dropdown-nav">
-										{% if session.get('rol') == 'admin' %}
-										<li><a href="/dashboard">Dashboard</a></li>
-										{% endif %}
-										<li><a href="/perfil">Perfil</a></li>
-										{% if session.get('rol') == 'proveedor' %}
-										<li><a href="{{ url_for('publicaciones.crear_publicacion') }}">Publicaciones</a></li>
-										{% endif %}
-										<li><a href="/payments">Notificaciones</a></li>
-										<li><a href="/favorites">Favoritos</a></li>
-										<li><a href="/logout">Cerrar Sesión</a></li>
-									</ul>
-								</li>
-								{% else %}
-								<li>
-									<a href="/index" class="main-btn btn-hover d-none d-md-block">Iniciar Sesion</a>
-								</li>
-								{% endif %}
-							</ul>
-						</nav> <!-- navbar -->
-					</div>
-				</div> <!-- row -->
-			</div> <!-- container -->
-		</div>
+								</ul>
+							</nav> <!-- navbar -->
+						</div>
+					</div> <!-- row -->
+				</div> <!-- container -->
+			</div>
 		 <!-- header navbar -->
- <div style="position: fixed; top: 100px; right: 20px; z-index: 9999; min-width: 300px; max-width: 400px;">
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        {% for category, message in messages %}
-          <div class="alert alert-{{ category }} alert-dismissible fade show auto-dismiss shadow" role="alert">
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-          </div>
-        {% endfor %}
-      {% endif %}
-    {% endwith %}
-</div>
+		<div style="position: fixed; top: 100px; right: 20px; z-index: 9999; min-width: 300px; max-width: 400px;">
+			{% with messages = get_flashed_messages(with_categories=true) %}
+			{% if messages %}
+				{% for category, message in messages %}
+				<div class="alert alert-{{ category }} alert-dismissible fade show auto-dismiss shadow" role="alert">
+					{{ message }}
+					<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+				</div>
+				{% endfor %}
+			{% endif %}
+			{% endwith %}
+		</div>
 	</header>
 
 	<!--====== HEADER PART ENDS ======-->
