@@ -74,11 +74,12 @@
 					<div class="col-xl-12">
 						<nav class="navbar navbar-expand-lg">
 							<a class="navbar-brand" href="Inicio.html">
-								<img id="logo" src="static/images/logo/logoHomi.png" alt="Logo" > 
-									<a class="navbar-brand">Homi</a>
+								<img id="logo" src="static/images/logo/logoHomi.png" alt="Logo">
+								<a class="navbar-brand">Homi</a>
 							</a>
-							<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
-								aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+							<button class="navbar-toggler" type="button" data-toggle="collapse"
+								data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+								aria-expanded="false" aria-label="Toggle navigation">
 								<span class="toggler-icon"></span>
 								<span class="toggler-icon"></span>
 								<span class="toggler-icon"></span>
@@ -89,40 +90,57 @@
 										<a class="page-scroll active" href="Inicio.html">Inicio</a>
 									</li>
 									<li class="nav-item">
-										<a class="page-scroll" data-toggle="collapse" data-target="#sub-nav1" aria-controls="sub-nav1"
-											aria-expanded="false" aria-label="Toggle navigation" href="javascript:void(0)">
+										<a class="page-scroll" data-toggle="collapse" data-target="#sub-nav1"
+											aria-controls="sub-nav1" aria-expanded="false"
+											aria-label="Toggle navigation" href="javascript:void(0)">
 											Comprar
 											<div class="sub-nav-toggler">
 												<span></span>
 											</div>
 										</a>
 										<ul class="sub-menu collapse" id="sub-nav1">
-											<li><a href="{{ url_for('buscar', operacion='venta', categoria='casa') }}">Casas</a></li>
-											<li><a href="{{ url_for('buscar', operacion='venta', categoria='departamento') }}">Departamentos</a></li>
-											<li><a href="{{ url_for('buscar', operacion='venta', categoria='local') }}">Locales</a></li>
-											<li><a href="{{ url_for('buscar', operacion='venta') }}">Más Propiedades</a></li>
+											<li><a
+													href="{{ url_for('buscar', operacion='venta', categoria='casa') }}">Casas</a>
+											</li>
+											<li><a
+													href="{{ url_for('buscar', operacion='venta', categoria='departamento') }}">Departamentos</a>
+											</li>
+											<li><a
+													href="{{ url_for('buscar', operacion='venta', categoria='local') }}">Locales</a>
+											</li>
+											<li><a href="{{ url_for('buscar', operacion='venta') }}">Más Propiedades</a>
+											</li>
 										</ul>
 									</li>
 
 									<li class="nav-item">
-										<a class="page-scroll" data-toggle="collapse" data-target="#sub-nav" aria-controls="sub-nav"
-											aria-expanded="false" aria-label="Toggle navigation" href="javascript:void(0)">
+										<a class="page-scroll" data-toggle="collapse" data-target="#sub-nav"
+											aria-controls="sub-nav" aria-expanded="false" aria-label="Toggle navigation"
+											href="javascript:void(0)">
 											Rentar
 											<div class="sub-nav-toggler">
 												<span></span>
 											</div>
 										</a>
 										<ul class="sub-menu collapse" id="sub-nav">
-											<li><a href="{{ url_for('buscar', operacion='renta', categoria='casa') }}">Casas</a></li>
-											<li><a href="{{ url_for('buscar', operacion='renta', categoria='departamento') }}">Departamentos</a></li>
-											<li><a href="{{ url_for('buscar', operacion='renta', categoria='local') }}">Locales</a></li>
-											<li><a href="{{ url_for('buscar', operacion='renta') }}">Más Propiedades</a></li>
+											<li><a
+													href="{{ url_for('buscar', operacion='renta', categoria='casa') }}">Casas</a>
+											</li>
+											<li><a
+													href="{{ url_for('buscar', operacion='renta', categoria='departamento') }}">Departamentos</a>
+											</li>
+											<li><a
+													href="{{ url_for('buscar', operacion='renta', categoria='local') }}">Locales</a>
+											</li>
+											<li><a href="{{ url_for('buscar', operacion='renta') }}">Más Propiedades</a>
+											</li>
 										</ul>
 									</li>
-									
+
 									<li class="nav-item">
-										<a class="page-scroll" data-toggle="collapse" data-target="#sub-nav-vender" aria-controls="sub-nav-vender"
-											aria-expanded="false" aria-label="Toggle navigation" href="javascript:void(0)">
+										<a class="page-scroll" data-toggle="collapse" data-target="#sub-nav-vender"
+											aria-controls="sub-nav-vender" aria-expanded="false"
+											aria-label="Toggle navigation" href="javascript:void(0)">
 											Vender
 											<div class="sub-nav-toggler">
 												<span></span>
@@ -131,73 +149,78 @@
 										<ul class="sub-menu collapse" id="sub-nav-vender">
 											<li style="padding: 10px 20px; border-bottom: 1px solid #eee;">
 												<h5 style="font-size: 16px; color: #2BB2BB;">¿Quieres publicar?</h5>
-												<p style="font-size: 12px; line-height: 1.2;">Únete a Homi y llega a miles.</p>
+												<p style="font-size: 12px; line-height: 1.2;">Únete a Homi y llega a
+													miles.</p>
 											</li>
 											<li style="padding: 10px 20px;">
-												<a href="{{ url_for('registro_proveedor') }}" class="btn btn-primary btn-sm" 
-												style="background-color: #2BB2BB; color: white; border-radius: 20px; padding: 5px 15px; text-align:center;">
-												Vuélvete proveedor
+												<a href="{{ url_for('registro_proveedor') }}"
+													class="btn btn-primary btn-sm"
+													style="background-color: #2BB2BB; color: white; border-radius: 20px; padding: 5px 15px; text-align:center;">
+													Vuélvete proveedor
 												</a>
 											</li>
 										</ul>
-									
-									 {% if session.get('rol') == 'proveedor' %}
+
+										{% if session.get('rol') == 'proveedor' %}
 										<ul class="sub-menu collapse" id="sub-nav-vender">
 											<li style="padding: 10px 20px; border-bottom: 1px solid #eee;">
 												<h5 style="font-size: 16px; color: #2BB2BB;">¿Listo para publicar?</h5>
-												<p style="font-size: 12px; line-height: 1.2;">Comparte tus propiedades con miles.</p>
+												<p style="font-size: 12px; line-height: 1.2;">Comparte tus propiedades
+													con miles.</p>
 											</li>
 											<li style="padding: 10px 20px;">
-												<a href="{{ url_for('publicaciones.crear_publicacion') }}" class="btn btn-primary btn-sm" 
-												style="background-color: #2BB2BB; color: white; border-radius: 20px; padding: 5px 15px; text-align:center;">
-												Publicar propiedad
+												<a href="{{ url_for('publicaciones.crear_publicacion') }}"
+													class="btn btn-primary btn-sm"
+													style="background-color: #2BB2BB; color: white; border-radius: 20px; padding: 5px 15px; text-align:center;">
+													Publicar propiedad
 												</a>
 											</li>
 										</ul>
-									 {% endif %}
+										{% endif %}
 									</li>
-								</div>
-								<ul class="header-btn d-md-flex">
-									{% if session.usuario_id %}
-									<li>
-										<a href="#" class="main-btn account-btn">
-											<span class="d-md-none"><i class="lni lni-user"></i></span>
-											<span class="d-none d-md-block">Mi cuenta</span>
-										</a>
-										<ul class="dropdown-nav">
-											{% if session.get('rol') == 'admin' %}
-											<li><a href="/dashboard">Dashboard</a></li>
-											{% endif %}
-											<li><a href="/perfil">Perfil</a></li>
-											{% if session.get('rol') == 'proveedor' %}
-											<li><a href="{{ url_for('publicaciones.crear_publicacion') }}">Publicaciones</a></li>
-											{% endif %}
-											<li><a href="/payments">Notificaciones</a></li>
-											<li><a href="/favorites">Favoritos</a></li>
-											<li><a href="/logout">Cerrar Sesión</a></li>
-										</ul>
-									</li>
-									{% else %}
-									<li>
-										<a href="/index" class="main-btn btn-hover d-none d-md-block">Iniciar Sesion</a>
-									</li>
-									{% endif %}
-								</ul>
-							</nav> <!-- navbar -->
-						</div>
-					</div> <!-- row -->
-				</div> <!-- container -->
-			</div>
-		 <!-- header navbar -->
+							</div>
+							<ul class="header-btn d-md-flex">
+								{% if session.usuario_id %}
+								<li>
+									<a href="#" class="main-btn account-btn">
+										<span class="d-md-none"><i class="lni lni-user"></i></span>
+										<span class="d-none d-md-block">Mi cuenta</span>
+									</a>
+									<ul class="dropdown-nav">
+										{% if session.get('rol') == 'admin' %}
+										<li><a href="/dashboard">Dashboard</a></li>
+										{% endif %}
+										<li><a href="/perfil">Perfil</a></li>
+										{% if session.get('rol') == 'proveedor' %}
+										<li><a href="{{ url_for('publicaciones.crear_publicacion') }}">Publicaciones</a>
+										</li>
+										{% endif %}
+										<li><a href="/payments">Notificaciones</a></li>
+										<li><a href="/favorites">Favoritos</a></li>
+										<li><a href="/logout">Cerrar Sesión</a></li>
+									</ul>
+								</li>
+								{% else %}
+								<li>
+									<a href="/index" class="main-btn btn-hover d-none d-md-block">Iniciar Sesion</a>
+								</li>
+								{% endif %}
+							</ul>
+						</nav> <!-- navbar -->
+					</div>
+				</div> <!-- row -->
+			</div> <!-- container -->
+		</div>
+		<!-- header navbar -->
 		<div style="position: fixed; top: 100px; right: 20px; z-index: 9999; min-width: 300px; max-width: 400px;">
 			{% with messages = get_flashed_messages(with_categories=true) %}
 			{% if messages %}
-				{% for category, message in messages %}
-				<div class="alert alert-{{ category }} alert-dismissible fade show auto-dismiss shadow" role="alert">
-					{{ message }}
-					<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-				</div>
-				{% endfor %}
+			{% for category, message in messages %}
+			<div class="alert alert-{{ category }} alert-dismissible fade show auto-dismiss shadow" role="alert">
+				{{ message }}
+				<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+			</div>
+			{% endfor %}
 			{% endif %}
 			{% endwith %}
 		</div>
@@ -229,10 +252,7 @@
 
 						<!-- Keyword -->
 						<div class="col-lg-3 col-sm-5 col-10">
-							<input class="form-control"
-								type="text"
-								name="keyword"
-								placeholder="¿Qué buscas?"
+							<input class="form-control" type="text" name="keyword" placeholder="¿Qué buscas?"
 								value="{{ keyword }}">
 						</div>
 
@@ -253,7 +273,7 @@
 							<select class="form-control" name="localizacion">
 								<option value="">Colonia</option>
 								{% for colonia in colonias %}
-									<option value="{{ colonia }}">{{ colonia }}</option>
+								<option value="{{ colonia }}">{{ colonia }}</option>
 								{% endfor %}
 							</select>
 						</div>
@@ -342,7 +362,8 @@
 				<div class="mx-auto col-xl-6 col-lg-7 col-md-10">
 					<div class="text-center section-title mb-60">
 						<h1>Nuestros servicios</h1>
-						<p>Centralizamos la oferta inmobiliaria en una sola plataforma robusta y segura. Olvídate de buscar en múltiples redes sociales; 
+						<p>Centralizamos la oferta inmobiliaria en una sola plataforma robusta y segura. Olvídate de
+							buscar en múltiples redes sociales;
 							compara precios, ubicaciones y contacta directamente sin intermediarios ocultos</p>
 					</div>
 				</div>
@@ -357,7 +378,8 @@
 						</div>
 						<div class="service-content">
 							<h3>Oferta Centralizada</h3>
-							<p>Accede a un catálogo completo de bienes raíces en Acapulco. Toda la información que necesitas, desde agencias hasta propietarios independientes, en un solo lugar.</p>
+							<p>Accede a un catálogo completo de bienes raíces en Acapulco. Toda la información que
+								necesitas, desde agencias hasta propietarios independientes, en un solo lugar.</p>
 						</div>
 					</div>
 				</div>
@@ -369,7 +391,9 @@
 						</div>
 						<div class="service-content">
 							<h3>Comparador Visual</h3>
-							<p>Evalúa tus opciones fácilmente. Nuestra herramienta te permite comparar inmuebles lado a lado, similar a las plataformas de turismo líderes, para que tomes la mejor decisión.</p>
+							<p>Evalúa tus opciones fácilmente. Nuestra herramienta te permite comparar inmuebles lado a
+								lado, similar a las plataformas de turismo líderes, para que tomes la mejor decisión.
+							</p>
 						</div>
 					</div>
 				</div>
@@ -381,7 +405,8 @@
 						</div>
 						<div class="service-content">
 							<h3>Ubicación Inteligente</h3>
-							<p>Explora propiedades mediante nuestro mapa interactivo dividido por zonas clave: Diamante, Tradicional, Playa y más, visualizando la oferta en tiempo real.</p>
+							<p>Explora propiedades mediante nuestro mapa interactivo dividido por zonas clave: Diamante,
+								Tradicional, Playa y más, visualizando la oferta en tiempo real.</p>
 						</div>
 					</div>
 				</div>
@@ -393,7 +418,8 @@
 						</div>
 						<div class="service-content">
 							<h3>Filtros a tu Medida</h3>
-							<p>No pierdas tiempo navegando sin rumbo. Filtra resultados por precio, tipo de propiedad, número de habitaciones y ubicación exacta para encontrar justo lo que buscas.</p>
+							<p>No pierdas tiempo navegando sin rumbo. Filtra resultados por precio, tipo de propiedad,
+								número de habitaciones y ubicación exacta para encontrar justo lo que buscas.</p>
 						</div>
 					</div>
 				</div>
@@ -405,7 +431,8 @@
 						</div>
 						<div class="service-content">
 							<h3>Trato Directo</h3>
-							<p>Conectamos a propietarios y buscadores sin barreras. Facilita la comunicación y agiliza el proceso de renta o venta con una conexión directa y transparente.</p>
+							<p>Conectamos a propietarios y buscadores sin barreras. Facilita la comunicación y agiliza
+								el proceso de renta o venta con una conexión directa y transparente.</p>
 						</div>
 					</div>
 				</div>
@@ -417,7 +444,8 @@
 						</div>
 						<div class="service-content">
 							<h3>Accesibilidad Total</h3>
-							<p>Lleva Homi contigo. Nuestra plataforma está diseñada para funcionar perfectamente en tu celular, tableta o computadora, para que busques o publiques desde donde estés.</p>
+							<p>Lleva Homi contigo. Nuestra plataforma está diseñada para funcionar perfectamente en tu
+								celular, tableta o computadora, para que busques o publiques desde donde estés.</p>
 						</div>
 					</div>
 				</div>
@@ -434,46 +462,60 @@
 				<div class="mx-auto col-lg-6 col-md-10">
 					<div class="text-center section-title mb-60">
 						<h1>Propiedades Recientes</h1>
-						<p>Explora nuestras últimas publicaciones, cuidadosamente seleccionadas para ofrecerte lo mejor.</p>
+						<p>Explora nuestras últimas publicaciones, cuidadosamente seleccionadas para ofrecerte lo mejor.
+						</p>
 					</div>
 				</div>
 			</div>
 
 			<div class="product-carousel-wrapper">
 				<div class="row feature-product-carousel">
-				
-                    {% if propiedades %}
-                        {% for prop in propiedades %}
-                        <div class="col-lg-4 col-md-6">
-                            <div class="single-product">
-                                <div class="product-img">
-                                    <a href="{{ url_for('detalle_propiedad', id_propiedad=prop._id) }}">
-                                        <img src="{{ prop.imagen_principal_url or url_for('static', filename='images/product/l-product-1.jpg') }}" alt="{{ prop.titulo }}" style="height: 250px; object-fit: cover; width: 100%;">
-                                    </a>
-                                </div>
-                    
-                                <div class="product-content">
-                                    <div class="rating-wrapper">
-                                        <h5 class="price theme-color">${{ "{:,.0f}".format(prop.precio) }}</h5>
-                                        <div class="rating">
-                                            <span class="badge bg-info text-white">{{ prop.tipo_operacion|upper }}</span>
-                                        </div>
-                                    </div>
-                                    <h3 class="name"><a href="{{ url_for('detalle_propiedad', id_propiedad=prop._id) }}">{{ prop.titulo }}</a></h3>
-                                    <p class="sort-des"><i class="lni lni-map-marker"></i> {{ prop.colonia }}, {{ prop.ciudad }}</p>
-                                    <div class="product-bottom">
-                                        <span class="theme-color"><i class="lni lni-home"></i> {{ prop.tipo_propiedad|capitalize }}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        {% endfor %}
-                    {% else %}
-                        <div class="col-12 text-center">
-                            <p class="text-muted">Aún no hay propiedades para mostrar en el carrusel.</p>
-                        </div>
-                    {% endif %}
-				
+
+					{% if propiedades %}
+					{% for prop in propiedades %}
+					<div class="col-lg-4 col-md-6">
+						<div class="single-product">
+							<div class="product-img">
+								<a href="{{ url_for('detalle_propiedad', id_propiedad=prop._id) }}">
+									<img src="{{ prop.imagen_principal_url or url_for('static', filename='images/product/l-product-1.jpg') }}"
+										alt="{{ prop.titulo }}" style="height: 250px; object-fit: cover; width: 100%;">
+								</a>
+							</div>
+
+							<div class="product-content">
+								<div class="rating-wrapper">
+									<h5 class="price theme-color">${{ "{:,.0f}".format(prop.precio) }}</h5>
+									<div class="rating">
+										<span class="badge bg-info text-white">{{ prop.tipo_operacion|upper }}</span>
+									</div>
+								</div>
+								<h3 class="name"><a href="{{ url_for('detalle_propiedad', id_propiedad=prop._id) }}">{{
+										prop.titulo }}</a></h3>
+								<p class="sort-des"><i class="lni lni-map-marker"></i> {{ prop.colonia }}, {{
+									prop.ciudad }}</p>
+
+								<div class="d-flex justify-content-start mt-2 mb-2"
+									style="gap: 15px; font-size: 13px; color: #777;">
+									<span><i class="lni lni-home" style="color: #2BB2BB;"></i> {{
+										prop.numero_habitaciones }} Hab.</span>
+									<span><i class="lni lni-drop" style="color: #2BB2BB;"></i> {{ prop.numero_banos }}
+										Baños</span>
+								</div>
+
+								<div class="product-bottom">
+									<span class="theme-color"><i class="lni lni-apartment"></i> {{
+										prop.tipo_propiedad|capitalize }}</span>
+								</div>
+							</div>
+						</div>
+					</div>
+					{% endfor %}
+					{% else %}
+					<div class="col-12 text-center">
+						<p class="text-muted">Aún no hay propiedades para mostrar en el carrusel.</p>
+					</div>
+					{% endif %}
+
 				</div>
 			</div>
 		</div>
@@ -487,13 +529,14 @@
 				<div class="mx-auto col-xl-6 col-lg-7 col-md-10">
 					<div class="text-center section-title mb-90">
 						<h1>Escoge el plan ideal para tu negocio</h1>
-						<p>Potencia tus ventas con nuestras herramientas especializadas. Desde particulares hasta grandes agencias, tenemos un paquete diseñado para maximizar tu visibilidad en Acapulco.</p>
+						<p>Potencia tus ventas con nuestras herramientas especializadas. Desde particulares hasta
+							grandes agencias, tenemos un paquete diseñado para maximizar tu visibilidad en Acapulco.</p>
 					</div>
 				</div>
 			</div>
 
 			<div class="row justify-content-center">
-				
+
 				<div class="col-lg-4 col-md-8 col-sm-10 col-11">
 					<div class="single-pricing">
 						<div class="icon">
@@ -555,7 +598,8 @@
 				</div>
 
 			</div>
-			<p class="text-center mt-30">¿Solo quieres probar? <a href="/index">Regístrate gratis</a> y publica hasta 2 propiedades.</p>
+			<p class="text-center mt-30">¿Solo quieres probar? <a href="/index">Regístrate gratis</a> y publica hasta 2
+				propiedades.</p>
 		</div>
 	</section>
 	<!--====== PRICING PRODUCT PART ENDS ======-->
@@ -572,10 +616,13 @@
 					<div class="col-xl-4 col-md-7">
 						<div class="footer-widget about">
 							<a href="index.html" class="d-inline-block mb-30">
-								<img src="static/images/logo/logoHomi.png" alt="" style="width: 60px;width: 100%; max-width: 70px;">
-								<a style="font-size: 30px; font-weight: bold; color: #2BB2BB; ;width: 100%;max-width: 70%;">Homi</a>
+								<img src="static/images/logo/logoHomi.png" alt=""
+									style="width: 60px;width: 100%; max-width: 70px;">
+								<a
+									style="font-size: 30px; font-weight: bold; color: #2BB2BB; ;width: 100%;max-width: 70%;">Homi</a>
 							</a>
-							<p class="text-white mb-25">Somos la comunidad inmobiliaria más grande de México que conecta de forma gratuita a quienes ofrecen y buscan cualquier tipo de propiedad.</p>
+							<p class="text-white mb-25">Somos la comunidad inmobiliaria más grande de México que conecta
+								de forma gratuita a quienes ofrecen y buscan cualquier tipo de propiedad.</p>
 							<ul class="social">
 								<li><a href="javascript:void(0)"><i class="lni lni-facebook-filled"></i></a></li>
 								<li><a href="javascript:void(0)"><i class="lni lni-twitter-filled"></i></a></li>
@@ -650,7 +697,7 @@
 				<div class="row">
 					<div class="col-sm-12">
 						<div class="text-center">
-							 <p style="color: #fff;">&copy; cosenø Dv. Todos los derechos reservados.</p>
+							<p style="color: #fff;">&copy; cosenø Dv. Todos los derechos reservados.</p>
 						</div>
 					</div>
 				</div>
@@ -675,7 +722,7 @@
 
 	<!--====== glightbox js ======-->
 	<script src="static/js/glightbox.min.js"></script>
-	
+
 	<!--====== Selectr js ======-->
 	<script src="static/js/selectr.min.js"></script>
 
@@ -707,7 +754,7 @@
 			controls: true,
 			controlsPosition: 'bottom',
 			controlsText: [
-				'<span class="prev"><i class="lni lni-chevron-left"></i></span>', 
+				'<span class="prev"><i class="lni lni-chevron-left"></i></span>',
 				'<span class="next"><i class="lni lni-chevron-right"></i></span>'
 			],
 			container: ".feature-product-carousel",
@@ -755,22 +802,22 @@
 			}
 		});
 	</script>
-	
+
 	<script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // Selecciona todas las alertas que tengan la clase 'auto-dismiss'
-            var alerts = document.querySelectorAll('.auto-dismiss');
-            
-            alerts.forEach(function(alert) {
-                // Esperar 5 segundos (5000 milisegundos)
-                setTimeout(function() {
-                    // Usar la API de Bootstrap para cerrar la alerta suavemente
-                    var bsAlert = new bootstrap.Alert(alert);
-                    bsAlert.close();
-                }, 5000);
-            });
-        });
-    </script>
+		document.addEventListener('DOMContentLoaded', function () {
+			// Selecciona todas las alertas que tengan la clase 'auto-dismiss'
+			var alerts = document.querySelectorAll('.auto-dismiss');
+
+			alerts.forEach(function (alert) {
+				// Esperar 5 segundos (5000 milisegundos)
+				setTimeout(function () {
+					// Usar la API de Bootstrap para cerrar la alerta suavemente
+					var bsAlert = new bootstrap.Alert(alert);
+					bsAlert.close();
+				}, 5000);
+			});
+		});
+	</script>
 
 </body>
 

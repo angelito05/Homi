@@ -41,6 +41,11 @@ def crear_publicacion():
     }
 
     if form.validate_on_submit():
+
+        if not request.files.get('foto1') and not form.foto1.data:
+            flash("Debes subir al menos la Foto Principal para publicar.", "error")
+            return render_template('Publicaciones.html', form=form, propietario=propietario_data)
+
         try:
             imagenes_guardadas = []
             # Lista de campos de archivo del formulario

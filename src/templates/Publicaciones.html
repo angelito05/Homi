@@ -43,6 +43,17 @@
             </div>
         </div>
 
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div style="padding: 0 20px;">
+            {% for category, message in messages %}
+            <div class="flash {{ category }}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
 
         <form action="/crear-publicacion" method="POST" enctype="multipart/form-data">
             {{ form.csrf_token }}

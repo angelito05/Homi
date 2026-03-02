@@ -36,6 +36,7 @@ db = client["HomiDB"]
 usuarios = db["usuarios"]
 propiedades = db["propiedades"]
 logs_col = db["log_audotoria"]
+resenas = db["resenas"]
 mongo = db
 
 # --- CONFIGURACIÓN CLOUDINARY ---
@@ -330,10 +331,9 @@ def detalle_propiedad(id_propiedad):
             flash("La propiedad no existe o fue eliminada.", "error")
             return redirect(url_for('home'))
 
-        # 2. Buscar al propietario (Dueño del ID guardado en la propiedad)
+        # 2. Buscar al propietario
         propietario = usuarios.find_one({"_id": prop.get("id_propietario")})
         
-        # 3. Preparar datos seguros para mostrar (Evitamos enviar la contraseña, etc.)
         datos_propietario = {}
         if propietario:
             datos_propietario = {
@@ -341,7 +341,6 @@ def detalle_propiedad(id_propiedad):
                 "telefono": propietario.get("telefono", "No disponible"),
                 "correo": propietario.get("correo_electronico", ""),
                 "fecha_registro": propietario.get("_id").generation_time.strftime('%Y'),
-                # Nota: Como aún no tenemos subida de foto de perfil, usamos la default
                 "foto": url_for('static', filename='images/dashboard/profile-img.png') 
             }
         else:
@@ -351,12 +350,56 @@ def detalle_propiedad(id_propiedad):
                 "foto": url_for('static', filename='images/dashboard/profile-img.png')
             }
 
-        return render_template("detalle_propiedad.html", prop=prop, propietario=datos_propietario)
+        # 3. --- NUEVO: LEER RESEÑAS DESDE LA COLECCIÓN INDEPENDIENTE ---
+        # Buscamos todas las reseñas de esta propiedad que no estén eliminadas y las ordenamos de la más nueva a la más vieja
+        comentarios_cursor = resenas.find({
+            "id_propiedad": ObjectId(id_propiedad), 
+            "esta_eliminado": False
+        }).sort("fecha_resena", -1)
+        
+        comentarios = []
+        suma_calificaciones = 0
+        total_calificaciones = 0
+        
+        for c in comentarios_cursor:
+            # Buscamos el nombre del usuario que hizo esta reseña
+            usr = usuarios.find_one({"_id": c["id_usuario"]})
+            nombre_usr = f"{usr.get('nombre', 'Usuario')} {usr.get('primer_apellido', '')}" if usr else "Usuario Anónimo"
+            
+            # Formateamos los datos para que el HTML los entienda como antes
+            comentarios.append({
+                "nombre_usuario": nombre_usr,
+                "calificacion": c.get("puntuacion", 0),
+                "comentario": c.get("comentario", ""),
+                # Convertimos la fecha de la base de datos a texto legible
+                "fecha": c["fecha_resena"].strftime('%d/%m/%Y %H:%M') if "fecha_resena" in c else ""
+            })
+            
+            suma_calificaciones += c.get("puntuacion", 0)
+            total_calificaciones += 1
+        
+        # Calcular promedio global
+        promedio_calificacion = (suma_calificaciones / total_calificaciones) if total_calificaciones > 0 else 0
+        
+        # 4. Comprobar si está en favoritos del usuario actual
+        es_favorito = False
+        if "usuario_id" in session:
+            usuario_actual = usuarios.find_one({"_id": ObjectId(session["usuario_id"])})
+            if usuario_actual and id_propiedad in usuario_actual.get("favoritos", []):
+                es_favorito = True
+
+        return render_template("detalle_propiedad.html", 
+                               prop=prop, 
+                               propietario=datos_propietario,
+                               comentarios=comentarios,
+                               promedio_calificacion=round(promedio_calificacion, 1),
+                               total_calificaciones=total_calificaciones,
+                               es_favorito=es_favorito)
 
     except Exception as e:
         print(f"Error cargando propiedad: {e}")
         flash("Ocurrió un error al cargar la propiedad.", "error")
-        return redirect(url_for('home'))        
+        return redirect(url_for('home'))       
         
 @app.route("/perfil", methods=["GET", "POST"])
 def perfil():
@@ -545,6 +588,83 @@ def dashboard():
         return redirect(url_for("home"))
 
     return render_template("Inicio.html", nombre=session["nombre"], rol=session["rol"])
+
+# --- NUEVA RUTA PARA COMENTAR Y CALIFICAR ---
+@app.route("/comentar_propiedad/<id_propiedad>", methods=["POST"])
+def comentar_propiedad(id_propiedad):
+    # Si no está registrado, lo mandamos a iniciar sesión
+    if "usuario_id" not in session:
+        flash("Debes iniciar sesión para comentar y calificar.", "error")
+        return redirect(url_for("index"))
+
+    comentario_texto = request.form.get("comentario")
+    # Convertimos a entero para cumplir con bsonType: 'int' de tu esquema
+    puntuacion = int(request.form.get("calificacion", 0))
+
+    # Estructura exacta basada en tu JSON Schema
+    nueva_resena = {
+        "id_usuario": ObjectId(session["usuario_id"]),
+        "id_propiedad": ObjectId(id_propiedad),
+        "puntuacion": puntuacion,
+        "comentario": comentario_texto,
+        "fecha_resena": datetime.utcnow(), # bsonType: 'date'
+        "fecha_edicion": None,             # bsonType: ['date', 'null']
+        "esta_eliminado": False            # bsonType: 'bool'
+    }
+
+    # Insertamos en la nueva colección
+    resenas.insert_one(nueva_resena)
+    
+    flash("Tu calificación y comentario han sido guardados.", "success")
+    return redirect(url_for('detalle_propiedad', id_propiedad=id_propiedad))
+
+
+# --- NUEVA RUTA PARA FAVORITOS ---
+@app.route("/toggle_favorito/<id_propiedad>", methods=["POST"])
+def toggle_favorito(id_propiedad):
+    if "usuario_id" not in session:
+        return redirect(url_for("index"))
+
+    usuario_id = ObjectId(session["usuario_id"])
+    usuario = usuarios.find_one({"_id": usuario_id})
+    favoritos = usuario.get("favoritos", [])
+
+    if id_propiedad in favoritos:
+        favoritos.remove(id_propiedad)
+        msg = "Eliminado de favoritos"
+    else:
+        favoritos.append(id_propiedad)
+        msg = "Agregado a favoritos"
+
+    usuarios.update_one({"_id": usuario_id}, {"$set": {"favoritos": favoritos}})
+    flash(msg, "success")
+    return redirect(url_for("detalle_propiedad", id_propiedad=id_propiedad))
+
+# --- NUEVA RUTA: VER FAVORITOS ---
+@app.route("/favorites")
+def mis_favoritos():
+    # 1. Validar que el usuario haya iniciado sesión
+    if "usuario_id" not in session:
+        flash("Debes iniciar sesión para ver tus favoritos.", "error")
+        return redirect(url_for("index"))
+
+    # 2. Buscar al usuario y obtener su lista de favoritos
+    usuario_actual = usuarios.find_one({"_id": ObjectId(session["usuario_id"])})
+    lista_ids_favoritos = usuario_actual.get("favoritos", [])
+
+    # 3. Convertir los IDs de texto a ObjectId para que MongoDB los entienda
+    ids_obj = []
+    for fid in lista_ids_favoritos:
+        try:
+            ids_obj.append(ObjectId(fid))
+        except:
+            pass
+
+    # 4. Buscar todas las propiedades que coincidan con esos IDs
+    propiedades_favoritas = list(propiedades.find({"_id": {"$in": ids_obj}}))
+
+    # 5. Mandar a la nueva pantalla
+    return render_template("favoritos.html", propiedades=propiedades_favoritas, mis_favoritos=lista_ids_favoritos)
 
 # Logout
 @app.route("/logout")
