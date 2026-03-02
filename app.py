@@ -12,6 +12,8 @@ import re
 from flask_talisman import Talisman
 from bson.objectid import ObjectId
 from app_publicaciones import publicaciones_bp
+import cloudinary
+import cloudinary.uploader
 
 app = Flask(__name__, template_folder="src/templates", static_folder="src/static")
 app.config.from_object(Config)
@@ -35,6 +37,14 @@ usuarios = db["usuarios"]
 propiedades = db["propiedades"]
 logs_col = db["log_audotoria"]
 mongo = db
+
+# --- CONFIGURACIÓN CLOUDINARY ---
+cloudinary.config(
+    cloud_name = app.config["CLOUDINARY_CLOUD_NAME"],
+    api_key = app.config["CLOUDINARY_API_KEY"],
+    api_secret = app.config["CLOUDINARY_API_SECRET"],
+    secure = True
+)
 
 # --- FUNCIÓN DE AYUDA PARA VALIDAR CONTRASEÑA ---
 def validar_contrasena_segura(password):
@@ -350,60 +360,116 @@ def detalle_propiedad(id_propiedad):
         
 @app.route("/perfil", methods=["GET", "POST"])
 def perfil():
-    # 1. Verificar Sesión
     if "usuario_id" not in session:
-        return redirect(url_for("home"))
+        return redirect(url_for("index"))
 
-    # 2. Obtener datos
-    usuario_id = ObjectId(session["usuario_id"])
-    usuario = usuarios.find_one({"_id": usuario_id})
+    usuario_id_str = session["usuario_id"]
+    usuario_id_obj = ObjectId(usuario_id_str)
+    usuario = usuarios.find_one({"_id": usuario_id_obj})
 
     if not usuario:
         session.clear()
         return redirect(url_for("home"))
 
-    form = PerfilForm()
+    # 1. Procesar la Edición de Datos
+    if request.method == 'POST':
+        tipo_form = request.form.get("tipo_form")
 
-    # 3. Pre-llenar el formulario
-    if request.method == 'GET':
-        form.correo_electronico.data = usuario.get('correo_electronico')
-        form.telefono.data = usuario.get('telefono')
+        if tipo_form == "basico":
+            # Datos generales para todos
+            datos_actualizar = {
+                "nombre": request.form.get("nombre", usuario.get("nombre")),
+                "primer_apellido": request.form.get("primer_apellido", usuario.get("primer_apellido")),
+                "telefono": request.form.get("telefono", usuario.get("telefono"))
+            }
 
-    # 4. Procesar Formulario 
-    if form.validate_on_submit():
-        # A) Verificar que la contraseña actual sea correcta (Seguridad)
-        if not bcrypt.check_password_hash(usuario["contrasena"], form.contrasena_actual.data):
-            flash("La contraseña actual es incorrecta. No se guardaron cambios.", "error")
-            return render_template("perfil.html", form=form, usuario=usuario)
+            # Si es proveedor, actualizamos también sus datos extra
+            if usuario.get("rol") == "proveedor":
+                datos_actualizar.update({
+                    "nombre_inmobiliaria": request.form.get("inmobiliaria", ""),
+                    "rfc_curp": request.form.get("rfc_curp", ""), # <--- CORREGIDO AQUÍ
+                    "url_facebook": request.form.get("url_facebook", ""),
+                    "url_instagram": request.form.get("url_instagram", ""),
+                    "url_whatsapp": request.form.get("url_whatsapp", "")
+                })
 
-        # B) Validar duplicidad de correo (si lo cambió)
-        if form.correo_electronico.data != usuario["correo_electronico"]:
-            if usuarios.find_one({"correo_electronico": form.correo_electronico.data}):
-                flash("Ese correo ya está registrado por otro usuario.", "error")
-                return render_template("perfil.html", form=form, usuario=usuario)
+            usuarios.update_one({"_id": usuario_id_obj}, {"$set": datos_actualizar})
+            flash("Datos actualizados correctamente.", "success")
+            return redirect(url_for("perfil"))
 
-        # C) Preparar datos a actualizar
-        datos_actualizar = {
-            "correo_electronico": form.correo_electronico.data,
-            "telefono": form.telefono.data
-        }
+        elif tipo_form == "sensible":
+            pass_actual = request.form.get("contrasena_actual")
+            if not bcrypt.check_password_hash(usuario["contrasena"], pass_actual):
+                flash("Contraseña actual incorrecta.", "error")
+                return redirect(url_for("perfil"))
+            
+            # (Aquí va tu lógica de cambiar correo/contraseña)
+            nuevo_correo = request.form.get("correo_electronico")
+            nueva_pass = request.form.get("nueva_contrasena")
+            updates = {}
+            if nuevo_correo and nuevo_correo != usuario.get("correo_electronico"):
+                updates["correo_electronico"] = nuevo_correo
+            if nueva_pass:
+                updates["contrasena"] = bcrypt.generate_password_hash(nueva_pass).decode('utf-8')
+            
+            if updates:
+                usuarios.update_one({"_id": usuario_id_obj}, {"$set": updates})
+                flash("Seguridad actualizada.", "success")
+            return redirect(url_for("perfil"))
+        
+        # --- LA FOTO DE PERFIL ---
+        elif tipo_form == "foto_perfil":
+            if 'foto' in request.files:
+                foto = request.files['foto']
+                if foto.filename != '':
+                    try:
+                        # Subir a Cloudinary en una carpeta especial
+                        upload_result = cloudinary.uploader.upload(
+                            foto,
+                            folder="homi_perfiles" 
+                        )
+                        url_foto = upload_result['secure_url']
+                        
+                        # Guardar la URL en el usuario
+                        usuarios.update_one({"_id": usuario_id_obj}, {"$set": {"foto_perfil": url_foto}})
+                        flash("Foto de perfil actualizada con éxito.", "success")
+                    except Exception as e:
+                        print(f"Error subiendo foto de perfil: {e}")
+                        flash("Hubo un error al subir la foto.", "error")
+                        
+            return redirect(url_for("perfil"))
 
-        # D) Cambio de Contraseña (si el usuario escribió algo en 'nueva_contrasena')
-        if form.nueva_contrasena.data:
-            # Usamos tu función existente para validar seguridad
-            if not validar_contrasena_segura(form.nueva_contrasena.data):
-                flash("La nueva contraseña debe tener mayúscula, número y símbolo.", "error")
-                return render_template("perfil.html", form=form, usuario=usuario)
+    # 2. Buscar Publicaciones del Proveedor 
+    mis_publicaciones = []
+    if usuario.get("rol") == "proveedor":
+        # Buscamos tanto por String como por ObjectId para asegurar que encuentre las publicaciones
+        mis_publicaciones = list(propiedades.find({
+            "$or": [
+                {"id_propietario": usuario_id_str},
+                {"id_propietario": usuario_id_obj}
+            ]
+        }))
+        for p in mis_publicaciones:
+            imagen_principal = ""
+            if "imagenes" in p and len(p["imagenes"]) > 0:
+                primera_img = p["imagenes"][0]
+                imagen_principal = primera_img.get("url_imagen", "") if isinstance(primera_img, dict) else primera_img
+            p["imagen_principal_url"] = imagen_principal
 
-            hashed_pw = bcrypt.generate_password_hash(form.nueva_contrasena.data).decode('utf-8')
-            datos_actualizar["contrasena"] = hashed_pw
+    # 3. Buscar Favoritos
+    mis_favoritos = []
+    favoritos_ids_str = usuario.get("favoritos", [])
+    if favoritos_ids_str:
+        favoritos_ids = [ObjectId(fid) for fid in favoritos_ids_str if ObjectId.is_valid(fid)]
+        mis_favoritos = list(propiedades.find({"_id": {"$in": favoritos_ids}}))
+        for p in mis_favoritos:
+            imagen_principal = ""
+            if "imagenes" in p and len(p["imagenes"]) > 0:
+                primera_img = p["imagenes"][0]
+                imagen_principal = primera_img.get("url_imagen", "") if isinstance(primera_img, dict) else primera_img
+            p["imagen_principal_url"] = imagen_principal
 
-        # E) Guardar en MongoDB
-        usuarios.update_one({"_id": usuario_id}, {"$set": datos_actualizar})
-        flash("¡Perfil actualizado correctamente!", "success")
-        return redirect(url_for("perfil"))
-
-    return render_template("perfil.html", form=form, usuario=usuario)
+    return render_template("perfil.html", usuario=usuario, mis_publicaciones=mis_publicaciones, mis_favoritos=mis_favoritos)
 
 @app.route('/admin_dashboard')
 def admin_dashboard():

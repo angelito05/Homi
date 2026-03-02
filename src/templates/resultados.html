@@ -163,9 +163,13 @@
 										<span class="d-none d-md-block">Mi cuenta</span>
 									</a>
 									<ul class="dropdown-nav">
+										{% if session.get('rol') == 'admin' %}
 										<li><a href="/dashboard">Dashboard</a></li>
-										<li><a href="/profile-settings">Perfil</a></li>
-										<li><a href="/post-ad">Publicaciones</a></li>
+										{% endif %}
+										<li><a href="/perfil">Perfil</a></li>
+										{% if session.get('rol') == 'proveedor' %}
+										<li><a href="{{ url_for('publicaciones.crear_publicacion') }}">Publicaciones</a></li>
+										{% endif %}
 										<li><a href="/payments">Notificaciones</a></li>
 										<li><a href="/favorites">Favoritos</a></li>
 										<li><a href="/logout">Cerrar Sesión</a></li>

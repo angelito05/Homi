@@ -1,149 +1,388 @@
-<!DOCTYPE html>
-<html lang="es">
+<!doctype html>
+<html class="no-js" lang="es">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="utf-8">
     <title>Mi Perfil | Homi</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='CSS/homi.css') }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <link rel="shortcut icon" href="static/images/logoHomi.png" type="image/png">
+    <link rel="stylesheet" href="static/css/LineIcons.2.0.css">
+    <link rel="stylesheet" href="static/css/bootstrap-5.0.5-alpha.min.css">
+    <link rel="stylesheet" href="static/css/style.css">
+
     <style>
-        .perfil-container {
-            max-width: 800px;
-            margin: 40px auto;
-            background: white;
-            padding: 30px;
+        .profile-banner {
+            background-color: #fff;
             border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+            box-shadow: 0 5px 30px rgba(0,0,0,0.05);
+            padding: 40px;
+            margin-bottom: 40px;
+            position: relative;
         }
-        .perfil-header {
+        
+        /* Inicial del Usuario (Avatar) */
+        .avatar-initial {
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #2BB2BB, #3CB371);
+            color: #fff;
             display: flex;
             align-items: center;
-            gap: 20px;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 20px;
-            margin-bottom: 20px;
+            justify-content: center;
+            font-size: 55px;
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(43, 178, 187, 0.3);
+            flex-shrink: 0;
+            margin: 0 auto;
         }
-        .avatar-grande {
-            width: 80px;
-            height: 80px;
+
+        /* Contenedor del Avatar y efecto Hover */
+        .avatar-container {
+            position: relative;
+            width: 130px;
+            height: 130px;
+            margin: 0 auto;
             border-radius: 50%;
-            object-fit: cover;
-            background: #eee;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(43, 178, 187, 0.3);
+            cursor: pointer;
+            border: 4px solid #fff; /* Borde blanco para que resalte */
         }
-        .info-estatica {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 30px;
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 10px;
-        }
-        .campo-info label {
-            font-size: 0.8em;
-            color: #666;
-            display: block;
-        }
-        .campo-info span {
-            font-weight: 600;
-            color: #333;
-        }
-        .form-section-title {
-            margin-top: 25px;
-            margin-bottom: 15px;
-            font-size: 1.1em;
-            color: #2c3e50;
-            border-left: 4px solid #0d6efd;
-            padding-left: 10px;
-        }
-        .homi-input {
+        
+        .avatar-img {
             width: 100%;
-            padding: 10px;
-            margin-bottom: 5px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
+            height: 100%;
+            object-fit: cover;
         }
-        .error-msg { color: #dc3545; font-size: 0.85em; margin-bottom: 10px; display: block; }
-        .alert { padding: 10px; border-radius: 5px; margin-bottom: 15px; }
-        .alert-success { background: #d1e7dd; color: #0f5132; }
-        .alert-error { background: #f8d7da; color: #842029; }
+
+        /* Capa oscura con la plumita que aparece al pasar el mouse */
+        .avatar-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            opacity: 0; /* Oculto por defecto */
+            transition: opacity 0.3s ease;
+        }
+
+        .avatar-container:hover .avatar-overlay {
+            opacity: 1; /* Aparece al pasar el mouse */
+        }
+
+        /* Engrane a la Derecha Superior */
+        .settings-btn {
+            background: #F5F7FC;
+            color: #333F57;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            transition: 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+        .settings-btn:hover { background: #2BB2BB; color: #fff; }
+        
+        /* Dropdown custom */
+        .settings-dropdown {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+
+        /* Estilos de tarjeta compacta */
+        .compact-card {
+            display: flex;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.05);
+            overflow: hidden;
+            margin-bottom: 20px;
+            height: 120px;
+            border: 1px solid #f0f0f0;
+        }
+        .compact-card img { width: 130px; height: 100%; object-fit: cover; }
+        .compact-card-body { padding: 15px; flex-grow: 1; position: relative;}
+        .compact-card-body h5 { font-size: 16px; margin-bottom: 5px; color:#333F57; }
+        .compact-card-body p { font-size: 13px; margin: 0; color: #7C869A; }
     </style>
 </head>
-<body>
 
-    <div class="perfil-container">
-        
-        <div style="margin-bottom: 15px;">
-            <a href="{{ url_for('home') }}" style="text-decoration: none; color: #666;">&larr; Volver al Inicio</a>
+<body style="background-color: #f9f9f9;">
+
+    <header class="header_area">
+        <div class="header_navbar" style="background:#fff; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+            <div class="container py-3">
+                <nav class="navbar navbar-expand-lg d-flex justify-content-between">
+                    <a class="navbar-brand" href="{{ url_for('home') }}">
+                        <img src="static/images/logo/logoHomi.png" style="max-width:50px;">
+                        <span style="color:#2BB2BB;font-weight:bold; font-size:24px;">Homi</span>
+                    </a>
+                </nav>
+            </div>
         </div>
+    </header>
+
+    <div class="container pt-100 pb-100">
+        
+        <button onclick="window.history.back();" class="btn btn-sm text-white mb-4" style="background-color: #333F57; border-radius: 20px; padding: 8px 20px;">
+            <i class="lni lni-arrow-left"></i> Regresar
+        </button>
 
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for category, message in messages %}
-                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                    <div class="alert alert-{{ 'danger' if category == 'error' else 'success' }}">{{ message }}</div>
                 {% endfor %}
             {% endif %}
         {% endwith %}
 
-        <div class="perfil-header">
-            <img src="{{ url_for('static', filename='images/dashboard/profile-img.png') }}" class="avatar-grande">
-            <div>
-                <h2 style="margin: 0;">{{ usuario.nombre }} {{ usuario.primer_apellido }}</h2>
-                <span style="color: #777; text-transform: capitalize;">{{ usuario.rol }}</span>
-                {% if usuario.verificado %}
-                    <span style="color: green; font-size: 0.9em;">(Verificado ✅)</span>
+        <div class="profile-banner">
+            
+            <div class="dropdown settings-dropdown">
+                <button class="settings-btn dropdown-toggle" type="button" id="settingsMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="lni lni-cog"></i>
+                </button>
+                <div class="dropdown-menu dropdown-menu-right shadow" aria-labelledby="settingsMenu">
+                    <a class="dropdown-item" href="javascript:void(0)" data-toggle="modal" data-target="#modalBasico">
+                        <i class="lni lni-pencil theme-color me-2"></i> Editar Información
+                    </a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item text-danger" href="javascript:void(0)" data-toggle="modal" data-target="#modalSensible">
+                        <i class="lni lni-lock text-danger me-2"></i> Seguridad (Correo/Pass)
+                    </a>
+                </div>
+            </div>
+
+            <div class="row align-items-center">
+                <div class="col-md-3 text-center mb-4 mb-md-0">
+                    
+                    <form action="{{ url_for('perfil') }}" method="POST" enctype="multipart/form-data" id="formFotoPerfil">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        <input type="hidden" name="tipo_form" value="foto_perfil">
+                        
+                        <input type="file" name="foto" id="inputFotoPerfil" style="display: none;" accept="image/*" onchange="document.getElementById('formFotoPerfil').submit();">
+                        
+                        <div class="avatar-container" onclick="document.getElementById('inputFotoPerfil').click();">
+                            
+                            {% if usuario.foto_perfil %}
+                                <img src="{{ usuario.foto_perfil }}" class="avatar-img" alt="Foto de perfil">
+                            {% else %}
+                                <div class="avatar-initial" style="width: 100%; height: 100%; margin: 0; box-shadow: none;">
+                                    {{ usuario.nombre[0]|upper if usuario.nombre else 'U' }}
+                                </div>
+                            {% endif %}
+                            
+                            <div class="avatar-overlay">
+                                <i class="lni lni-pencil"></i>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="col-md-9">
+                    <div class="row">
+                        <div class="col-lg-6 mb-3">
+                            <h2 style="color: #333F57; font-weight: 700;">{{ usuario.nombre }} {{ usuario.primer_apellido }}</h2>
+                            <span class="badge mb-3" style="background-color: #2BB2BB; font-size: 14px;">{{ usuario.rol | capitalize }}</span>
+                            <p class="mb-1"><i class="lni lni-envelope theme-color"></i> {{ usuario.correo_electronico }}</p>
+                            <p class="mb-1"><i class="lni lni-phone theme-color"></i> {{ usuario.telefono }}</p>
+                            <p class="text-muted small mt-2"><i class="lni lni-calendar"></i> Miembro desde {{ usuario.fecha_registro.strftime('%Y') if usuario.fecha_registro else '2025' }}</p>
+                        </div>
+
+                        {% if usuario.rol == 'proveedor' %}
+                        <div class="col-lg-6 border-start pl-4">
+                            <h5 style="color: #333F57;" class="mb-3">Información de Negocio</h5>
+                            
+                            <p class="mb-1"><strong><i class="lni lni-briefcase theme-color"></i> Inmobiliaria:</strong> <br>
+                                <span class="text-muted">{{ usuario.nombre_inmobiliaria if usuario.nombre_inmobiliaria else 'No registrado' }}</span>
+                            </p>
+                            
+                            <p class="mb-2"><strong><i class="lni lni-files theme-color"></i> RFC / CURP:</strong> <br>
+                                <span class="text-muted">{{ usuario.rfc_curp if usuario.rfc_curp else 'No registrado' }}</span>
+                            </p>
+                            
+                            <div class="mt-3">
+                                {% if usuario.url_facebook %}<a href="{{ usuario.url_facebook }}" target="_blank" class="mr-2 text-primary fs-4"><i class="lni lni-facebook-filled"></i></a>{% endif %}
+                                {% if usuario.url_instagram %}<a href="{{ usuario.url_instagram }}" target="_blank" class="mr-2 text-danger fs-4"><i class="lni lni-instagram-filled"></i></a>{% endif %}
+                                {% if usuario.url_whatsapp %}<a href="{{ usuario.url_whatsapp }}" target="_blank" class="text-success fs-4"><i class="lni lni-whatsapp"></i></a>{% endif %}
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            
+            <div class="col-lg-6 mb-4">
+                <h4 style="color: #333F57;" class="mb-4"><i class="lni lni-heart-filled" style="color: #ff4757;"></i> Mis Favoritos</h4>
+                {% if mis_favoritos %}
+                    {% for p in mis_favoritos %}
+                    <div class="compact-card">
+                        <a href="{{ url_for('detalle_propiedad', id_propiedad=p._id) }}">
+                            <img src="{{ p.imagen_principal_url or 'static/images/product/l-product-1.jpg' }}" alt="Propiedad">
+                        </a>
+                        <div class="compact-card-body">
+                            <h5 class="theme-color">${{ "{:,.0f}".format(p.precio|float) if p.precio else "0" }}</h5>
+                            <a href="{{ url_for('detalle_propiedad', id_propiedad=p._id) }}"><h5 style="color: #333F57;">{{ p.titulo }}</h5></a>
+                            <p><i class="lni lni-map-marker"></i> {{ p.colonia }}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="text-center p-4 box-style">
+                        <p class="text-muted mb-0">No tienes propiedades favoritas.</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="col-lg-6 mb-4">
+                <h4 style="color: #333F57;" class="mb-4"><i class="lni lni-home theme-color"></i> Mis Publicaciones</h4>
+                {% if usuario.rol == 'proveedor' %}
+                    {% if mis_publicaciones %}
+                        {% for p in mis_publicaciones %}
+                        <div class="compact-card">
+                            <a href="{{ url_for('detalle_propiedad', id_propiedad=p._id) }}">
+                                <img src="{{ p.imagen_principal_url or 'static/images/product/l-product-1.jpg' }}" alt="Propiedad">
+                            </a>
+                            <div class="compact-card-body">
+                                <span class="badge bg-success float-right" style="position: absolute; right: 15px; top: 15px;">Activa</span>
+                                <h5 class="theme-color">${{ "{:,.0f}".format(p.precio|float) if p.precio else "0" }}</h5>
+                                <a href="{{ url_for('detalle_propiedad', id_propiedad=p._id) }}"><h5 style="color: #333F57;">{{ p.titulo }}</h5></a>
+                                <p><i class="lni lni-map-marker"></i> {{ p.colonia }}</p>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center p-5 box-style">
+                            <h5>Aún no tienes publicaciones</h5>
+                            <a href="{{ url_for('publicaciones.crear_publicacion') }}" class="btn main-btn btn-hover mt-2">Crear mi primera publicación</a>
+                        </div>
+                    {% endif %}
+                {% else %}
+                    <div class="text-center p-5 box-style" style="border: 2px dashed #2BB2BB;">
+                        <i class="lni lni-briefcase mb-2" style="font-size: 40px; color: #2BB2BB;"></i>
+                        <h5>¿Eres dueño o agente?</h5>
+                        <p class="text-muted">Vuelve tu cuenta a proveedor para publicar.</p>
+                        <a href="{{ url_for('registro_proveedor') }}" class="btn main-btn btn-hover w-100">Vuélvete Proveedor</a>
+                    </div>
                 {% endif %}
             </div>
         </div>
-
-        <div class="info-estatica">
-            <div class="campo-info">
-                <label>Nombre Completo</label>
-                <span>{{ usuario.nombre }} {{ usuario.primer_apellido }} {{ usuario.segundo_apellido }}</span>
-            </div>
-            <div class="campo-info">
-                <label>Rol de Cuenta</label>
-                <span style="text-transform: capitalize;">{{ usuario.rol }}</span>
-            </div>
-            {% if usuario.rfc_curp %}
-            <div class="campo-info">
-                <label>RFC / CURP</label>
-                <span>{{ usuario.rfc_curp }}</span>
-            </div>
-            {% endif %}
-        </div>
-
-        <form method="POST">
-            {{ form.hidden_tag() }}
-
-            <div class="form-section-title">Datos de Contacto</div>
-            
-            <label>Correo Electrónico</label>
-            {{ form.correo_electronico(class="homi-input") }}
-            {% for error in form.correo_electronico.errors %}<span class="error-msg">{{ error }}</span>{% endfor %}
-
-            <label>Teléfono</label>
-            {{ form.telefono(class="homi-input") }}
-            {% for error in form.telefono.errors %}<span class="error-msg">{{ error }}</span>{% endfor %}
-
-            <div class="form-section-title">Seguridad</div>
-            
-            <label>Nueva Contraseña (Déjalo vacío si no quieres cambiarla)</label>
-            {{ form.nueva_contrasena(class="homi-input", placeholder="********") }}
-            {% for error in form.nueva_contrasena.errors %}<span class="error-msg">{{ error }}</span>{% endfor %}
-
-            <label>Confirmar Nueva Contraseña</label>
-            {{ form.confirmar_contrasena(class="homi-input", placeholder="********") }}
-            {% for error in form.confirmar_contrasena.errors %}<span class="error-msg">{{ error }}</span>{% endfor %}
-
-            <hr style="margin: 30px 0;">
-
-            <label style="font-weight: bold; color: #d63384;">Para guardar cambios, ingresa tu contraseña actual:</label>
-            {{ form.contrasena_actual(class="homi-input", style="border-color: #d63384;", placeholder="Contraseña actual requerida") }}
-            {% for error in form.contrasena_actual.errors %}<span class="error-msg">{{ error }}</span>{% endfor %}
-
-            {{ form.submit(class="btn-publicar", style="width: 100%; margin-top: 10px;") }}
-        </form>
-
     </div>
+
+    <div class="modal fade" id="modalBasico" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+            <div class="modal-content" style="border-radius: 15px;">
+                <div class="modal-header">
+                    <h5 class="modal-title theme-color">Editar Información</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form action="{{ url_for('perfil') }}" method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    <input type="hidden" name="tipo_form" value="basico">
+
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Nombre(s)</label>
+                                <input type="text" class="form-control" name="nombre" value="{{ usuario.nombre }}" required style="border-radius: 30px;">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Apellidos</label>
+                                <input type="text" class="form-control" name="primer_apellido" value="{{ usuario.primer_apellido }}" required style="border-radius: 30px;">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Teléfono</label>
+                                <input type="text" class="form-control" name="telefono" value="{{ usuario.telefono }}" style="border-radius: 30px;">
+                            </div>
+
+                            {% if usuario.rol == 'proveedor' %}
+                            <div class="col-12 mt-3"><hr><h6 class="theme-color">Datos de Proveedor</h6></div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Inmobiliaria</label>
+                                <input type="text" class="form-control" name="inmobiliaria" value="{{ usuario.nombre_inmobiliaria }}" style="border-radius: 30px;">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">RFC o CURP</label>
+                                <input type="text" class="form-control" name="rfc_curp" value="{{ usuario.rfc_curp }}" style="border-radius: 30px; text-transform: uppercase;">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Facebook</label>
+                                <input type="text" class="form-control" name="url_facebook" value="{{ usuario.url_facebook }}" style="border-radius: 30px;">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Instagram</label>
+                                <input type="text" class="form-control" name="url_instagram" value="{{ usuario.url_instagram }}" style="border-radius: 30px;">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">WhatsApp</label>
+                                <input type="text" class="form-control" name="url_whatsapp" value="{{ usuario.url_whatsapp }}" style="border-radius: 30px;">
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0">
+                        <button type="submit" class="btn main-btn btn-hover w-100">Guardar Cambios</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalSensible" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content" style="border-radius: 15px;">
+                <div class="modal-header bg-danger text-white" style="border-radius: 15px 15px 0 0;">
+                    <h5 class="modal-title"><i class="lni lni-shield"></i> Seguridad</h5>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Cerrar">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form action="{{ url_for('perfil') }}" method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    <input type="hidden" name="tipo_form" value="sensible">
+
+                    <div class="modal-body">
+                        <p class="text-muted small mb-4">Ingresa tu contraseña actual para autorizar cambios.</p>
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Contraseña Actual *</label>
+                            <input type="password" class="form-control" name="contrasena_actual" required style="border-radius: 30px;">
+                        </div>
+                        <hr>
+                        <div class="mb-3">
+                            <label class="form-label">Nuevo Correo (Opcional)</label>
+                            <input type="email" class="form-control" name="correo_electronico" value="{{ usuario.correo_electronico }}" style="border-radius: 30px;">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Nueva Contraseña (Opcional)</label>
+                            <input type="password" class="form-control" name="nueva_contrasena" style="border-radius: 30px;">
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0">
+                        <button type="submit" class="btn btn-danger w-100" style="border-radius: 30px;">Actualizar Seguridad</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="static/js/bootstrap.bundle-5.0.0.alpha-min.js"></script>
 </body>
 </html>
