@@ -1,0 +1,442 @@
+<!doctype html>
+<html class="no-js" lang="es">
+
+<head>
+    <meta charset="utf-8">
+    <title>Dashboard de Proveedor | Homi</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='images/logoHomi.png') }}" type="image/png">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/animate.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/LineIcons.2.0.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap-5.0.5-alpha.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+
+        .header_navbar,
+		.header_navbar.sticky {
+			position: fixed !important;
+			top: 0 !important;
+			left: 0 !important;
+			width: 100% !important;
+			background-color: #ffffff !important;
+			box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05) !important;
+			animation: none !important;
+			/* Evita el salto visual */
+			transition: none !important;
+			/* Evita el salto visual */
+			z-index: 9999 !important;
+		}
+
+		/* Obligamos a que las letras siempre sean oscuras */
+		.header_navbar .navbar-nav .nav-item a {
+			color: #333F57 !important;
+		}
+
+		.header_navbar .navbar-nav .nav-item a:hover {
+			color: #2BB2BB !important;
+		}
+
+		/* Obligamos a que el botón de menú de celular se vea oscuro */
+		.header_navbar .navbar-toggler .toggler-icon {
+			background-color: #333F57 !important;
+		}
+        /* Colores Homi */
+        :root {
+            --homi-turquesa: #2BB2BB;
+            --homi-oscuro: #333F57;
+        }
+
+        body { background-color: #f4f7f6; color: var(--homi-oscuro); }
+
+        .stat-card {
+            background: #fff;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+            height: 100%;
+            transition: 0.3s;
+        }
+        .stat-card:hover { transform: translateY(-5px); }
+        .stat-icon {
+            font-size: 2.5rem;
+            color: var(--homi-turquesa);
+            margin-bottom: 15px;
+        }
+        .stat-value { font-size: 2.2rem; font-weight: 700; color: var(--homi-oscuro); }
+        .stat-label { color: #7C869A; font-size: 1rem; }
+
+        .dash-section-title { font-weight: 700; color: var(--homi-oscuro); margin-bottom: 25px; }
+
+        /* Estilo tabla/lista propiedades estilo YT Studio */
+        .property-list-item {
+            background: #fff;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .prop-thumb {
+            width: 100px; height: 70px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-right: 20px;
+        }
+        .prop-info { flex-grow: 1; min-width: 200px; }
+        .prop-title { font-weight: 600; color: var(--homi-oscuro); margin: 0; font-size: 1.1rem; }
+        .prop-meta { font-size: 0.85rem; color: #7C869A; }
+        
+        .prop-stats { display: flex; gap: 20px; text-align: center; padding: 0 20px; }
+        .prop-stat-v { font-weight: 600; color: var(--homi-oscuro); }
+        .prop-stat-l { font-size: 0.8rem; color: #7C869A; display: block;}
+
+        .prop-actions { display: flex; gap: 10px; }
+        
+        /* Comentarios */
+        .comment-item { border-bottom: 1px solid #eee; padding: 15px 0; }
+        .comment-item:last-child { border-bottom: none; }
+    </style>
+</head>
+
+<body>
+    <div class="preloader">
+        <div class="loader">
+            <div class="ytp-spinner">
+                <div class="ytp-spinner-container">
+                    <div class="ytp-spinner-rotator">
+                        <div class="ytp-spinner-left"><div class="ytp-spinner-circle"></div></div>
+                        <div class="ytp-spinner-right"><div class="ytp-spinner-circle"></div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <header class="header_area">
+        <div id="header_navbar" class="header_navbar sticky">
+            <div class="container position-relative">
+                <div class="row align-items-center">
+                    <div class="col-xl-12">
+                        <nav class="navbar navbar-expand-lg">
+                            <a class="navbar-brand" href="{{ url_for('home') }}">
+                                <img id="logo" src="{{ url_for('static', filename='images/logo/logoHomi.png') }}" alt="Logo" style="max-width:50px;"> 
+                                <span style="color:#2BB2BB;font-weight:bold; font-size: 24px; margin-left: 10px;">Homi</span>
+                            </a>
+                            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+                                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                                <span class="toggler-icon"></span>
+                                <span class="toggler-icon"></span>
+                                <span class="toggler-icon"></span>
+                            </button>
+                            <div class="collapse navbar-collapse sub-menu-bar" id="navbarSupportedContent">
+                                <ul id="nav" class="navbar-nav">
+                                    <li class="nav-item"><a href="{{ url_for('home') }}">Inicio</a></li>
+                                    <li class="nav-item"><a href="{{ url_for('buscar', operacion='venta') }}">Comprar</a></li>
+                                    <li class="nav-item"><a href="{{ url_for('buscar', operacion='renta') }}">Rentar</a></li>
+                                </ul>
+                            </div>
+                            <ul class="header-btn d-md-flex">
+                                <li>
+                                    <a href="#" class="main-btn account-btn">
+                                        <span class="d-md-none"><i class="lni lni-user"></i></span>
+                                        <span class="d-none d-md-block">Proveedor</span>
+                                    </a>
+                                    <ul class="dropdown-nav">
+                                        <li><a href="{{ url_for('dashboard_proveedor') }}">Dashboard</a></li>
+                                        <li><a href="/perfil">Perfil</a></li>
+                                        <li><a href="/post-ad">Publicar Propiedad</a></li>
+                                        <li><a href="/favorites">Favoritos</a></li>
+                                        <li><a href="/logout">Cerrar Sesión</a></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="dashboard-main pt-150 pb-100">
+        <div class="container">
+            
+            <div class="row mb-30 align-items-center">
+                <div class="col-md-6">
+                    <h2 class="dash-section-title">Panel de Control de {{ session.get('nombre', 'Proveedor') }}</h2>
+                    <p class="text-muted">Revisa el rendimiento de tus propiedades en tiempo real.</p>
+                </div>
+                <div class="col-md-6 text-md-right mt-3 mt-md-0">
+                    <a href="/post-ad" class="main-btn btn-hover" style="padding: 12px 30px;">
+                        <i class="lni lni-plus"></i> Nueva Publicación
+                    </a>
+                </div>
+            </div>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ 'danger' if category == 'error' else 'success' }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <div class="row mb-50">
+                <div class="col-lg-4 col-md-6 mb-30">
+                    <div class="stat-card text-center">
+                        <i class="lni lni-library stat-icon"></i>
+                        <div class="stat-value">{{ total_publicaciones }}</div>
+                        <div class="stat-label">Propiedades Publicadas</div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 mb-30">
+                    <div class="stat-card text-center">
+                        <i class="lni lni-eye stat-icon"></i>
+                        <div class="stat-value">{{ "{:,}".format(total_visitas) }}</div>
+                        <div class="stat-label">Vistas Totales</div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 mb-30">
+                    <div class="stat-card text-center">
+                        <i class="lni lni-heart stat-icon" style="color: #ff4757;"></i>
+                        <div class="stat-value">{{ total_favoritos }}</div>
+                        <div class="stat-label">Interesados (Favoritos)</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                
+                <div class="col-lg-4 mb-40">
+                    <div class="bg-white p-4" style="border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); height: 100%;">
+                        <h4 class="mb-30" style="color: var(--homi-oscuro);">Comentarios Recientes</h4>
+                        
+                        {% if comentarios %}
+                            {% for c in comentarios %}
+                            <a href="{{ url_for('detalle_propiedad', id_propiedad=c.id_propiedad) }}" style="text-decoration: none; color: inherit; display: block;" class="mb-3">
+                                <div class="comment-item p-3 bg-light" style="border-radius: 10px; transition: 0.2s; border: 1px solid transparent;" onmouseover="this.style.borderColor='#2BB2BB'" onmouseout="this.style.borderColor='transparent'">
+                                    
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <h6 style="color: #2BB2BB; margin: 0; font-size: 0.95rem;">
+                                            <i class="lni lni-user"></i> {{ c.nombre_usuario }}
+                                        </h6>
+                                        <span class="badge bg-warning text-dark" style="font-size: 0.75rem;">
+                                            {{ c.calificacion_num }} <i class="lni lni-star-filled"></i>
+                                        </span>
+                                    </div>
+                                    
+                                    <small class="text-muted d-block mb-2" style="font-size: 0.75rem;">
+                                        <i class="lni lni-clock"></i> {{ c.fecha_formateada }}
+                                    </small>
+                                    
+                                    <p class="text-dark small mb-2" style="line-height: 1.4; font-style: italic;">"{{ c.comentario_texto }}"</p>
+                                    
+                                    <span class="small text-muted fw-600 d-block" style="border-top: 1px solid #ddd; padding-top: 5px;">
+                                        En: {{ c.titulo_propiedad | truncate(35) }} <i class="lni lni-arrow-right float-end"></i>
+                                    </span>
+                                </div>
+                            </a>
+                            {% endfor %}
+                        {% else %}
+                            <div class="text-center py-5 text-muted">
+                                <i class="lni lni-comments" style="font-size: 3rem; color: #eee;"></i>
+                                <p class="mt-3">Aún no hay comentarios en tus propiedades.</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="col-lg-8 mb-40">
+                    <h4 class="dash-section-title">Gestión de Publicaciones</h4>
+                    
+                    {% if propiedades %}
+                        {% for p in propiedades %}
+                        <div class="property-list-item">
+                            <img src="{{ p.imagen_principal_url or url_for('static', filename='images/product/l-product-1.jpg') }}" class="prop-thumb" alt="Thumbnail">
+                            
+                            <div class="prop-info">
+                                <p class="prop-title">{{ p.titulo | truncate(40) }}</p>
+                                <span class="prop-meta">{{ p.colonia }} | ${{ "{:,.0f}".format(p.precio) }}</span>
+                                <span class="badge bg-light text-dark small ml-2">{{ p.tipo_operacion|upper }}</span>
+                            </div>
+                            
+                            <div class="prop-stats d-none d-md-flex">
+                                <div><span class="prop-stat-v">{{ p.get('visitas', 0) }}</span><span class="prop-stat-l">Vistas</span></div>
+                                {% if p.get('disponibilidad') == 'Vendida' %}
+                                    <span class="badge bg-danger text-white small ml-3">VENDIDA</span>
+                                {% elif p.get('disponibilidad') == 'Rentada' %}
+                                    <span class="badge bg-primary text-white small ml-3">RENTADA</span>
+                                {% elif p.get('disponibilidad') == 'Oculta' %}
+                                    <span class="badge bg-secondary text-white small ml-3">PAUSADA</span>
+                                {% else %}
+                                    <span class="badge bg-success text-white small ml-3">ACTIVA</span>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="prop-actions mt-3 mt-md-0 w-100 w-md-auto text-right">
+                                <a href="{{ url_for('detalle_propiedad', id_propiedad=p._id) }}" class="btn btn-sm btn-outline-secondary" title="Ver Detalle">
+                                    <i class="lni lni-eye"></i>
+                                </a>
+                                <a href="{{ url_for('editar_propiedad', id_propiedad=p._id) }}" class="btn btn-sm btn-outline-primary" title="Editar">
+                                    <i class="lni lni-pencil"></i>
+                                </a>
+                                <button class="btn btn-sm btn-outline-danger" title="Eliminar" data-toggle="modal" data-target="#deleteModal{{ p._id }}">
+                                    <i class="lni lni-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="modal fade" id="deleteModal{{ p._id }}" tabindex="-1" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content" style="border-radius: 15px;">
+                                    <div class="modal-header border-0">
+                                        <h5 class="modal-title fw-700">Confirmar eliminación</h5>
+                                        <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body text-center p-4">
+                                        <i class="lni lni-warning text-danger" style="font-size: 4rem;"></i>
+                                        <p class="mt-30 fw-600 text-dark" style="font-size: 1.1rem;">¿Estás seguro de que quieres eliminar la propiedad?</p>
+                                        <p class="text-danger mt-2">"{{ p.titulo }}"</p>
+                                        <p class="text-muted small mt-2">Esta acción no se puede deshacer y se borrarán todas las imágenes asociadas.</p>
+                                    </div>
+                                    <div class="modal-footer border-0 justify-content-center pb-4">
+                                        <button type="button" class="btn btn-light btn-hover" data-dismiss="modal" style="border-radius: 30px; padding: 10px 30px;">Cancelar</button>
+                                        <form action="{{ url_for('eliminar_propiedad', id_propiedad=p._id) }}" method="POST">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                                            <button type="submit" class="btn btn-danger btn-hover" style="border-radius: 30px; padding: 10px 30px; background-color: #ff4757; border:none;">
+                                                Sí, eliminar definitivamente
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center bg-white p-5 text-muted" style="border-radius: 10px; border: 2px dashed #eee;">
+                            <i class="lni lni-empty-file" style="font-size: 4rem; color: #eee;"></i>
+                            <h5 class="mt-30 text-dark">No tienes propiedades publicadas aún</h5>
+                            <p class="mt-2 mb-30">Empieza a vender o rentar hoy mismo.</p>
+                            <a href="/post-ad" class="main-btn btn-hover">Crear mi primera publicación</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <footer class="footer-area">
+		<div class="widget-wrapper">
+			<div class="map-img">
+				<img src="static/images/footer/map-img.svg" alt="">
+			</div>
+			<div class="container">
+				<div class="row">
+
+					<div class="col-xl-4 col-md-7">
+						<div class="footer-widget about">
+							<a href="{{ url_for('home') }}" class="d-inline-block mb-30">
+								<img src="static/images/logo/logoHomi.png" alt="" style="width: 60px; max-width: 70px;">
+								<span style="font-size: 30px; font-weight: bold; color: #2BB2BB;">Homi</span>
+							</a>
+							<p class="text-white mb-25">Somos la comunidad inmobiliaria más grande de México que conecta
+								de forma gratuita a quienes ofrecen y buscan cualquier tipo de propiedad.</p>
+							<ul class="social">
+								<li><a href="javascript:void(0)"><i class="lni lni-facebook-filled"></i></a></li>
+								<li><a href="javascript:void(0)"><i class="lni lni-twitter-filled"></i></a></li>
+								<li><a href="javascript:void(0)"><i class="lni lni-instagram-filled"></i></a></li>
+								<li><a href="javascript:void(0)"><i class="lni lni-linkedin-original"></i></a></li>
+							</ul>
+						</div>
+					</div>
+
+					<div class="col-xl-2 col-md-4 order-md-2 order-xl-1 col-sm-6">
+						<div class="footer-widget">
+							<h4>Enlace rapido</h4>
+							<ul class="link">
+								<li><a href="javascript:void(0)">Inicio</a></li>
+								<li><a href="javascript:void(0)">Acerca de</a></li>
+								<li><a href="javascript:void(0)">Categorias</a></li>
+								<li><a href="javascript:void(0)">Contacto</a></li>
+							</ul>
+						</div>
+					</div>
+
+					<div class="col-xl-2 col-md-4 order-md-3 order-xl-2 col-sm-6">
+						<div class="footer-widget">
+							<h4>Soporte</h4>
+							<ul class="link">
+								<li><a href="javascript:void(0)">Chat en vivo</a></li>
+								<li><a href="javascript:void(0)">Politicas de Privacidad</a></li>
+								<li><a href="javascript:void(0)">Proteccion</a></li>
+								<li><a href="javascript:void(0)">Soporte</a></li>
+							</ul>
+						</div>
+					</div>
+
+					<div class="col-xl-2 col-md-4 order-md-4 order-xl-3 col-sm-6">
+						<div class="footer-widget">
+							<h4>Informacion</h4>
+							<ul class="link">
+								<li><a href="javascript:void(0)">Empresa</a></li>
+								<li><a href="javascript:void(0)">Información de Contacto</a></li>
+								<li><a href="javascript:void(0)">Terminos de servicio</a></li>
+								<li><a href="javascript:void(0)">Politicas de Privacidad</a></li>
+							</ul>
+						</div>
+					</div>
+
+					<div class="col-xl-2 col-md-5 order-md-1 order-xl-4 col-sm-6">
+						<div class="footer-widget">
+							<h4>Contacto</h4>
+							<ul>
+								<li>
+									<span>Telefono:</span> +52 7441444444
+								</li>
+								<li>
+									<span>Correo:</span> homiexcelente@gmail.com
+								</li>
+								<li>
+									<span>Localizacion:</span> Acapulco de Juarez, Gro., Mexico
+								</li>
+							</ul>
+						</div>
+					</div>
+
+				</div>
+			</div>
+		</div>
+
+		<div class="copy-right">
+			<div class="container">
+				<div class="row">
+					<div class="col-sm-12">
+						<div class="text-center">
+							<p style="color: #fff;">&copy; cosenø Dv. Todos los derechos reservados.</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</footer>
+
+	<a href="#" class="back-to-top btn-hover"><i class="lni lni-chevron-up"></i></a>
+
+	<script src="static/js/bootstrap.bundle-5.0.0.alpha-min.js"></script>
+	<script src="static/js/main.js"></script>
+
+    <script src="{{ url_for('static', filename='js/vendor/modernizr-3.7.1.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/vendor/jquery-1.12.4.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap.bundle-5.0.0.alpha-min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+</body>
+
+</html>

@@ -190,12 +190,14 @@
 										{% if session.get('rol') == 'admin' %}
 										<li><a href="/dashboard">Dashboard</a></li>
 										{% endif %}
+										{% if session.get('rol') == 'proveedor' %}
+										<li><a href="{{ url_for('dashboard_proveedor') }}">Dashboard</a></li>
+										{% endif %}
 										<li><a href="/perfil">Perfil</a></li>
 										{% if session.get('rol') == 'proveedor' %}
-										<li><a href="{{ url_for('publicaciones.crear_publicacion') }}">Publicaciones</a>
+										<li><a href="{{ url_for('publicaciones.crear_publicacion') }}">Publicar Propiedad</a>
 										</li>
 										{% endif %}
-										<li><a href="/payments">Notificaciones</a></li>
 										<li><a href="/favorites">Favoritos</a></li>
 										<li><a href="/logout">Cerrar Sesión</a></li>
 									</ul>
