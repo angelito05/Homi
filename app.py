@@ -334,23 +334,30 @@ def detalle_propiedad(id_propiedad):
         # 2. Buscar al propietario
         propietario = usuarios.find_one({"_id": prop.get("id_propietario")})
         
+        # 3. Preparar datos seguros para mostrar
         datos_propietario = {}
         if propietario:
             datos_propietario = {
                 "nombre": f"{propietario.get('nombre', 'Anfitrión')} {propietario.get('primer_apellido', '')}",
+                "nombre_raw": propietario.get("nombre", "U"), # Para sacar la letra inicial
                 "telefono": propietario.get("telefono", "No disponible"),
                 "correo": propietario.get("correo_electronico", ""),
                 "fecha_registro": propietario.get("_id").generation_time.strftime('%Y'),
-                "foto": url_for('static', filename='images/dashboard/profile-img.png') 
+                "foto": propietario.get("foto_perfil", ""), # Obtiene la URL de Cloudinary si existe
+                "url_facebook": propietario.get("url_facebook", ""),
+                "url_instagram": propietario.get("url_instagram", ""),
+                "url_whatsapp": propietario.get("url_whatsapp", "")
             }
         else:
             datos_propietario = {
                 "nombre": "Usuario Desconocido",
+                "nombre_raw": "U",
                 "telefono": "---",
-                "foto": url_for('static', filename='images/dashboard/profile-img.png')
+                "foto": ""
             }
+            return render_template("detalle_propiedad.html", prop=prop, propietario=datos_propietario)
 
-        # 3. --- NUEVO: LEER RESEÑAS DESDE LA COLECCIÓN INDEPENDIENTE ---
+        # LEER RESEÑAS DESDE LA COLECCIÓN INDEPENDIENTE ---
         # Buscamos todas las reseñas de esta propiedad que no estén eliminadas y las ordenamos de la más nueva a la más vieja
         comentarios_cursor = resenas.find({
             "id_propiedad": ObjectId(id_propiedad), 
