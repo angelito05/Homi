@@ -13,39 +13,42 @@
 	<link rel="stylesheet" href="static/css/bootstrap-5.0.5-alpha.min.css">
 	<link rel="stylesheet" href="static/css/style.css">
 
-    <script>
-        function toggleHeart(propId, btnElement) {
-            fetch('/toggle_favorito', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ propiedad_id: propId })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    let icon = btnElement.querySelector('i');
-                    if (data.action === 'added') {
-                        icon.classList.remove('lni-heart'); icon.classList.add('lni-heart-filled'); icon.style.color = '#ff4757';
-                    } else {
-                        icon.classList.remove('lni-heart-filled'); icon.classList.add('lni-heart'); icon.style.color = '';
-                    }
-                } else if (data.message === 'Debes iniciar sesión') {
-                    alert("Inicia sesión para guardar favoritos");
-                }
-            });
-        }
-    </script>
+	<script>
+		function toggleHeart(propId, btnElement) {
+			fetch('/toggle_favorito', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ propiedad_id: propId })
+			})
+				.then(response => response.json())
+				.then(data => {
+					if (data.status === 'success') {
+						let icon = btnElement.querySelector('i');
+						if (data.action === 'added') {
+							icon.classList.remove('lni-heart'); icon.classList.add('lni-heart-filled'); icon.style.color = '#ff4757';
+						} else {
+							icon.classList.remove('lni-heart-filled'); icon.classList.add('lni-heart'); icon.style.color = '';
+						}
+					} else if (data.message === 'Debes iniciar sesión') {
+						alert("Inicia sesión para guardar favoritos");
+					}
+				});
+		}
+	</script>
 	<style>
 		/* Forzamos que, tenga o no la clase sticky que pone el JS, siempre esté fijo */
-		.header_navbar, .header_navbar.sticky {
+		.header_navbar,
+		.header_navbar.sticky {
 			position: fixed !important;
 			top: 0 !important;
 			left: 0 !important;
 			width: 100% !important;
 			background-color: #ffffff !important;
 			box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05) !important;
-			animation: none !important;      /* Evita el salto visual */
-			transition: none !important;   /* Evita el salto visual */
+			animation: none !important;
+			/* Evita el salto visual */
+			transition: none !important;
+			/* Evita el salto visual */
 			z-index: 9999 !important;
 		}
 
@@ -53,7 +56,7 @@
 		.header_navbar .navbar-nav .nav-item a {
 			color: #333F57 !important;
 		}
-		
+
 		.header_navbar .navbar-nav .nav-item a:hover {
 			color: #2BB2BB !important;
 		}
@@ -71,8 +74,12 @@
 			<div class="ytp-spinner">
 				<div class="ytp-spinner-container">
 					<div class="ytp-spinner-rotator">
-						<div class="ytp-spinner-left"><div class="ytp-spinner-circle"></div></div>
-						<div class="ytp-spinner-right"><div class="ytp-spinner-circle"></div></div>
+						<div class="ytp-spinner-left">
+							<div class="ytp-spinner-circle"></div>
+						</div>
+						<div class="ytp-spinner-right">
+							<div class="ytp-spinner-circle"></div>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -86,11 +93,13 @@
 					<div class="col-xl-12">
 						<nav class="navbar navbar-expand-lg">
 							<a class="navbar-brand" href="{{ url_for('home') }}">
-								<img id="logo" src="static/images/logo/logoHomi.png" alt="Logo" style="max-width:50px;"> 
-								<span style="color:#2BB2BB;font-weight:bold; font-size: 24px; margin-left: 10px;">Homi</span>
+								<img id="logo" src="static/images/logo/logoHomi.png" alt="Logo" style="max-width:50px;">
+								<span
+									style="color:#2BB2BB;font-weight:bold; font-size: 24px; margin-left: 10px;">Homi</span>
 							</a>
-							<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
-								aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+							<button class="navbar-toggler" type="button" data-toggle="collapse"
+								data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+								aria-expanded="false" aria-label="Toggle navigation">
 								<span class="toggler-icon"></span>
 								<span class="toggler-icon"></span>
 								<span class="toggler-icon"></span>
@@ -101,58 +110,77 @@
 										<a class="page-scroll" href="{{ url_for('home') }}">Inicio</a>
 									</li>
 									<li class="nav-item">
-										<a class="page-scroll" data-toggle="collapse" data-target="#sub-nav1" aria-controls="sub-nav1"
-											aria-expanded="false" aria-label="Toggle navigation" href="javascript:void(0)">
+										<a class="page-scroll" data-toggle="collapse" data-target="#sub-nav1"
+											aria-controls="sub-nav1" aria-expanded="false"
+											aria-label="Toggle navigation" href="javascript:void(0)">
 											Comprar
 											<div class="sub-nav-toggler">
 												<span></span>
 											</div>
 										</a>
 										<ul class="sub-menu collapse" id="sub-nav1">
-											<li><a href="{{ url_for('buscar', operacion='venta', categoria='casa') }}">Casas</a></li>
-											<li><a href="{{ url_for('buscar', operacion='venta', categoria='departamento') }}">Departamentos</a></li>
-											<li><a href="{{ url_for('buscar', operacion='venta', categoria='local') }}">Locales</a></li>
-											<li><a href="{{ url_for('buscar', operacion='venta') }}">Más Propiedades</a></li>
+											<li><a
+													href="{{ url_for('buscar', operacion='venta', categoria='casa') }}">Casas</a>
+											</li>
+											<li><a
+													href="{{ url_for('buscar', operacion='venta', categoria='departamento') }}">Departamentos</a>
+											</li>
+											<li><a
+													href="{{ url_for('buscar', operacion='venta', categoria='local') }}">Locales</a>
+											</li>
+											<li><a href="{{ url_for('buscar', operacion='venta') }}">Más Propiedades</a>
+											</li>
 										</ul>
 									</li>
 
 									<li class="nav-item">
-										<a class="page-scroll" data-toggle="collapse" data-target="#sub-nav" aria-controls="sub-nav"
-											aria-expanded="false" aria-label="Toggle navigation" href="javascript:void(0)">
+										<a class="page-scroll" data-toggle="collapse" data-target="#sub-nav"
+											aria-controls="sub-nav" aria-expanded="false" aria-label="Toggle navigation"
+											href="javascript:void(0)">
 											Rentar
 											<div class="sub-nav-toggler">
 												<span></span>
 											</div>
 										</a>
 										<ul class="sub-menu collapse" id="sub-nav">
-											<li><a href="{{ url_for('buscar', operacion='renta', categoria='casa') }}">Casas</a></li>
-											<li><a href="{{ url_for('buscar', operacion='renta', categoria='departamento') }}">Departamentos</a></li>
-											<li><a href="{{ url_for('buscar', operacion='renta', categoria='local') }}">Locales</a></li>
-											<li><a href="{{ url_for('buscar', operacion='renta') }}">Más Propiedades</a></li>
+											<li><a
+													href="{{ url_for('buscar', operacion='renta', categoria='casa') }}">Casas</a>
+											</li>
+											<li><a
+													href="{{ url_for('buscar', operacion='renta', categoria='departamento') }}">Departamentos</a>
+											</li>
+											<li><a
+													href="{{ url_for('buscar', operacion='renta', categoria='local') }}">Locales</a>
+											</li>
+											<li><a href="{{ url_for('buscar', operacion='renta') }}">Más Propiedades</a>
+											</li>
 										</ul>
 									</li>
-                                    
-                                    {% if session.get('rol') != 'proveedor' %}
+
+									{% if session.get('rol') != 'proveedor' %}
 									<li class="nav-item">
-										<a class="page-scroll" data-toggle="collapse" data-target="#sub-nav-vender" aria-controls="sub-nav-vender"
-											aria-expanded="false" aria-label="Toggle navigation" href="javascript:void(0)">
+										<a class="page-scroll" data-toggle="collapse" data-target="#sub-nav-vender"
+											aria-controls="sub-nav-vender" aria-expanded="false"
+											aria-label="Toggle navigation" href="javascript:void(0)">
 											Vender
 											<div class="sub-nav-toggler"><span></span></div>
 										</a>
 										<ul class="sub-menu collapse" id="sub-nav-vender">
 											<li style="padding: 10px 20px; border-bottom: 1px solid #eee;">
 												<h5 style="font-size: 16px; color: #2BB2BB;">¿Quieres publicar?</h5>
-												<p style="font-size: 12px; line-height: 1.2;">Únete a Homi y llega a miles.</p>
+												<p style="font-size: 12px; line-height: 1.2;">Únete a Homi y llega a
+													miles.</p>
 											</li>
 											<li style="padding: 10px 20px;">
-												<a href="{{ url_for('registro_proveedor') }}" class="btn btn-primary btn-sm" 
-												style="background-color: #2BB2BB; color: white; border-radius: 20px; padding: 5px 15px; text-align:center;">
-												Vuélvete proveedor
+												<a href="{{ url_for('registro_proveedor') }}"
+													class="btn btn-primary btn-sm"
+													style="background-color: #2BB2BB; color: white; border-radius: 20px; padding: 5px 15px; text-align:center;">
+													Vuélvete proveedor
 												</a>
 											</li>
 										</ul>
 									</li>
-                                    {% endif %}
+									{% endif %}
 								</ul>
 							</div>
 							<ul class="header-btn d-md-flex">
@@ -190,29 +218,34 @@
 				<form action="{{ url_for('buscar') }}" method="get">
 					<div class="row justify-content-center align-items-center">
 						<input type="hidden" name="operacion" value="{{ request.args.get('operacion','') }}">
-						
+
 						<div class="col-lg-3 col-md-6 mb-3">
-							<input class="form-control m-0" type="text" name="keyword" placeholder="¿Qué buscas?" value="{{ keyword }}" style="border-radius: 30px;">
+							<input class="form-control m-0" type="text" name="keyword" placeholder="¿Qué buscas?"
+								value="{{ keyword }}" style="border-radius: 30px;">
 						</div>
 						<div class="col-lg-3 col-md-6 mb-3">
 							<select class="form-control m-0" name="categoria" style="border-radius: 30px;">
 								<option value="">Categoría</option>
-								<option value="Casa" {% if categoria == 'Casa' %}selected{% endif %}>Casa</option>
-								<option value="Departamento" {% if categoria == 'Departamento' %}selected{% endif %}>Departamento</option>
-								<option value="Terreno" {% if categoria == 'Terreno' %}selected{% endif %}>Terreno</option>
-								<option value="Local" {% if categoria == 'Local' %}selected{% endif %}>Local</option>
+								<option value="Casa" {% if categoria=='Casa' %}selected{% endif %}>Casa</option>
+								<option value="Departamento" {% if categoria=='Departamento' %}selected{% endif %}>
+									Departamento</option>
+								<option value="Terreno" {% if categoria=='Terreno' %}selected{% endif %}>Terreno
+								</option>
+								<option value="Local" {% if categoria=='Local' %}selected{% endif %}>Local</option>
 							</select>
 						</div>
 						<div class="col-lg-3 col-md-6 mb-3">
 							<select class="form-control m-0" name="localizacion" style="border-radius: 30px;">
 								<option value="">Colonia</option>
 								{% for col in colonias %}
-									<option value="{{ col }}" {% if localizacion == col %}selected{% endif %}>{{ col }}</option>
+								<option value="{{ col }}" {% if localizacion==col %}selected{% endif %}>{{ col }}
+								</option>
 								{% endfor %}
 							</select>
 						</div>
 						<div class="col-lg-2 col-md-6 mb-3">
-							<button class="main-btn btn-hover w-100 m-0" style="padding: 12px; border-radius: 30px;">Buscar</button>
+							<button class="main-btn btn-hover w-100 m-0"
+								style="padding: 12px; border-radius: 30px;">Buscar</button>
 						</div>
 					</div>
 				</form>
@@ -231,50 +264,55 @@
 
 			<div class="row">
 				{% if resultados %}
-					{% for p in resultados %}
-					<div class="col-xl-4 col-lg-6 col-md-6 mb-4">
-						<div class="single-product">
-							<div class="product-img">
-								<a href="{{ url_for('detalle_propiedad', id_propiedad=p._id) }}">
-									<img src="{{ p.imagen_principal_url or url_for('static', filename='images/product/l-product-1.jpg') }}" alt="Propiedad" style="height: 250px; object-fit: cover; width: 100%;">
+				{% for p in resultados %}
+				<div class="col-xl-4 col-lg-6 col-md-6 mb-4">
+					<div class="single-product">
+						<div class="product-img">
+							<a href="{{ url_for('detalle_propiedad', id_propiedad=p._id) }}">
+								<img src="{{ p.imagen_principal_url or url_for('static', filename='images/product/l-product-1.jpg') }}"
+									alt="Propiedad" style="height: 250px; object-fit: cover; width: 100%;">
+							</a>
+
+							<div class="product-action">
+								{% set pid_str = p._id|string %}
+								<a href="javascript:void(0)" onclick="toggleHeart('{{ pid_str }}', this)">
+									{% if mis_favoritos and pid_str in mis_favoritos %}
+									<i class="lni lni-heart-filled" style="color: #ff4757;"></i>
+									{% else %}
+									<i class="lni lni-heart"></i>
+									{% endif %}
 								</a>
-								
-								<div class="product-action">
-									{% set pid_str = p._id|string %}
-									<a href="javascript:void(0)" onclick="toggleHeart('{{ pid_str }}', this)">
-										{% if mis_favoritos and pid_str in mis_favoritos %}
-											<i class="lni lni-heart-filled" style="color: #ff4757;"></i>
-										{% else %}
-											<i class="lni lni-heart"></i>
-										{% endif %}
-									</a>
-								</div>
 							</div>
+						</div>
 
-							<div class="product-content">
-								<h3 class="name">
-									<a href="{{ url_for('detalle_propiedad', id_propiedad=p._id) }}">{{ p.titulo }}</a>
-								</h3>
-                                <span class="update">{{ p.colonia }}</span>
-								<ul class="address">
-									<li><i class="lni lni-home"></i> {{ (p.tipo_propiedad or 'Propiedad') | capitalize }}</li>
-                                    <li><i class="lni lni-ruler"></i> {{ p.superficie_m2 }} m²</li>
-                                    <li><i class="lni lni-tag"></i> {{ (p.tipo_operacion or 'venta') | upper }}</li>
-								</ul>
+						<div class="product-content">
+							<h3 class="name">
+								<a href="{{ url_for('detalle_propiedad', id_propiedad=p._id) }}">{{ p.titulo }}</a>
+							</h3>
+							<span class="update">{{ p.colonia }}</span>
+							<ul class="address"
+								style="list-style: none; padding: 0; margin: 15px 0 10px 0; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; color: #777; font-size: 13px;">
+								<li><i class="lni lni-home" style="color: #2BB2BB;"></i> {{ p.numero_habitaciones }}
+									Hab.</li>
+								<li><i class="lni lni-drop" style="color: #2BB2BB;"></i> {{ p.numero_banos }} Baños</li>
+								<li><i class="lni lni-ruler" style="color: #2BB2BB;"></i> {{ p.superficie_m2 }} m²</li>
+								<li><i class="lni lni-tag" style="color: #2BB2BB;"></i> {{ (p.tipo_operacion or 'venta')
+									| upper }}</li>
+							</ul>
 
-								<div class="product-bottom">
-									<h3 class="price">${{ "{:,.0f}".format(p.precio|float) if p.precio else "0" }}</h3>
-								</div>
+							<div class="product-bottom">
+								<h3 class="price">${{ "{:,.0f}".format(p.precio|float) if p.precio else "0" }}</h3>
 							</div>
 						</div>
 					</div>
-					{% endfor %}
+				</div>
+				{% endfor %}
 				{% else %}
-					<div class="col-12 text-center mt-5">
-						<i class="lni lni-search-alt" style="font-size: 50px; color: #ccc;"></i>
-						<h4 class="mt-3">No se encontraron propiedades 😕</h4>
-						<p class="text-muted">Intenta cambiar los filtros de búsqueda</p>
-					</div>
+				<div class="col-12 text-center mt-5">
+					<i class="lni lni-search-alt" style="font-size: 50px; color: #ccc;"></i>
+					<h4 class="mt-3">No se encontraron propiedades 😕</h4>
+					<p class="text-muted">Intenta cambiar los filtros de búsqueda</p>
+				</div>
 				{% endif %}
 			</div>
 		</div>
@@ -283,7 +321,7 @@
 	<footer class="footer-area">
 		<div class="widget-wrapper">
 			<div class="map-img">
-                <img src="static/images/footer/map-img.svg" alt="">
+				<img src="static/images/footer/map-img.svg" alt="">
 			</div>
 			<div class="container">
 				<div class="row">
@@ -294,7 +332,8 @@
 								<img src="static/images/logo/logoHomi.png" alt="" style="width: 60px; max-width: 70px;">
 								<span style="font-size: 30px; font-weight: bold; color: #2BB2BB;">Homi</span>
 							</a>
-							<p class="text-white mb-25">Somos la comunidad inmobiliaria más grande de México que conecta de forma gratuita a quienes ofrecen y buscan cualquier tipo de propiedad.</p>
+							<p class="text-white mb-25">Somos la comunidad inmobiliaria más grande de México que conecta
+								de forma gratuita a quienes ofrecen y buscan cualquier tipo de propiedad.</p>
 							<ul class="social">
 								<li><a href="javascript:void(0)"><i class="lni lni-facebook-filled"></i></a></li>
 								<li><a href="javascript:void(0)"><i class="lni lni-twitter-filled"></i></a></li>
@@ -366,7 +405,7 @@
 				<div class="row">
 					<div class="col-sm-12">
 						<div class="text-center">
-							 <p style="color: #fff;">&copy; cosenø Dv. Todos los derechos reservados.</p>
+							<p style="color: #fff;">&copy; cosenø Dv. Todos los derechos reservados.</p>
 						</div>
 					</div>
 				</div>
@@ -379,4 +418,5 @@
 	<script src="static/js/bootstrap.bundle-5.0.0.alpha-min.js"></script>
 	<script src="static/js/main.js"></script>
 </body>
+
 </html>

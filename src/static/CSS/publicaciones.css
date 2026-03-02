@@ -303,3 +303,78 @@ body {
     cursor: pointer;
     color: #333;
 }
+
+/* ========================================================= */
+/* --- ESTILOS DE DETALLE DE PROPIEDAD Y CALIFICACIONES ---  */
+/* ========================================================= */
+
+.publisher-card { 
+    border: 1px solid #eee; 
+    border-radius: 10px; 
+    padding: 25px; 
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05); 
+    position: sticky; 
+    top: 100px; 
+}
+
+.avatar-lg { 
+    width: 80px; 
+    height: 80px; 
+    border-radius: 50%; 
+    object-fit: cover; 
+    border: 3px solid #fff; 
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+}
+
+.feature-box { 
+    background: #f8f9fa; 
+    padding: 15px; 
+    border-radius: 8px; 
+    text-align: center; 
+    margin-bottom: 15px; 
+}
+
+.feature-box i { 
+    font-size: 1.5rem; 
+    color: #2BB2BB; 
+    margin-bottom: 5px; 
+    display: block; 
+}
+
+.feature-box span { 
+    font-weight: 600; 
+    color: #555; 
+}
+
+/* Estrellas estáticas (Promedio global) */
+.star-rating { 
+    color: #FFD700; 
+    font-size: 1.2rem; 
+}
+
+/* Sistema de Calificación Interactivo con Estrellas (Formulario) */
+.rate-stars {
+    display: flex;
+    flex-direction: row-reverse; /* Ilumina de derecha a izquierda */
+    justify-content: flex-end;
+    margin-bottom: 10px;
+}
+
+.rate-stars input {
+    display: none; /* Oculta los botones de radio redondos */
+}
+
+.rate-stars label {
+    cursor: pointer;
+    font-size: 35px;
+    color: #ddd;
+    margin: 0 4px 0 0;
+    transition: color 0.2s;
+}
+
+/* Animación de iluminación (Hover y Click) */
+.rate-stars input:checked ~ label,
+.rate-stars label:hover,
+.rate-stars label:hover ~ label {
+    color: #FFD700;
+}
