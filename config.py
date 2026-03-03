@@ -9,7 +9,7 @@ SESSION_COOKIE_SAMESITE = 'Lax'
 
 class Config:
 
-    SECRET_KEY = os.environ.get('SECRET_KEY', 'tu-clave-secreta-local-muy-dificil')
+    SECRET_KEY = os.environ.get('SECRET_KEY')
     
     MONGODB_URI = os.environ.get('MONGODB_URI')
     
