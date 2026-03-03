@@ -17,16 +17,32 @@
             gap: 15px;
             margin-bottom: 10px;
         }
-
-        .columna-formulario {
-            flex: 1;
-        }
+        .columna-formulario { flex: 1; }
 
         .error-texto {
             color: #dc3545;
             font-size: 0.85em;
             margin-top: 2px;
             display: block;
+        }
+
+        /* ===== LAYOUT DE FILAS (reemplaza pub-grid) ===== */
+        .form-row {
+            display: flex;
+            gap: 30px;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+        /* La parte del formulario ocupa 1 parte */
+        .form-section { flex: 1; min-width: 0; }
+        /* El carrusel / mapa ocupa 1 parte */
+        .form-aside   { flex: 1; min-width: 0; }
+
+        /* Separador entre bloques */
+        .form-divider {
+            border: none;
+            border-top: 2px solid #F5F5F5;
+            margin: 20px 0;
         }
 
         /* ===== AMENIDADES ===== */
@@ -37,7 +53,6 @@
             margin-top: 10px;
             margin-bottom: 15px;
         }
-
         .amenidad-item {
             background: #f8f9fa;
             border: 1px solid #e8ecef;
@@ -45,13 +60,11 @@
             padding: 12px 14px;
             transition: border-color 0.2s, box-shadow 0.2s;
         }
-
         .amenidad-item:has(.amenidad-chk:checked) {
             border-color: #2BB2BB;
             background: #f0fbfc;
             box-shadow: 0 0 0 2px rgba(43,178,187,0.12);
         }
-
         .amenidad-toggle {
             display: flex;
             align-items: center;
@@ -63,41 +76,50 @@
             margin: 0;
             user-select: none;
         }
-
         .amenidad-chk {
-            width: 18px;
-            height: 18px;
+            width: 18px; height: 18px;
             accent-color: #2BB2BB;
-            cursor: pointer;
-            flex-shrink: 0;
+            cursor: pointer; flex-shrink: 0;
         }
-
-        .amenidad-icon {
-            font-size: 1.2em;
-            line-height: 1;
-        }
-
+        .amenidad-icon { font-size: 1.2em; line-height: 1; }
         .amenidad-detalle {
             margin-top: 10px;
             padding-top: 10px;
             border-top: 1px dashed #d0e8ea;
             animation: fadeIn 0.2s ease;
         }
-
         .amenidad-detalle label {
-            font-size: 0.82em;
-            color: #666;
-            margin-bottom: 4px;
-            display: block;
+            font-size: 0.82em; color: #666;
+            margin-bottom: 4px; display: block;
         }
-
-        .amenidad-detalle .homi-input {
-            margin-bottom: 0;
-        }
+        .amenidad-detalle .homi-input { margin-bottom: 0; }
 
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(-4px); }
             to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 900px) {
+            /* Cada form-row apila sus hijos en columna */
+            .form-row {
+                flex-direction: column;
+                gap: 16px;
+            }
+            /* El aside (carrusel/mapa) va justo debajo de su sección */
+            .form-aside { width: 100%; }
+            .form-section { width: 100%; }
+        }
+
+        @media (max-width: 600px) {
+            .fila-formulario { flex-direction: column; gap: 0; }
+            .columna-formulario { width: 100%; }
+            input.homi-input.columna-formulario,
+            select.homi-input.columna-formulario { width: 100%; margin-bottom: 10px; }
+            .amenidades-grid { grid-template-columns: 1fr; }
+            .btn-publicar { width: 100%; }
+            .owner-section { flex-direction: column; text-align: center; gap: 8px; }
+            .owner-avatar { margin: 0 auto; }
         }
     </style>
 </head>
@@ -118,9 +140,7 @@
         {% if messages %}
         <div style="padding: 0 20px;">
             {% for category, message in messages %}
-            <div class="flash {{ category }}">
-                {{ message }}
-            </div>
+            <div class="flash {{ category }}">{{ message }}</div>
             {% endfor %}
         </div>
         {% endif %}
@@ -129,16 +149,18 @@
         <form action="/crear-publicacion" method="POST" enctype="multipart/form-data">
             {{ form.csrf_token }}
 
-            <div class="pub-grid">
+            <!-- ====================================================
+                 FILA 1: Detalles  |  Carrusel de fotos
+                 ==================================================== -->
+            <div class="form-row">
 
-                <div class="left-col">
+                <div class="form-section">
                     <label class="label-titulo">Detalles de la Publicación</label>
 
                     {{ form.titulo(class="homi-input", placeholder="Título de la propiedad (Ej: Casa en el centro)") }}
                     {% for error in form.titulo.errors %}<span class="error-texto">{{ error }}</span>{% endfor %}
 
-                    {{ form.descripcion(class="homi-input homi-textarea", style="height: 100px;",
-                    placeholder="Descripción detallada...") }}
+                    {{ form.descripcion(class="homi-input homi-textarea", style="height: 100px;", placeholder="Descripción detallada...") }}
 
                     <div class="fila-formulario">
                         <div class="columna-formulario">
@@ -169,8 +191,83 @@
                             {{ form.superficie_m2(class="homi-input") }}
                         </div>
                     </div>
+                </div><!-- /form-section detalles -->
 
-                    <label class="label-titulo" style="margin-top: 15px;">Dirección</label>
+                <div class="form-aside">
+                    <label class="label-titulo">Fotos de la Propiedad</label>
+
+                    <div class="carousel-container">
+                        <input type="file" name="foto1" id="file-1" accept="image/*" hidden onchange="previewCarouselImage(this, 1)">
+                        <input type="file" name="foto2" id="file-2" accept="image/*" hidden onchange="previewCarouselImage(this, 2)">
+                        <input type="file" name="foto3" id="file-3" accept="image/*" hidden onchange="previewCarouselImage(this, 3)">
+                        <input type="file" name="foto4" id="file-4" accept="image/*" hidden onchange="previewCarouselImage(this, 4)">
+                        <input type="file" name="foto5" id="file-5" accept="image/*" hidden onchange="previewCarouselImage(this, 5)">
+
+                        <div class="carousel-slide active" onclick="triggerUpload(1)">
+                            <div class="placeholder-content" id="ph-1">
+                                <i class="lni lni-camera" style="font-size: 40px; color: #2BB2BB;"></i>
+                                <p>Foto Principal</p>
+                                <span class="click-hint">Click para subir</span>
+                            </div>
+                            <img src="" class="slide-img" id="img-1" style="display:none;">
+                            <button type="button" class="btn-delete" id="del-1" onclick="deleteImage(event, 1)">×</button>
+                        </div>
+                        <div class="carousel-slide" onclick="triggerUpload(2)">
+                            <div class="placeholder-content" id="ph-2">
+                                <i class="lni lni-plus" style="font-size: 40px; color: #ccc;"></i>
+                                <p>Foto 2</p>
+                            </div>
+                            <img src="" class="slide-img" id="img-2" style="display:none;">
+                            <button type="button" class="btn-delete" id="del-2" onclick="deleteImage(event, 2)">×</button>
+                        </div>
+                        <div class="carousel-slide" onclick="triggerUpload(3)">
+                            <div class="placeholder-content" id="ph-3">
+                                <i class="lni lni-plus" style="font-size: 40px; color: #ccc;"></i>
+                                <p>Foto 3</p>
+                            </div>
+                            <img src="" class="slide-img" id="img-3" style="display:none;">
+                            <button type="button" class="btn-delete" id="del-3" onclick="deleteImage(event, 3)">×</button>
+                        </div>
+                        <div class="carousel-slide" onclick="triggerUpload(4)">
+                            <div class="placeholder-content" id="ph-4">
+                                <i class="lni lni-plus" style="font-size: 40px; color: #ccc;"></i>
+                                <p>Foto 4</p>
+                            </div>
+                            <img src="" class="slide-img" id="img-4" style="display:none;">
+                            <button type="button" class="btn-delete" id="del-4" onclick="deleteImage(event, 4)">×</button>
+                        </div>
+                        <div class="carousel-slide" onclick="triggerUpload(5)">
+                            <div class="placeholder-content" id="ph-5">
+                                <i class="lni lni-plus" style="font-size: 40px; color: #ccc;"></i>
+                                <p>Foto 5</p>
+                            </div>
+                            <img src="" class="slide-img" id="img-5" style="display:none;">
+                            <button type="button" class="btn-delete" id="del-5" onclick="deleteImage(event, 5)">×</button>
+                        </div>
+
+                        <div class="carousel-indicators">
+                            <span class="dot active" onclick="currentSlide(1)"></span>
+                            <span class="dot" onclick="currentSlide(2)"></span>
+                            <span class="dot" onclick="currentSlide(3)"></span>
+                            <span class="dot" onclick="currentSlide(4)"></span>
+                            <span class="dot" onclick="currentSlide(5)"></span>
+                        </div>
+                        <a class="carousel-btn prev" onclick="moveSlide(-1)" style="left:0;">&#10094;</a>
+                        <a class="carousel-btn next" onclick="moveSlide(1)" style="right:0;">&#10095;</a>
+                    </div>
+                </div><!-- /form-aside carrusel -->
+
+            </div><!-- /form-row 1 -->
+
+            <hr class="form-divider">
+
+            <!-- ====================================================
+                 FILA 2: Dirección  |  Mapa
+                 ==================================================== -->
+            <div class="form-row">
+
+                <div class="form-section">
+                    <label class="label-titulo">Dirección</label>
                     {{ form.calle(class="homi-input", placeholder="Calle") }}
 
                     <div class="fila-formulario">
@@ -181,209 +278,128 @@
                         {{ form.colonia(class="homi-input columna-formulario", placeholder="Colonia") }}
                         {{ form.ciudad(class="homi-input columna-formulario", placeholder="Ciudad") }}
                     </div>
+                </div><!-- /form-section dirección -->
 
-                    <!-- ===== SECCIÓN AMENIDADES ===== -->
-                    <label class="label-titulo" style="margin-top: 20px;">Amenidades <span style="font-weight:400; color:#999; font-size:0.85em;">(Opcional)</span></label>
-                    <div class="amenidades-grid">
-
-                        <!-- ALBERCA -->
-                        <div class="amenidad-item">
-                            <label class="amenidad-toggle">
-                                {{ form.tiene_alberca(id="chk_alberca", class="amenidad-chk", onchange="toggleAmenidad('det_alberca', this)") }}
-                                <span class="amenidad-icon">🏊</span>
-                                <span>Alberca / Piscina</span>
-                            </label>
-                            <div class="amenidad-detalle" id="det_alberca" style="display:none;">
-                                <label>Metros (m²)</label>
-                                {{ form.metros_alberca(class="homi-input", placeholder="Ej: 25") }}
-                            </div>
-                        </div>
-
-                        <!-- ESTACIONAMIENTO -->
-                        <div class="amenidad-item">
-                            <label class="amenidad-toggle">
-                                {{ form.tiene_estacionamiento(id="chk_estacionamiento", class="amenidad-chk", onchange="toggleAmenidad('det_estacionamiento', this)") }}
-                                <span class="amenidad-icon">🚗</span>
-                                <span>Estacionamiento</span>
-                            </label>
-                            <div class="amenidad-detalle" id="det_estacionamiento" style="display:none;">
-                                <label>Cajones</label>
-                                {{ form.capacidad_estacionamiento(class="homi-input", placeholder="Ej: 2") }}
-                                <label class="amenidad-toggle" style="margin-top:8px;">
-                                    {{ form.estacionamiento_techado(class="amenidad-chk") }}
-                                    <span style="font-size:0.9em; color:#555;">Techado</span>
-                                </label>
-                            </div>
-                        </div>
-
-                        <!-- JARDÍN -->
-                        <div class="amenidad-item">
-                            <label class="amenidad-toggle">
-                                {{ form.tiene_jardin(id="chk_jardin", class="amenidad-chk", onchange="toggleAmenidad('det_jardin', this)") }}
-                                <span class="amenidad-icon">🌳</span>
-                                <span>Jardín</span>
-                            </label>
-                            <div class="amenidad-detalle" id="det_jardin" style="display:none;">
-                                <label>Metros (m²)</label>
-                                {{ form.metros_jardin(class="homi-input", placeholder="Ej: 80") }}
-                            </div>
-                        </div>
-
-                        <!-- SIMPLES (sin detalles adicionales) -->
-                        <div class="amenidad-item">
-                            <label class="amenidad-toggle">
-                                {{ form.tiene_gimnasio(class="amenidad-chk") }}
-                                <span class="amenidad-icon">🏋️</span>
-                                <span>Gimnasio</span>
-                            </label>
-                        </div>
-                        <div class="amenidad-item">
-                            <label class="amenidad-toggle">
-                                {{ form.tiene_roof_garden(class="amenidad-chk") }}
-                                <span class="amenidad-icon">🌇</span>
-                                <span>Roof Garden / Terraza</span>
-                            </label>
-                        </div>
-                        <div class="amenidad-item">
-                            <label class="amenidad-toggle">
-                                {{ form.tiene_cuarto_servicio(class="amenidad-chk") }}
-                                <span class="amenidad-icon">🛏️</span>
-                                <span>Cuarto de servicio</span>
-                            </label>
-                        </div>
-                        <div class="amenidad-item">
-                            <label class="amenidad-toggle">
-                                {{ form.tiene_bodega(class="amenidad-chk") }}
-                                <span class="amenidad-icon">📦</span>
-                                <span>Bodega</span>
-                            </label>
-                        </div>
-                        <div class="amenidad-item">
-                            <label class="amenidad-toggle">
-                                {{ form.tiene_elevador(class="amenidad-chk") }}
-                                <span class="amenidad-icon">🛗</span>
-                                <span>Elevador</span>
-                            </label>
-                        </div>
-                        <div class="amenidad-item">
-                            <label class="amenidad-toggle">
-                                {{ form.amueblado(class="amenidad-chk") }}
-                                <span class="amenidad-icon">🛋️</span>
-                                <span>Amueblado</span>
-                            </label>
-                        </div>
-                        <div class="amenidad-item">
-                            <label class="amenidad-toggle">
-                                {{ form.permite_mascotas(class="amenidad-chk") }}
-                                <span class="amenidad-icon">🐾</span>
-                                <span>Permite mascotas</span>
-                            </label>
-                        </div>
-
-                    </div>
-                    <!-- ===== FIN AMENIDADES ===== -->
-
-                    <div class="owner-section">
-                        <img src="{{ url_for('static', filename=propietario.foto_perfil) }}" class="owner-avatar"
-                            onerror="this.src='https://cdn-icons-png.flaticon.com/512/847/847969.png'">
-                        <div>
-                            <strong>Propietario:</strong><br><span>{{ propietario.nombre }}</span>
-                        </div>
-                    </div>
-
-                    {{ form.submit(class="btn-publicar") }}
-                </div>
-
-                <div class="right-col">
-
-                    <div class="carousel-container">
-
-                        <input type="file" name="foto1" id="file-1" accept="image/*" hidden
-                            onchange="previewCarouselImage(this, 1)">
-                        <input type="file" name="foto2" id="file-2" accept="image/*" hidden
-                            onchange="previewCarouselImage(this, 2)">
-                        <input type="file" name="foto3" id="file-3" accept="image/*" hidden
-                            onchange="previewCarouselImage(this, 3)">
-                        <input type="file" name="foto4" id="file-4" accept="image/*" hidden
-                            onchange="previewCarouselImage(this, 4)">
-                        <input type="file" name="foto5" id="file-5" accept="image/*" hidden
-                            onchange="previewCarouselImage(this, 5)">
-
-                        <div class="carousel-slide active" onclick="triggerUpload(1)">
-                            <div class="placeholder-content" id="ph-1">
-                                <i class="lni lni-camera" style="font-size: 40px; color: #2BB2BB;"></i>
-                                <p>Foto Principal</p>
-                                <span class="click-hint">Click para subir</span>
-                            </div>
-                            <img src="" class="slide-img" id="img-1" style="display:none;">
-                            <button type="button" class="btn-delete" id="del-1" onclick="deleteImage(event, 1)">
-                                ×
-                            </button>
-                        </div>
-
-                        <div class="carousel-slide" onclick="triggerUpload(2)">
-                            <div class="placeholder-content" id="ph-2">
-                                <i class="lni lni-plus" style="font-size: 40px; color: #ccc;"></i>
-                                <p>Foto 2</p>
-                            </div>
-                            <img src="" class="slide-img" id="img-2" style="display:none;">
-                            <button type="button" class="btn-delete" id="del-2" onclick="deleteImage(event, 2)">
-                                ×
-                            </button>
-                        </div>
-
-                        <div class="carousel-slide" onclick="triggerUpload(3)">
-                            <div class="placeholder-content" id="ph-3">
-                                <i class="lni lni-plus" style="font-size: 40px; color: #ccc;"></i>
-                                <p>Foto 3</p>
-                            </div>
-                            <img src="" class="slide-img" id="img-3" style="display:none;">
-                           <button type="button" class="btn-delete" id="del-3" onclick="deleteImage(event, 3)">
-                                ×
-                            </button>
-                        </div>
-
-                        <div class="carousel-slide" onclick="triggerUpload(4)">
-                            <div class="placeholder-content" id="ph-4">
-                                <i class="lni lni-plus" style="font-size: 40px; color: #ccc;"></i>
-                                <p>Foto 4</p>
-                            </div>
-                            <img src="" class="slide-img" id="img-4" style="display:none;">
-                            <button type="button" class="btn-delete" id="del-4" onclick="deleteImage(event, 4)">
-                                ×
-                            </button>
-                        </div>
-
-                        <div class="carousel-slide" onclick="triggerUpload(5)">
-                            <div class="placeholder-content" id="ph-5">
-                                <i class="lni lni-plus" style="font-size: 40px; color: #ccc;"></i>
-                                <p>Foto 5</p>
-                            </div>
-                            <img src="" class="slide-img" id="img-5" style="display:none;">
-                            <button type="button" class="btn-delete" id="del-5" onclick="deleteImage(event, 5)">
-                                ×
-                            </button>
-                        </div>
-
-                        <div class="carousel-indicators">
-                            <span class="dot active" onclick="currentSlide(1)"></span>
-                            <span class="dot" onclick="currentSlide(2)"></span>
-                            <span class="dot" onclick="currentSlide(3)"></span>
-                            <span class="dot" onclick="currentSlide(4)"></span>
-                            <span class="dot" onclick="currentSlide(5)"></span>
-                        </div>
-
-                        <a class="carousel-btn prev" onclick="moveSlide(-1)" style="left:0;">&#10094;</a>
-                        <a class="carousel-btn next" onclick="moveSlide(1)" style="right:0;">&#10095;</a>
-                    </div>
-
-                    <label class="label-titulo">Ubicación (Selecciona en el mapa)</label>
-                    <div id="map" style="height: 300px; width: 100%; border-radius: 10px;"></div>
-
+                <div class="form-aside">
+                    <label class="label-titulo">Ubicación en el mapa</label>
+                    <div id="map" style="height: 210px; width: 100%; border-radius: 10px;"></div>
                     {{ form.latitud(id="lat") }}
                     {{ form.longitud(id="lng") }}
+                </div><!-- /form-aside mapa -->
+
+            </div><!-- /form-row 2 -->
+
+            <hr class="form-divider">
+
+            <!-- ====================================================
+                 AMENIDADES  (ancho completo)
+                 ==================================================== -->
+            <label class="label-titulo">Amenidades <span style="font-weight:400; color:#999; font-size:0.85em;">(Opcional)</span></label>
+            <div class="amenidades-grid">
+
+                <!-- ALBERCA -->
+                <div class="amenidad-item">
+                    <label class="amenidad-toggle">
+                        {{ form.tiene_alberca(id="chk_alberca", class="amenidad-chk", onchange="toggleAmenidad('det_alberca', this)") }}
+                        <span class="amenidad-icon">🏊</span>
+                        <span>Alberca / Piscina</span>
+                    </label>
+                    <div class="amenidad-detalle" id="det_alberca" style="display:none;">
+                        <label>Metros (m²)</label>
+                        {{ form.metros_alberca(class="homi-input", placeholder="Ej: 25") }}
+                    </div>
+                </div>
+
+                <!-- ESTACIONAMIENTO -->
+                <div class="amenidad-item">
+                    <label class="amenidad-toggle">
+                        {{ form.tiene_estacionamiento(id="chk_estacionamiento", class="amenidad-chk", onchange="toggleAmenidad('det_estacionamiento', this)") }}
+                        <span class="amenidad-icon">🚗</span>
+                        <span>Estacionamiento</span>
+                    </label>
+                    <div class="amenidad-detalle" id="det_estacionamiento" style="display:none;">
+                        <label>Cajones</label>
+                        {{ form.capacidad_estacionamiento(class="homi-input", placeholder="Ej: 2") }}
+                        <label class="amenidad-toggle" style="margin-top:8px;">
+                            {{ form.estacionamiento_techado(class="amenidad-chk") }}
+                            <span style="font-size:0.9em; color:#555;">Techado</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- JARDÍN -->
+                <div class="amenidad-item">
+                    <label class="amenidad-toggle">
+                        {{ form.tiene_jardin(id="chk_jardin", class="amenidad-chk", onchange="toggleAmenidad('det_jardin', this)") }}
+                        <span class="amenidad-icon">🌳</span>
+                        <span>Jardín</span>
+                    </label>
+                    <div class="amenidad-detalle" id="det_jardin" style="display:none;">
+                        <label>Metros (m²)</label>
+                        {{ form.metros_jardin(class="homi-input", placeholder="Ej: 80") }}
+                    </div>
+                </div>
+
+                <div class="amenidad-item">
+                    <label class="amenidad-toggle">
+                        {{ form.tiene_gimnasio(class="amenidad-chk") }}
+                        <span class="amenidad-icon">🏋️</span><span>Gimnasio</span>
+                    </label>
+                </div>
+                <div class="amenidad-item">
+                    <label class="amenidad-toggle">
+                        {{ form.tiene_roof_garden(class="amenidad-chk") }}
+                        <span class="amenidad-icon">🌇</span><span>Roof Garden / Terraza</span>
+                    </label>
+                </div>
+                <div class="amenidad-item">
+                    <label class="amenidad-toggle">
+                        {{ form.tiene_cuarto_servicio(class="amenidad-chk") }}
+                        <span class="amenidad-icon">🛏️</span><span>Cuarto de servicio</span>
+                    </label>
+                </div>
+                <div class="amenidad-item">
+                    <label class="amenidad-toggle">
+                        {{ form.tiene_bodega(class="amenidad-chk") }}
+                        <span class="amenidad-icon">📦</span><span>Bodega</span>
+                    </label>
+                </div>
+                <div class="amenidad-item">
+                    <label class="amenidad-toggle">
+                        {{ form.tiene_elevador(class="amenidad-chk") }}
+                        <span class="amenidad-icon">🛗</span><span>Elevador</span>
+                    </label>
+                </div>
+                <div class="amenidad-item">
+                    <label class="amenidad-toggle">
+                        {{ form.amueblado(class="amenidad-chk") }}
+                        <span class="amenidad-icon">🛋️</span><span>Amueblado</span>
+                    </label>
+                </div>
+                <div class="amenidad-item">
+                    <label class="amenidad-toggle">
+                        {{ form.permite_mascotas(class="amenidad-chk") }}
+                        <span class="amenidad-icon">🐾</span><span>Permite mascotas</span>
+                    </label>
+                </div>
+
+            </div><!-- /amenidades-grid -->
+
+            <hr class="form-divider">
+
+            <!-- ====================================================
+                 PROPIETARIO + BOTÓN  (ancho completo)
+                 ==================================================== -->
+            <div class="owner-section">
+                <img src="{{ url_for('static', filename=propietario.foto_perfil) }}" class="owner-avatar"
+                    onerror="this.src='https://cdn-icons-png.flaticon.com/512/847/847969.png'">
+                <div>
+                    <strong>Propietario:</strong><br><span>{{ propietario.nombre }}</span>
                 </div>
             </div>
+
+            {{ form.submit(class="btn-publicar") }}
+
         </form>
     </div>
 
@@ -397,7 +413,6 @@
                 detalle.style.display = 'block';
             } else {
                 detalle.style.display = 'none';
-                // Limpiar valores al desactivar
                 detalle.querySelectorAll('input[type="number"], input[type="text"]').forEach(i => i.value = '');
                 detalle.querySelectorAll('input[type="checkbox"]').forEach(i => i.checked = false);
             }
@@ -405,5 +420,4 @@
     </script>
 
 </body>
-
 </html>

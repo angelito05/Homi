@@ -53,18 +53,21 @@ body {
     font-weight: 400;
     margin-top: 2px;
 }
-/* GRID PRINCIPAL DE 2 COLUMNAS */
-.pub-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr; /* Mitad y mitad exacto */
+/* FILAS DEL FORMULARIO — 2 columnas en desktop, 1 en móvil */
+.form-row {
+    display: flex;
     gap: 40px;
-    align-items: start;
+    align-items: flex-start;
+    margin-bottom: 10px;
 }
 
-.left-col, .right-col {
+.form-section,
+.form-aside {
+    flex: 1;
+    min-width: 0;
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 12px;
 }
 
 /* Inputs */
@@ -379,4 +382,124 @@ body {
 .rate-stars label:hover,
 .rate-stars label:hover ~ label {
     color: #FFD700;
+}
+
+/* =========================================================
+   RESPONSIVE — Publicaciones
+   ========================================================= */
+
+/* --- Tablet (≤ 900px): apila las dos columnas --- */
+@media (max-width: 900px) {
+
+    .pub-container {
+        width: 95%;
+        padding: 20px 16px;
+        margin: 12px auto;
+        border-radius: 14px;
+    }
+
+    .pub-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+
+    .form-row {
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .carousel-container {
+        height: 280px;
+    }
+
+    #map {
+        height: 260px;
+    }
+}
+
+/* --- Móvil (≤ 600px): ajustes más compactos --- */
+@media (max-width: 600px) {
+
+    .pub-container {
+        width: 100%;
+        padding: 16px 12px;
+        margin: 0;
+        border-radius: 0;
+        box-shadow: none;
+    }
+
+    /* Filas de múltiples campos → una columna */
+    .fila-formulario {
+        flex-direction: column;
+        gap: 0;
+        margin-bottom: 0;
+    }
+
+    .columna-formulario {
+        width: 100%;
+    }
+
+    /* Inputs usados directamente con la clase columna */
+    input.homi-input.columna-formulario,
+    select.homi-input.columna-formulario {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    /* Carrusel más bajo en móvil */
+    .carousel-container {
+        height: 220px;
+    }
+
+    #map {
+        height: 220px;
+    }
+
+    /* Botón publicar ocupa todo el ancho */
+    .btn-publicar {
+        width: 100%;
+        padding: 16px;
+        font-size: 15px;
+    }
+
+    /* Sección propietario: apila verticalmente */
+    .owner-section {
+        flex-direction: column;
+        text-align: center;
+        gap: 8px;
+    }
+
+    .owner-avatar {
+        margin: 0 auto;
+    }
+
+    /* Logo más pequeño */
+    .logo-text {
+        font-size: 22px;
+    }
+
+    /* Label titulos un poco más chicos */
+    .label-titulo {
+        font-size: 1em;
+    }
+}
+
+/* --- Pantallas muy pequeñas (≤ 380px) --- */
+@media (max-width: 380px) {
+
+    .homi-input {
+        padding: 12px 10px;
+        font-size: 13px;
+    }
+
+    .btn-publicar {
+        font-size: 14px;
+        padding: 14px;
+    }
+
+    .carousel-container {
+        height: 180px;
+    }
 }
