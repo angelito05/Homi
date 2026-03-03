@@ -1,18 +1,22 @@
 <!DOCTYPE html>
 <html class="no-js" lang="es">
+
 <head>
     <meta charset="utf-8">
     <title>Crear Cuenta - Homi</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="shortcut icon" href="static/images/logoHomi.png" type="image/png">
-    
-    <link rel="stylesheet" href="static/css/LineIcons.2.0.css">
-    <link rel="stylesheet" href="static/css/bootstrap-5.0.5-alpha.min.css">
-    <link rel="stylesheet" href="static/css/style.css">
-    
+    <link rel="shortcut icon" href="{{ url_for('static', filename='images/logoHomi.png') }}" type="image/png">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='CSS/LineIcons.2.0.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='CSS/bootstrap-5.0.5-alpha.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='CSS/style.css') }}">
+
     <style>
         /* Estilo para el ojito dentro del input */
-        .password-container { position: relative; }
+        .password-container {
+            position: relative;
+        }
+
         .toggle-password {
             position: absolute;
             right: 15px;
@@ -49,11 +53,12 @@
                         </div>
 
                         {% with messages = get_flashed_messages(with_categories=true) %}
-                            {% if messages %}
-                                {% for category, message in messages %}
-                                    <div class="alert alert-{{ 'danger' if category == 'error' else 'success' }}">{{ message }}</div>
-                                {% endfor %}
-                            {% endif %}
+                        {% if messages %}
+                        {% for category, message in messages %}
+                        <div class="alert alert-{{ 'danger' if category == 'error' else 'success' }}">{{ message }}
+                        </div>
+                        {% endfor %}
+                        {% endif %}
                         {% endwith %}
 
                         <form action="/registro" method="POST">
@@ -62,51 +67,60 @@
                                 <div class="col-md-6">
                                     <div class="single-input mb-30">
                                         <label>Nombre</label>
-                                        <input type="text" name="nombre" value="{{ data.nombre if data else '' }}" required>
+                                        <input type="text" name="nombre" value="{{ data.nombre if data else '' }}"
+                                            required>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="single-input mb-30">
                                         <label>Primer Apellido</label>
-                                        <input type="text" name="primer_apellido" value="{{ data.primer_apellido if data else '' }}" required>
+                                        <input type="text" name="primer_apellido"
+                                            value="{{ data.primer_apellido if data else '' }}" required>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="single-input mb-30">
                                         <label>Segundo Apellido</label>
-                                        <input type="text" name="segundo_apellido" value="{{ data.segundo_apellido if data else '' }}" required>
+                                        <input type="text" name="segundo_apellido"
+                                            value="{{ data.segundo_apellido if data else '' }}" required>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="single-input mb-30">
                                         <label>Correo Electrónico</label>
-                                        <input type="email" name="correo_electronico" value="{{ data.correo_electronico if data else '' }}" required>
+                                        <input type="email" name="correo_electronico"
+                                            value="{{ data.correo_electronico if data else '' }}" required>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="single-input mb-30">
                                         <label>Teléfono</label>
-                                        <input type="tel" name="telefono" value="{{ data.telefono if data else '' }}" required>
+                                        <input type="tel" name="telefono" value="{{ data.telefono if data else '' }}"
+                                            required>
                                     </div>
                                 </div>
-                                
+
                                 <div class="col-md-6">
                                     <div class="single-input mb-30 password-container">
                                         <label>Contraseña</label>
-                                        <input type="password" name="contrasena" id="passRegistro" required placeholder="********">
-                                        <i class="lni lni-eye toggle-password" onclick="togglePass('passRegistro', this)"></i>
+                                        <input type="password" name="contrasena" id="passRegistro" required
+                                            placeholder="********">
+                                        <i class="lni lni-eye toggle-password"
+                                            onclick="togglePass('passRegistro', this)"></i>
                                     </div>
                                 </div>
 
                                 <div class="col-md-6">
                                     <div class="single-input mb-30">
                                         <label>Confirmar Contraseña</label>
-                                        <input type="password" name="confirmar_contrasena" required placeholder="Repite la contraseña">
+                                        <input type="password" name="confirmar_contrasena" required
+                                            placeholder="Repite la contraseña">
                                     </div>
                                 </div>
 
                                 <div class="col-12">
-                                    <p class="small text-muted mb-30 text-center">Debe tener mayúscula, número y símbolo especial.</p>
+                                    <p class="small text-muted mb-30 text-center">Debe tener mayúscula, número y símbolo
+                                        especial.</p>
                                 </div>
                                 <div class="col-12 text-center">
                                     <button type="submit" class="main-btn btn-hover w-100">Registrarse</button>
@@ -133,4 +147,5 @@
         }
     </script>
 </body>
+
 </html>
