@@ -1,10 +1,9 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
-from wtforms import StringField, TextAreaField, SelectField, DecimalField, IntegerField, HiddenField, SubmitField
+from wtforms import StringField, TextAreaField, SelectField, DecimalField, IntegerField, HiddenField, SubmitField, BooleanField
 from wtforms import StringField, PasswordField, SubmitField, FileField
 from wtforms.validators import DataRequired, NumberRange, Length, Email, EqualTo, Optional
 
-print("--- [DIAGNÓSTICO] EL ARCHIVO FORMS.PY SE HA CARGADO CORRECTAMENTE ---")
 
 class PublicacionForm(FlaskForm):
     # Campos básicos
@@ -31,6 +30,25 @@ class PublicacionForm(FlaskForm):
     # Coordenadas (Ocultos, se llenan con JS)
     latitud = HiddenField('Latitud', validators=[DataRequired()])
     longitud = HiddenField('Longitud', validators=[DataRequired()])
+
+    # --- Amenidades (Opcionales, se activan con checkbox) ---
+    tiene_alberca = BooleanField('Alberca / Piscina', validators=[Optional()])
+    metros_alberca = DecimalField('Metros de alberca (m²)', validators=[Optional(), NumberRange(min=0)], places=1)
+
+    tiene_estacionamiento = BooleanField('Estacionamiento', validators=[Optional()])
+    capacidad_estacionamiento = IntegerField('Cajones de estacionamiento', validators=[Optional(), NumberRange(min=1)], default=1)
+    estacionamiento_techado = BooleanField('Estacionamiento techado', validators=[Optional()])
+
+    tiene_jardin = BooleanField('Jardín', validators=[Optional()])
+    metros_jardin = DecimalField('Metros de jardín (m²)', validators=[Optional(), NumberRange(min=0)], places=1)
+
+    tiene_gimnasio = BooleanField('Gimnasio', validators=[Optional()])
+    tiene_roof_garden = BooleanField('Roof Garden / Terraza', validators=[Optional()])
+    tiene_cuarto_servicio = BooleanField('Cuarto de servicio', validators=[Optional()])
+    tiene_bodega = BooleanField('Bodega', validators=[Optional()])
+    tiene_elevador = BooleanField('Elevador', validators=[Optional()])
+    amueblado = BooleanField('Amueblado', validators=[Optional()])
+    permite_mascotas = BooleanField('Permite mascotas', validators=[Optional()])
 
     # Imágenes (Validamos extensiones seguras)
     foto1 = FileField('Foto 1', validators=[FileAllowed(['jpg', 'png', 'jpeg'], 'Solo imágenes')])

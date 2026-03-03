@@ -244,28 +244,30 @@ body {
 }
 /* --- BOTÓN ELIMINAR IMAGEN --- */
 .btn-delete {
-    display: none; /* Oculto inicialmente */
+    display: none;
     position: absolute;
-    top: 15px;
-    right: 15px;
-    background-color: #ff4d4d; /* Rojo */
-    color: white;
+    top: 10px;
+    right: 10px;
+    background-color: transparent;
+    color: #ff0000;
     border: none;
-    width: 35px;
-    height: 35px;
-    border-radius: 50%;
+    width: 28px;
+    height: 28px;
     cursor: pointer;
-    z-index: 20; /* Por encima de todo */
-    font-size: 16px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    transition: transform 0.2s, background 0.2s;
+    z-index: 20;
+    font-size: 22px;
+    font-weight: 900;
+    line-height: 1;
+    padding: 0;
+    transition: transform 0.2s;
     justify-content: center;
     align-items: center;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.6);
 }
 
 .btn-delete:hover {
-    background-color: #cc0000;
-    transform: scale(1.1);
+    transform: scale(1.2);
+    background-color: transparent;
 }
 /* --- ESTILOS DEL LOGO HOMI --- */
 

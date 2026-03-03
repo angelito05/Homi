@@ -40,6 +40,32 @@
         .feature-box { background: #f9f9f9; padding: 20px; border-radius: 12px; text-align: center; margin-bottom: 15px; }
         .feature-box i { font-size: 1.8rem; color: #2BB2BB; margin-bottom: 8px; display: block; }
         .feature-box span { font-weight: 600; color: #333F57; font-size: 15px; }
+
+        /* ===== AMENIDADES DETALLE ===== */
+        .amenidades-section { margin-bottom: 2.5rem; }
+        .amenidades-wrap {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 12px;
+            margin-top: 14px;
+        }
+        .amenidad-chip {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            background: #f0fbfc;
+            border: 1.5px solid #c5eaed;
+            border-radius: 12px;
+            padding: 14px 10px;
+            text-align: center;
+            transition: transform 0.15s;
+        }
+        .amenidad-chip:hover { transform: translateY(-2px); }
+        .amenidad-chip .chip-icon { font-size: 1.7rem; line-height: 1; }
+        .amenidad-chip .chip-label { font-size: 0.82rem; font-weight: 600; color: #333F57; }
+        .amenidad-chip .chip-sub { font-size: 0.75rem; color: #2BB2BB; font-weight: 500; }
     </style>
 </head>
 
@@ -157,6 +183,27 @@
                     <hr>
                     <p style="white-space: pre-line; color: #666; line-height: 1.8;">{{ prop['descripcion'] }}</p>
                 </div>
+
+                {% set am = prop.get('amenidades', {}) %}
+                {% if am %}{% set tiene_alguna = (am.get('alberca', {}).get('tiene') or am.get('estacionamiento', {}).get('tiene') or am.get('jardin', {}).get('tiene') or am.get('gimnasio') or am.get('roof_garden') or am.get('cuarto_servicio') or am.get('bodega') or am.get('elevador') or am.get('amueblado') or am.get('permite_mascotas')) %}
+                {% if tiene_alguna %}
+                <div class="amenidades-section">
+                    <h4>Amenidades</h4>
+                    <hr>
+                    <div class="amenidades-wrap">
+                        {% if am.get('alberca', {}).get('tiene') %}<div class="amenidad-chip"><span class="chip-icon">🏊</span><span class="chip-label">Alberca</span>{% if am['alberca'].get('metros_m2') %}<span class="chip-sub">{{ am['alberca']['metros_m2']|int }} m²</span>{% endif %}</div>{% endif %}
+                        {% if am.get('estacionamiento', {}).get('tiene') %}<div class="amenidad-chip"><span class="chip-icon">🚗</span><span class="chip-label">Estacionamiento</span>{% if am['estacionamiento'].get('cajones') %}<span class="chip-sub">{{ am['estacionamiento']['cajones'] }} cajón{% if am['estacionamiento']['cajones'] > 1 %}es{% endif %}{% if am['estacionamiento'].get('techado') %} · Techado{% endif %}</span>{% endif %}</div>{% endif %}
+                        {% if am.get('jardin', {}).get('tiene') %}<div class="amenidad-chip"><span class="chip-icon">🌳</span><span class="chip-label">Jardín</span>{% if am['jardin'].get('metros_m2') %}<span class="chip-sub">{{ am['jardin']['metros_m2']|int }} m²</span>{% endif %}</div>{% endif %}
+                        {% if am.get('gimnasio') %}<div class="amenidad-chip"><span class="chip-icon">🏋️</span><span class="chip-label">Gimnasio</span></div>{% endif %}
+                        {% if am.get('roof_garden') %}<div class="amenidad-chip"><span class="chip-icon">🌇</span><span class="chip-label">Roof Garden</span></div>{% endif %}
+                        {% if am.get('cuarto_servicio') %}<div class="amenidad-chip"><span class="chip-icon">🛏️</span><span class="chip-label">Cuarto de servicio</span></div>{% endif %}
+                        {% if am.get('bodega') %}<div class="amenidad-chip"><span class="chip-icon">📦</span><span class="chip-label">Bodega</span></div>{% endif %}
+                        {% if am.get('elevador') %}<div class="amenidad-chip"><span class="chip-icon">🛗</span><span class="chip-label">Elevador</span></div>{% endif %}
+                        {% if am.get('amueblado') %}<div class="amenidad-chip"><span class="chip-icon">🛋️</span><span class="chip-label">Amueblado</span></div>{% endif %}
+                        {% if am.get('permite_mascotas') %}<div class="amenidad-chip"><span class="chip-icon">🐾</span><span class="chip-label">Mascotas OK</span></div>{% endif %}
+                    </div>
+                </div>
+                {% endif %}{% endif %}
 
                 <div class="mb-5">
                     <h4>Comentarios y Calificaciones</h4>

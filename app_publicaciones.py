@@ -109,8 +109,31 @@ def crear_publicacion():
                 "fecha_destacado_expira": None,
                 "disponible": True,
                 "fecha_publicacion": datetime.utcnow(),
-                
-                "imagenes": imagenes_guardadas # <--- Ahora contiene URLs de Cloudinary
+                "imagenes": imagenes_guardadas,
+
+                # --- Amenidades opcionales ---
+                "amenidades": {
+                    "alberca": {
+                        "tiene": form.tiene_alberca.data,
+                        "metros_m2": float(form.metros_alberca.data) if form.tiene_alberca.data and form.metros_alberca.data else None
+                    },
+                    "estacionamiento": {
+                        "tiene": form.tiene_estacionamiento.data,
+                        "cajones": int(form.capacidad_estacionamiento.data) if form.tiene_estacionamiento.data and form.capacidad_estacionamiento.data else None,
+                        "techado": form.estacionamiento_techado.data if form.tiene_estacionamiento.data else False
+                    },
+                    "jardin": {
+                        "tiene": form.tiene_jardin.data,
+                        "metros_m2": float(form.metros_jardin.data) if form.tiene_jardin.data and form.metros_jardin.data else None
+                    },
+                    "gimnasio": form.tiene_gimnasio.data,
+                    "roof_garden": form.tiene_roof_garden.data,
+                    "cuarto_servicio": form.tiene_cuarto_servicio.data,
+                    "bodega": form.tiene_bodega.data,
+                    "elevador": form.tiene_elevador.data,
+                    "amueblado": form.amueblado.data,
+                    "permite_mascotas": form.permite_mascotas.data
+                }
             }
             
             # Registrar Log

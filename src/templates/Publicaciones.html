@@ -28,6 +28,77 @@
             margin-top: 2px;
             display: block;
         }
+
+        /* ===== AMENIDADES ===== */
+        .amenidades-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 10px;
+            margin-bottom: 15px;
+        }
+
+        .amenidad-item {
+            background: #f8f9fa;
+            border: 1px solid #e8ecef;
+            border-radius: 10px;
+            padding: 12px 14px;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .amenidad-item:has(.amenidad-chk:checked) {
+            border-color: #2BB2BB;
+            background: #f0fbfc;
+            box-shadow: 0 0 0 2px rgba(43,178,187,0.12);
+        }
+
+        .amenidad-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            font-size: 0.92em;
+            font-weight: 600;
+            color: #444;
+            margin: 0;
+            user-select: none;
+        }
+
+        .amenidad-chk {
+            width: 18px;
+            height: 18px;
+            accent-color: #2BB2BB;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .amenidad-icon {
+            font-size: 1.2em;
+            line-height: 1;
+        }
+
+        .amenidad-detalle {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px dashed #d0e8ea;
+            animation: fadeIn 0.2s ease;
+        }
+
+        .amenidad-detalle label {
+            font-size: 0.82em;
+            color: #666;
+            margin-bottom: 4px;
+            display: block;
+        }
+
+        .amenidad-detalle .homi-input {
+            margin-bottom: 0;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-4px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
 
@@ -111,6 +182,107 @@
                         {{ form.ciudad(class="homi-input columna-formulario", placeholder="Ciudad") }}
                     </div>
 
+                    <!-- ===== SECCIÓN AMENIDADES ===== -->
+                    <label class="label-titulo" style="margin-top: 20px;">Amenidades <span style="font-weight:400; color:#999; font-size:0.85em;">(Opcional)</span></label>
+                    <div class="amenidades-grid">
+
+                        <!-- ALBERCA -->
+                        <div class="amenidad-item">
+                            <label class="amenidad-toggle">
+                                {{ form.tiene_alberca(id="chk_alberca", class="amenidad-chk", onchange="toggleAmenidad('det_alberca', this)") }}
+                                <span class="amenidad-icon">🏊</span>
+                                <span>Alberca / Piscina</span>
+                            </label>
+                            <div class="amenidad-detalle" id="det_alberca" style="display:none;">
+                                <label>Metros (m²)</label>
+                                {{ form.metros_alberca(class="homi-input", placeholder="Ej: 25") }}
+                            </div>
+                        </div>
+
+                        <!-- ESTACIONAMIENTO -->
+                        <div class="amenidad-item">
+                            <label class="amenidad-toggle">
+                                {{ form.tiene_estacionamiento(id="chk_estacionamiento", class="amenidad-chk", onchange="toggleAmenidad('det_estacionamiento', this)") }}
+                                <span class="amenidad-icon">🚗</span>
+                                <span>Estacionamiento</span>
+                            </label>
+                            <div class="amenidad-detalle" id="det_estacionamiento" style="display:none;">
+                                <label>Cajones</label>
+                                {{ form.capacidad_estacionamiento(class="homi-input", placeholder="Ej: 2") }}
+                                <label class="amenidad-toggle" style="margin-top:8px;">
+                                    {{ form.estacionamiento_techado(class="amenidad-chk") }}
+                                    <span style="font-size:0.9em; color:#555;">Techado</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- JARDÍN -->
+                        <div class="amenidad-item">
+                            <label class="amenidad-toggle">
+                                {{ form.tiene_jardin(id="chk_jardin", class="amenidad-chk", onchange="toggleAmenidad('det_jardin', this)") }}
+                                <span class="amenidad-icon">🌳</span>
+                                <span>Jardín</span>
+                            </label>
+                            <div class="amenidad-detalle" id="det_jardin" style="display:none;">
+                                <label>Metros (m²)</label>
+                                {{ form.metros_jardin(class="homi-input", placeholder="Ej: 80") }}
+                            </div>
+                        </div>
+
+                        <!-- SIMPLES (sin detalles adicionales) -->
+                        <div class="amenidad-item">
+                            <label class="amenidad-toggle">
+                                {{ form.tiene_gimnasio(class="amenidad-chk") }}
+                                <span class="amenidad-icon">🏋️</span>
+                                <span>Gimnasio</span>
+                            </label>
+                        </div>
+                        <div class="amenidad-item">
+                            <label class="amenidad-toggle">
+                                {{ form.tiene_roof_garden(class="amenidad-chk") }}
+                                <span class="amenidad-icon">🌇</span>
+                                <span>Roof Garden / Terraza</span>
+                            </label>
+                        </div>
+                        <div class="amenidad-item">
+                            <label class="amenidad-toggle">
+                                {{ form.tiene_cuarto_servicio(class="amenidad-chk") }}
+                                <span class="amenidad-icon">🛏️</span>
+                                <span>Cuarto de servicio</span>
+                            </label>
+                        </div>
+                        <div class="amenidad-item">
+                            <label class="amenidad-toggle">
+                                {{ form.tiene_bodega(class="amenidad-chk") }}
+                                <span class="amenidad-icon">📦</span>
+                                <span>Bodega</span>
+                            </label>
+                        </div>
+                        <div class="amenidad-item">
+                            <label class="amenidad-toggle">
+                                {{ form.tiene_elevador(class="amenidad-chk") }}
+                                <span class="amenidad-icon">🛗</span>
+                                <span>Elevador</span>
+                            </label>
+                        </div>
+                        <div class="amenidad-item">
+                            <label class="amenidad-toggle">
+                                {{ form.amueblado(class="amenidad-chk") }}
+                                <span class="amenidad-icon">🛋️</span>
+                                <span>Amueblado</span>
+                            </label>
+                        </div>
+                        <div class="amenidad-item">
+                            <label class="amenidad-toggle">
+                                {{ form.permite_mascotas(class="amenidad-chk") }}
+                                <span class="amenidad-icon">🐾</span>
+                                <span>Permite mascotas</span>
+                            </label>
+                        </div>
+
+                    </div>
+                    <!-- ===== FIN AMENIDADES ===== -->
+
                     <div class="owner-section">
                         <img src="{{ url_for('static', filename=propietario.foto_perfil) }}" class="owner-avatar"
                             onerror="this.src='https://cdn-icons-png.flaticon.com/512/847/847969.png'">
@@ -145,7 +317,7 @@
                             </div>
                             <img src="" class="slide-img" id="img-1" style="display:none;">
                             <button type="button" class="btn-delete" id="del-1" onclick="deleteImage(event, 1)">
-                                <i class="lni lni-trash"></i>
+                                ×
                             </button>
                         </div>
 
@@ -156,7 +328,7 @@
                             </div>
                             <img src="" class="slide-img" id="img-2" style="display:none;">
                             <button type="button" class="btn-delete" id="del-2" onclick="deleteImage(event, 2)">
-                                <i class="lni lni-trash"></i>
+                                ×
                             </button>
                         </div>
 
@@ -166,8 +338,8 @@
                                 <p>Foto 3</p>
                             </div>
                             <img src="" class="slide-img" id="img-3" style="display:none;">
-                            <button type="button" class="btn-delete" id="del-3" onclick="deleteImage(event, 3)">
-                                <i class="lni lni-trash"></i>
+                           <button type="button" class="btn-delete" id="del-3" onclick="deleteImage(event, 3)">
+                                ×
                             </button>
                         </div>
 
@@ -178,7 +350,7 @@
                             </div>
                             <img src="" class="slide-img" id="img-4" style="display:none;">
                             <button type="button" class="btn-delete" id="del-4" onclick="deleteImage(event, 4)">
-                                <i class="lni lni-trash"></i>
+                                ×
                             </button>
                         </div>
 
@@ -189,7 +361,7 @@
                             </div>
                             <img src="" class="slide-img" id="img-5" style="display:none;">
                             <button type="button" class="btn-delete" id="del-5" onclick="deleteImage(event, 5)">
-                                <i class="lni lni-trash"></i>
+                                ×
                             </button>
                         </div>
 
@@ -216,8 +388,21 @@
     </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
     <script src="{{ url_for('static', filename='JS/publicaciones.js') }}?v=2"></script>
+    <script>
+        function toggleAmenidad(detalleId, checkbox) {
+            const detalle = document.getElementById(detalleId);
+            if (!detalle) return;
+            if (checkbox.checked) {
+                detalle.style.display = 'block';
+            } else {
+                detalle.style.display = 'none';
+                // Limpiar valores al desactivar
+                detalle.querySelectorAll('input[type="number"], input[type="text"]').forEach(i => i.value = '');
+                detalle.querySelectorAll('input[type="checkbox"]').forEach(i => i.checked = false);
+            }
+        }
+    </script>
 
 </body>
 
