@@ -12,21 +12,21 @@
 
 	<link rel="shortcut icon" href="{{ url_for('static', filename='images/logoHomi.png') }}" type="image/png">
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='CSS/animate.css') }}">
+	<link rel="stylesheet" href="{{ url_for('static', filename='CSS/animate.css') }}">
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='CSS/tiny-slider.css') }}">
+	<link rel="stylesheet" href="{{ url_for('static', filename='CSS/tiny-slider.css') }}">
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='CSS/glightbox.min.css') }}">
+	<link rel="stylesheet" href="{{ url_for('static', filename='CSS/glightbox.min.css') }}">
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='CSS/LineIcons.2.0.css') }}">
+	<link rel="stylesheet" href="{{ url_for('static', filename='CSS/LineIcons.2.0.css') }}">
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='CSS/selectr.css') }}">
+	<link rel="stylesheet" href="{{ url_for('static', filename='CSS/selectr.css') }}">
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='CSS/nouislider.css') }}">
+	<link rel="stylesheet" href="{{ url_for('static', filename='CSS/nouislider.css') }}">
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='CSS/bootstrap-5.0.5-alpha.min.css') }}">
+	<link rel="stylesheet" href="{{ url_for('static', filename='CSS/bootstrap-5.0.5-alpha.min.css') }}">
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='CSS/style.css') }}">
+	<link rel="stylesheet" href="{{ url_for('static', filename='CSS/style.css') }}">
 
 </head>
 
@@ -186,7 +186,8 @@
 										{% endif %}
 										<li><a href="/perfil">Perfil</a></li>
 										{% if session.get('rol') == 'proveedor' %}
-										<li><a href="{{ url_for('publicaciones.crear_publicacion') }}">Publicar Propiedad</a>
+										<li><a href="{{ url_for('publicaciones.crear_publicacion') }}">Publicar
+												Propiedad</a>
 										</li>
 										{% endif %}
 										<li><a href="/favorites">Favoritos</a></li>
@@ -195,7 +196,10 @@
 								</li>
 								{% else %}
 								<li>
-									<a href="/index" class="main-btn btn-hover d-none d-md-block">Iniciar Sesion</a>
+									<a href="{{ url_for('index') }}" class="main-btn btn-hover">
+										<span class="d-md-none"><i class="lni lni-enter"></i></span>
+										<span class="d-none d-md-block">Iniciar Sesión</span>
+									</a>
 								</li>
 								{% endif %}
 							</ul>
