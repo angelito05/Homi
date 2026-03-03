@@ -14,6 +14,7 @@ from bson.objectid import ObjectId
 from app_publicaciones import publicaciones_bp
 import cloudinary
 import cloudinary.uploader
+import traceback
 
 app = Flask(__name__, template_folder="src/templates", static_folder="src/static")
 app.config.from_object(Config)
@@ -326,6 +327,7 @@ def registro_proveedor():
 def detalle_propiedad(id_propiedad):
     try:
         # 1. Buscar la propiedad
+        propiedades.update_one({"_id": ObjectId(id_propiedad)}, {"$inc": {"visitas": 1}})
         prop = propiedades.find_one({"_id": ObjectId(id_propiedad)})
         if not prop:
             flash("La propiedad no existe o fue eliminada.", "error")
@@ -355,14 +357,17 @@ def detalle_propiedad(id_propiedad):
                 "telefono": "---",
                 "foto": ""
             }
-            return render_template("detalle_propiedad.html", prop=prop, propietario=datos_propietario)
 
         # LEER RESEÑAS DESDE LA COLECCIÓN INDEPENDIENTE ---
-        # Buscamos todas las reseñas de esta propiedad que no estén eliminadas y las ordenamos de la más nueva a la más vieja
         comentarios_cursor = resenas.find({
-            "id_propiedad": ObjectId(id_propiedad), 
-            "esta_eliminado": False
-        }).sort("fecha_resena", -1)
+            "$and": [
+                {"$or": [
+                    {"id_propiedad": str(id_propiedad)}, 
+                    {"id_propiedad": ObjectId(id_propiedad)}
+                ]},
+                {"esta_eliminado": {"$ne": True}}
+            ]
+        }).sort("fecha_resena", -1) # Ordenamos por la fecha correcta
         
         comentarios = []
         suma_calificaciones = 0
@@ -547,6 +552,176 @@ def admin_dashboard():
     # CAMBIO IMPORTANTE: Renderizamos index.html activando el modo admin
     return render_template('index.html', movimientos=movimientos, mostrar_admin=True)
 
+# --- RUTA DEL DASHBOARD DE PROVEEDOR ---
+@app.route("/dashboard_proveedor")
+def dashboard_proveedor():
+    if "usuario_id" not in session or session.get("rol") != "proveedor":
+        return redirect(url_for("index"))
+
+    proveedor_id_str = session["usuario_id"]
+    mis_propiedades = list(propiedades.find({
+        "$or": [{"id_propietario": proveedor_id_str}, {"id_propietario": ObjectId(proveedor_id_str)}]
+    }))
+
+    ids_mis_propiedades_obj = []
+    ids_mis_propiedades_str = []
+    total_visitas = 0
+
+    for p in mis_propiedades:
+        total_visitas += p.get("visitas", 0) # Suma las vistas reales
+        ids_mis_propiedades_obj.append(p["_id"])
+        ids_mis_propiedades_str.append(str(p["_id"]))
+        
+        # Imagen principal (igual que antes)
+        p["imagen_principal_url"] = p["imagenes"][0].get("url_imagen", "") if ("imagenes" in p and p["imagenes"] and isinstance(p["imagenes"][0], dict)) else (p["imagenes"][0] if "imagenes" in p and p["imagenes"] else "")
+
+    # --- COMENTARIOS RECIENTES PARA EL DASHBOARD ---
+    comentarios_recientes_cursor = resenas.find({
+        "$and": [
+            {"$or": [
+                {"id_propiedad": {"$in": ids_mis_propiedades_obj}},
+                {"id_propiedad": {"$in": ids_mis_propiedades_str}}
+            ]},
+            {"esta_eliminado": {"$ne": True}}
+        ]
+    }).sort("fecha_resena", -1).limit(5)
+    
+    comentarios_dashboard = []
+
+    for c in comentarios_recientes_cursor:
+        # 1. Ponerle el título de la propiedad al comentario
+        prop_info = propiedades.find_one({
+            "$or": [{"_id": ObjectId(c["id_propiedad"])}, {"_id": str(c["id_propiedad"])}]
+        })
+        titulo_prop = prop_info["titulo"] if prop_info else "Propiedad eliminada"
+        
+        # 2. Buscar el nombre de quién hizo el comentario
+        usr = usuarios.find_one({"_id": c.get("id_usuario")})
+        nombre_autor = f"{usr.get('nombre', 'Usuario')} {usr.get('primer_apellido', '')}" if usr else "Anónimo"
+        
+        # 3. Formatear la fecha/hora
+        fecha_texto = c["fecha_resena"].strftime('%d/%m/%Y a las %H:%M') if "fecha_resena" in c else "Sin fecha"
+        
+        # 4. Guardarlo en la lista
+        comentarios_dashboard.append({
+            "id_propiedad": c["id_propiedad"],
+            "titulo_propiedad": titulo_prop,
+            "nombre_usuario": nombre_autor,
+            "fecha_formateada": fecha_texto,
+            "comentario_texto": c.get("comentario", ""),
+            "calificacion_num": c.get("puntuacion", 5)
+        })
+
+    total_favoritos = usuarios.count_documents({"favoritos": {"$in": ids_mis_propiedades_str}})
+
+    return render_template("dashboard_proveedor.html", 
+                           total_publicaciones=len(mis_propiedades),
+                           total_visitas=total_visitas,
+                           total_favoritos=total_favoritos,
+                           comentarios=comentarios_dashboard,
+                           propiedades=mis_propiedades)
+
+@app.route("/eliminar_propiedad/<id_propiedad>", methods=["POST"])
+def eliminar_propiedad(id_propiedad):
+    if "usuario_id" not in session or session.get("rol") != "proveedor":
+        return redirect(url_for("index"))
+    
+    # Eliminación real en la base de datos
+    propiedades.delete_one({"_id": ObjectId(id_propiedad)})
+    
+    # También borramos sus comentarios
+    db.comentarios.delete_many({"id_propiedad": id_propiedad})
+    
+    flash("Publicación eliminada para siempre.", "success")
+    return redirect(url_for("dashboard_proveedor"))
+
+@app.route("/editar_propiedad/<id_propiedad>", methods=["GET", "POST"])
+def editar_propiedad(id_propiedad):
+    if "usuario_id" not in session or session.get("rol") != "proveedor":
+        return redirect(url_for("index"))
+
+    try:
+        prop = propiedades.find_one({"_id": ObjectId(id_propiedad)})
+        if not prop:
+            flash("Propiedad no encontrada.", "error")
+            return redirect(url_for("dashboard_proveedor"))
+
+        if request.method == "POST":
+            # Convertidor seguro
+            def safe_float(val, default=0.0):
+                try: 
+                    return float(val) if val else default
+                except ValueError: 
+                    return default
+
+            precio_final = safe_float(request.form.get("precio"), prop.get("precio", 0))
+            habs_final = safe_float(request.form.get("numero_habitaciones"), prop.get("numero_habitaciones", 0))
+            # FORZAMOS A QUE LOS BAÑOS SEAN ENTEROS (int) PARA CUMPLIR LA REGLA DE MONGO
+            banos_final = safe_float(request.form.get("numero_banos"), prop.get("numero_banos", 0))
+            m2_final = safe_float(request.form.get("superficie_m2"), prop.get("superficie_m2", 0))
+
+            datos_actualizados = {
+                "titulo": request.form.get("titulo", prop.get("titulo")),
+                "descripcion": request.form.get("descripcion", prop.get("descripcion")),
+                
+                # CREADO NUEVO CAMPO "disponibilidad" EN VEZ DE SOBRESCRIBIR "estado_publicacion"
+                "disponibilidad": request.form.get("disponibilidad", prop.get("disponibilidad", "Disponible")),
+                
+                "precio": precio_final,
+                "numero_habitaciones": int(habs_final),
+                "numero_banos": int(banos_final), # <-- Pasado a int()
+                "superficie_m2": int(m2_final),
+                "calle": request.form.get("calle", prop.get("calle")),
+                "numero_ext_int": request.form.get("numero_ext_int", prop.get("numero_ext_int")),
+                "colonia": request.form.get("colonia", prop.get("colonia")),
+                "codigo_postal": request.form.get("codigo_postal", prop.get("codigo_postal")),
+                "ciudad": request.form.get("ciudad", prop.get("ciudad"))
+            }
+
+            # 2. Manejo de Imágenes (Con Try-Except para evitar crash si falla Cloudinary)
+            nuevas_imagenes = []
+            try:
+                import cloudinary.uploader
+                for i in range(1, 6):
+                    foto_campo = f"foto{i}"
+                    if foto_campo in request.files:
+                        foto = request.files[foto_campo]
+                        if foto.filename != '':
+                            upload_result = cloudinary.uploader.upload(foto, folder="homi_propiedades")
+                            nuevas_imagenes.append({
+                                "url_imagen": upload_result['secure_url'],
+                                "public_id": upload_result['public_id'],
+                                "es_principal": False
+                            })
+            except Exception as e_cloud:
+                print(f"Error de Cloudinary (Ignorado para no tumbar la app): {e_cloud}")
+                flash("Aviso: No se pudieron subir las imágenes. Revisa tu conexión a Cloudinary.", "error")
+
+            # Combinar o reemplazar imágenes
+            if nuevas_imagenes:
+                if request.form.get("reemplazar_imagenes") == "si":
+                    nuevas_imagenes[0]["es_principal"] = True
+                    datos_actualizados["imagenes"] = nuevas_imagenes
+                else:
+                    imagenes_actuales = prop.get("imagenes", [])
+                    datos_actualizados["imagenes"] = imagenes_actuales + nuevas_imagenes
+
+            # 3. Guardar cambios en MongoDB
+            propiedades.update_one({"_id": ObjectId(id_propiedad)}, {"$set": datos_actualizados})
+            flash("¡Publicación actualizada con éxito!", "success")
+            return redirect(url_for("dashboard_proveedor"))
+
+        return render_template("editar_propiedad.html", prop=prop)
+        
+    except Exception as e:
+        # ¡ESTO IMPRIMIRÁ EL ERROR EXACTO EN TU TERMINAL EN VEZ DE PANTALLA BLANCA!
+        print("\n" + "="*50)
+        print("ERROR CRÍTICO AL EDITAR PROPIEDAD:")
+        traceback.print_exc() 
+        print("="*50 + "\n")
+        flash(f"Error interno: {str(e)}", "error")
+        return redirect(url_for("dashboard_proveedor"))
+
 # Login
 @app.route("/index", methods=["POST", "GET"])
 @limiter.limit("5 per minute", methods=["POST"])
@@ -611,7 +786,7 @@ def comentar_propiedad(id_propiedad):
     # Estructura exacta basada en tu JSON Schema
     nueva_resena = {
         "id_usuario": ObjectId(session["usuario_id"]),
-        "id_propiedad": ObjectId(id_propiedad),
+        "id_propiedad": str(id_propiedad), # Guardamos como string para evitar problemas de búsqueda
         "puntuacion": puntuacion,
         "comentario": comentario_texto,
         "fecha_resena": datetime.utcnow(), # bsonType: 'date'
