@@ -318,7 +318,7 @@ def registro_proveedor():
             session["rol"] = "proveedor"
 
             flash("¡Felicidades! Tu cuenta ahora es de Proveedor.", "success")
-            return redirect(url_for("dashboard"))
+            return redirect(url_for("home"))
         else:
             # Nuevo usuario, crear cuenta de proveedor
             hashed_password = bcrypt.generate_password_hash(contrasena).decode("utf-8")
@@ -656,6 +656,21 @@ def eliminar_propiedad(id_propiedad):
     if "usuario_id" not in session or session.get("rol") != "proveedor":
         return redirect(url_for("index"))
     
+    id_propietario_actual = session["usuario_id"]
+
+    # Buscar propiedad PERO asegurando que el propietario sea quien hace la petición
+    prop = propiedades.find_one({
+        "_id": ObjectId(id_propiedad),
+        "$or": [
+            {"id_propietario": id_propietario_actual},
+            {"id_propietario": ObjectId(id_propietario_actual)}
+        ]
+    })
+
+    if not prop:
+        flash("No tienes permiso o la propiedad no existe.", "error")
+        return redirect(url_for("dashboard_proveedor"))
+    
     # Eliminación real en la base de datos
     propiedades.delete_one({"_id": ObjectId(id_propiedad)})
     
@@ -669,6 +684,21 @@ def eliminar_propiedad(id_propiedad):
 def editar_propiedad(id_propiedad):
     if "usuario_id" not in session or session.get("rol") != "proveedor":
         return redirect(url_for("index"))
+    
+    id_propietario_actual = session["usuario_id"]
+
+    # Buscar propiedad PERO asegurando que el propietario sea quien hace la petición
+    prop = propiedades.find_one({
+        "_id": ObjectId(id_propiedad),
+        "$or": [
+            {"id_propietario": id_propietario_actual},
+            {"id_propietario": ObjectId(id_propietario_actual)}
+        ]
+    })
+
+    if not prop:
+        flash("No tienes permiso o la propiedad no existe.", "error")
+        return redirect(url_for("dashboard_proveedor"))
 
     try:
         prop = propiedades.find_one({"_id": ObjectId(id_propiedad)})
@@ -790,7 +820,7 @@ def index():
         return redirect(url_for("admin_dashboard"))
     
     # Usuarios normales van a su dashboard estándar
-    return redirect(url_for("dashboard"))
+    return redirect(url_for("home"))
 
 # --- NUEVA RUTA PARA COMENTAR Y CALIFICAR ---
 @app.route("/comentar_propiedad/<id_propiedad>", methods=["POST"])
