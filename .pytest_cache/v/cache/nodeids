@@ -1,0 +1,6 @@
+[
+  "test.py::TestSeguridadHomi::test_cliente_no_puede_acceder_a_admin_dashboard",
+  "test.py::TestSeguridadHomi::test_interfaz_segun_rol_proveedor",
+  "test_gui.py::TestSeguridadHomi::test_cliente_no_puede_acceder_a_admin_dashboard",
+  "test_gui.py::TestSeguridadHomi::test_interfaz_segun_rol_proveedor"
+]

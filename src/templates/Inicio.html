@@ -64,8 +64,8 @@
 				<div class="row align-items-center">
 					<div class="col-xl-12">
 						<nav class="navbar navbar-expand-lg">
-							<a class="navbar-brand" href="Inicio.html">
-								<img id="logo" src="static/images/logo/logoHomi.png" alt="Logo">
+							<a class="navbar-brand" href="{{ url_for('home') }}">
+								<img id="logo" src="{{ url_for('static', filename='images/logo/logoHomi.png') }}" alt="Logo">
 								<a class="navbar-brand">Homi</a>
 							</a>
 							<button class="navbar-toggler" type="button" data-toggle="collapse"
@@ -78,7 +78,7 @@
 							<div class="collapse navbar-collapse sub-menu-bar" id="navbarSupportedContent">
 								<ul id="nav" class="navbar-nav">
 									<li class="nav-item">
-										<a class="page-scroll active" href="Inicio.html">Inicio</a>
+										<a class="page-scroll active" href="{{ url_for('home') }}">Inicio</a>
 									</li>
 									<li class="nav-item">
 										<a class="page-scroll" data-toggle="collapse" data-target="#sub-nav1"

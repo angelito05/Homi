@@ -7,7 +7,7 @@ from flask_wtf.csrf import CSRFProtect
 from flask_limiter.util import get_remote_address
 import consultas
 from datetime import datetime 
-from forms import PublicacionForm, PerfilForm
+from forms import PublicacionForm, PerfilForm, RegistroForm
 import re
 from flask_talisman import Talisman
 from bson.objectid import ObjectId
@@ -15,6 +15,7 @@ from app_publicaciones import publicaciones_bp
 import cloudinary
 import cloudinary.uploader
 import traceback
+import os
 
 app = Flask(__name__, template_folder="src/templates", static_folder="src/static")
 app.config.from_object(Config)
@@ -25,7 +26,28 @@ limiter = Limiter(
     app=app
 )
 
-Talisman(app, content_security_policy=None, force_https=False)
+csp = {
+    'default-src': [
+        '\'self\'',             # Solo permite recursos de tu propio dominio
+        'https://res.cloudinary.com',  # Permite tus imágenes
+        'https://cdn.jsdelivr.net',   # Si usas Bootstrap/JS desde CDN
+    ],
+    'script-src': [
+        '\'self\'',
+        '\'unsafe-inline\'', # Intenta evitar esto, usa archivos JS externos
+        'https://cdn.jsdelivr.net'
+    ],
+    'style-src': [
+        '\'self\'',
+        '\'unsafe-inline\'', # Necesario para muchos CSS framework inline styles
+        'https://cdn.jsdelivr.net'
+    ]
+}
+
+entorno_produccion = os.environ.get('FLASK_ENV') == 'production'
+
+# 3. Inicializamos Talisman con la variable dinámica
+Talisman(app, content_security_policy=csp, force_https=entorno_produccion)
 
 bcrypt = Bcrypt(app)
 
@@ -157,6 +179,7 @@ def buscar():
 # Registro de usuarios
 @app.route("/registro", methods=["GET", "POST"])
 def registro():
+    form = RegistroForm()
     if request.method == "POST":
         data = request.form.to_dict()
         rol = "cliente"
@@ -184,22 +207,29 @@ def registro():
         if usuarios.find_one({"correo_electronico": data["correo_electronico"]}):
             flash("El correo electrónico ya está registrado.", "error")
             return redirect(url_for("registro"))
+        
+        
+        if form.validate_on_submit():
+            email = form.email.data
+            if db.usuarios.find_one({"email": email}):
+                flash("El correo ya está registrado.", "danger")
+                return render_template("registro.html", form=form)
 
         # Hash de contraseña
         hashed_password = bcrypt.generate_password_hash(data["contrasena"]).decode("utf-8")
 
         nuevo_usuario = {
-            "nombre": data["nombre"],
-            "primer_apellido": data["primer_apellido"],
-            "correo_electronico": data["correo_electronico"],
+            "nombre": form.nombre.data,
+            "primer_apellido": form.primer_apellido.data,
+            "correo_electronico": form.correo_electronico.data,
             "contrasena": hashed_password,
-            "segundo_apellido": data.get("segundo_apellido"),
-            "telefono": data.get("telefono"),
-            "rol": rol,
+            "segundo_apellido": form.segundo_apellido.data,
+            "telefono": form.telefono.data,
+            "rol": "cliente",
             "estado": "activo"
         }
 
-        usuarios.insert_one(nuevo_usuario)
+        result = db.usuarios.insert_one(nuevo_usuario)
         flash("Registro exitoso. Ahora puedes iniciar sesión.", "success")
         return redirect(url_for("index"))
 
@@ -761,15 +791,6 @@ def index():
     
     # Usuarios normales van a su dashboard estándar
     return redirect(url_for("dashboard"))
-
-# Dashboard
-@app.route("/dashboard")
-def dashboard():
-    if "usuario_id" not in session:
-        flash("Debes iniciar sesión primero.", "error")
-        return redirect(url_for("home"))
-
-    return render_template("Inicio.html", nombre=session["nombre"], rol=session["rol"])
 
 # --- NUEVA RUTA PARA COMENTAR Y CALIFICAR ---
 @app.route("/comentar_propiedad/<id_propiedad>", methods=["POST"])

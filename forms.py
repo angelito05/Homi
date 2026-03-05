@@ -59,6 +59,17 @@ class PublicacionForm(FlaskForm):
 
     submit = SubmitField('PUBLICAR PROPIEDAD')
 
+class RegistroForm(FlaskForm):
+    nombre = StringField('Nombre', validators=[DataRequired(), Length(max=50)])
+    primer_apellido = StringField('Primer Apellido', validators=[DataRequired(), Length(max=50)])
+    segundo_apellido = StringField('Segundo Apellido', validators=[Length(max=50)])
+    correo_electronico = StringField('Correo Electrónico', validators=[DataRequired(), Email()])
+    telefono = StringField('Teléfono', validators=[DataRequired(), Length(min=10, max=15)])
+    password = PasswordField('Contraseña', validators=[DataRequired(), Length(min=8)])
+    confirmar_password = PasswordField('Confirmar Contraseña', validators=[DataRequired(), EqualTo('password', message='Las contraseñas no coinciden')])
+    
+    submit = SubmitField('REGISTRARSE')
+
 class PerfilForm(FlaskForm):
     # Datos editables
     correo_electronico = StringField('Correo Electrónico', validators=[DataRequired(), Email()])
